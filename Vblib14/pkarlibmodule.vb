@@ -2052,6 +2052,18 @@ Friend Class IniDefaultsConfigurationProvider
                     iInd = sLineTrim.IndexOf(" // ")
                     If iInd > 0 Then sLineTrim = sLineTrim.Substring(0, iInd)
 
+                    iInd = sLineTrim.IndexOf(vbTab & "# ")
+                    If iInd > 0 Then sLineTrim = sLineTrim.Substring(0, iInd)
+
+                    iInd = sLineTrim.IndexOf(vbTab & "' ")
+                    If iInd > 0 Then sLineTrim = sLineTrim.Substring(0, iInd)
+
+                    iInd = sLineTrim.IndexOf(vbTab & "; ")
+                    If iInd > 0 Then sLineTrim = sLineTrim.Substring(0, iInd)
+
+                    iInd = sLineTrim.IndexOf(vbTab & "// ")
+                    If iInd > 0 Then sLineTrim = sLineTrim.Substring(0, iInd)
+
                     Dim aKeyVal As String() = sLineTrim.Split("=")
                     If aKeyVal.Length = 2 Then
                         Data(aKeyVal(0).Trim) = aKeyVal(1).Trim
