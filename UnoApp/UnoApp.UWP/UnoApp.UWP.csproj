@@ -128,6 +128,10 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <ProjectReference Include="..\..\Vblib14\Vblib14.vbproj">
+      <Project>{50a21bbf-b091-4a5d-a414-4fa3205a6f1b}</Project>
+      <Name>Vblib14</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />

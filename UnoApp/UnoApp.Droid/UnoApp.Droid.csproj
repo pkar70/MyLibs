@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>f9acf293-e486-4666-bf6a-9740ed726535</ProjectGuid>
+    <ProjectGuid>{F9ACF293-E486-4666-BF6A-9740ED726535}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -94,6 +94,12 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\Styles.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Vblib14\Vblib14.vbproj">
+      <Project>{50a21bbf-b091-4a5d-a414-4fa3205a6f1b}</Project>
+      <Name>Vblib14</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\UnoApp.Shared\UnoApp.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

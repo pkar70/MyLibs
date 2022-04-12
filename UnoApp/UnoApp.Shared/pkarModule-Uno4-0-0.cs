@@ -397,9 +397,7 @@ namespace p
             string sAppDir = TryGetInstallDir();
 
             Microsoft.Extensions.Configuration.IConfigurationBuilder oBuilder = new Microsoft.Extensions.Configuration.ConfigurationBuilder();
-#if NETFX_CORE
-            oBuilder = oBuilder.AddIniRelDebugSettings(sAppDir);  // defaults.ini w głównym katalogu Project, sekcje [main] oraz [debug]
-#endif 
+            oBuilder = oBuilder.AddIniRelDebugSettings(Vblib.IniLikeDefaults.sIniContent);  
             oBuilder = oBuilder.AddEnvironmentVariablesROConfigurationSource(sAppName, Environment.GetEnvironmentVariables()); // Environment.GetEnvironmentVariables, Std 2.0
             oBuilder = oBuilder.AddUwpSettings();
             oBuilder = oBuilder.AddJsonRwSettings(Windows.Storage.ApplicationData.Current.LocalFolder.Path,
