@@ -40,4 +40,9 @@
       <LastGenOutput>Resource_pl.Designer.vb</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)_changes.txt" />
+    <None Include="$(MSBuildThisFileDirectory)_tudus.txt" />
+  </ItemGroup>
+
 </Project>

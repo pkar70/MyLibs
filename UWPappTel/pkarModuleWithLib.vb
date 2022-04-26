@@ -178,12 +178,13 @@ Public Module pkar
     ''' dla starszych: InitLib(Nothing)
     ''' dla nowszych:  InitLib(Environment.GetCommandLineArgs)
     ''' </summary>
-    Public Sub InitLib(aCmdLineArgs As String(), Optional bUseOwnFolderIfNotSD As Boolean = True)
+    Public Sub InitLib(aCmdLineArgs As List(Of String), Optional bUseOwnFolderIfNotSD As Boolean = True)
 
         InitSettings(aCmdLineArgs)
-        VBlib.LibInitToast(AddressOf FromLibMakeToast)
-        VBlib.LibInitDialogBox(AddressOf FromLibDialogBoxAsync, AddressOf FromLibDialogBoxYNAsync, AddressOf FromLibDialogBoxInputAllDirectAsync)
+        Vblib.LibInitToast(AddressOf FromLibMakeToast)
+        Vblib.LibInitDialogBox(AddressOf FromLibDialogBoxAsync, AddressOf FromLibDialogBoxYNAsync, AddressOf FromLibDialogBoxInputAllDirectAsync)
 
+        Vblib.LibInitClip(AddressOf FromLibClipPut, AddressOf FromLibClipPutHtml)
 #Disable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
         InitDatalogFolder(bUseOwnFolderIfNotSD)
 #Enable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
@@ -215,7 +216,7 @@ Public Module pkar
     ' -- CLIPBOARD ---------------------------------------------
 
 #Region "ClipBoard"
-    Public Sub ClipPut(sTxt As String)
+    Private Sub FromLibClipPut(sTxt As String)
         Dim oClipCont As New DataTransfer.DataPackage With {
             .RequestedOperation = DataTransfer.DataPackageOperation.Copy
         }
@@ -223,7 +224,7 @@ Public Module pkar
         DataTransfer.Clipboard.SetContent(oClipCont)
     End Sub
 
-    Public Sub ClipPutHtml(sHtml As String)
+    Private Sub FromLibClipPutHtml(sHtml As String)
         Dim oClipCont As New DataTransfer.DataPackage With {
             .RequestedOperation = DataTransfer.DataPackageOperation.Copy
         }
@@ -251,11 +252,11 @@ Public Module pkar
     ''' <summary>
     ''' inicjalizacja pełnych zmiennych, bez tego wywołania będą tylko defaulty z pliku INI (i nie będzie pamiętania)
     ''' </summary>
-    Private Sub InitSettings(aCmdLineArgs As String())
+    Private Sub InitSettings(aCmdLineArgs As List(Of String))
         Dim sAppName As String = Windows.ApplicationModel.Package.Current.DisplayName
 
         Dim oBuilder As New Microsoft.Extensions.Configuration.ConfigurationBuilder()
-        oBuilder = oBuilder.AddIniRelDebugSettings(VBlib.IniLikeDefaults.sIniContent)   ' defaults.ini w głównym katalogu Project, sekcje [main] oraz [debug]
+        oBuilder = oBuilder.AddIniRelDebugSettings(Vblib.IniLikeDefaults.sIniContent)   ' defaults.ini w głównym katalogu Project, sekcje [main] oraz [debug]
 
         ' ale i tak jest Empty
         Dim oDict As IDictionary = Environment.GetEnvironmentVariables()    ' że, w 1.4, zwraca HashTable?
@@ -267,7 +268,7 @@ Public Module pkar
 
         Dim settings As Microsoft.Extensions.Configuration.IConfigurationRoot = oBuilder.Build
 
-        VBlib.LibInitSettings(settings)
+        Vblib.LibInitSettings(settings)
     End Sub
 
 #If FalseThen Then
@@ -715,7 +716,6 @@ Public Module pkar
     End Sub
 
     Public Sub RemoveScheduledToasts()
-
         Try
             While Windows.UI.Notifications.ToastNotificationManager.CreateToastNotifier().GetScheduledToastNotifications().Count > 0
                 Windows.UI.Notifications.ToastNotificationManager.CreateToastNotifier().RemoveFromSchedule(Windows.UI.Notifications.ToastNotificationManager.CreateToastNotifier().GetScheduledToastNotifications().Item(0))
@@ -725,6 +725,11 @@ Public Module pkar
         End Try
 
     End Sub
+
+    Public Sub RemoveCurrentToasts()
+        Windows.UI.Notifications.ToastNotificationManager.History.Clear()
+    End Sub
+
 #End Region
 
 #Region "WinVer, AppVer"
@@ -1627,6 +1632,26 @@ Module Extensions
         oTB.ShowAppVers()
     End Sub
 
+#Region "MAUI_ulatwiacz"
+
+    ''' <summary>
+    ''' żeby było tak samo jak w MAUI, skoro nie da się w MAUI tego zrobić
+    ''' </summary>
+    <Extension()>
+    Public Sub GoBack(ByVal oPage As Page)
+	oPage.Frame.GoBack
+    End Sub
+
+
+    ''' <summary>
+    ''' żeby było tak samo jak w MAUI, skoro nie da się w MAUI tego zrobić
+    ''' </summary>
+    <Extension()>
+    Public Sub Navigate(ByVal oPage As Page, sourcePageType as Type)
+	oPage.Frame.Navigate(sourcePageType)
+    End Sub
+#End region
+
     ' --- progring ------------------------
 
 #Region "ProgressBar/Ring"
@@ -2069,5 +2094,144 @@ Partial Module Extensions
         Return configurationBuilder
     End Function
 End Module
+
+#End Region
+
+#Region "Konwertery Bindings XAML"
+' nie mogą być w VBlib, bo Implements Microsoft.UI.Xaml.Data.IValueConverter
+
+' parameter = NEG robi negację
+Public Class KonwersjaVisibility
+    Implements IValueConverter
+
+    Public Function Convert(ByVal value As Object,
+    ByVal targetType As Type, ByVal parameter As Object,
+    ByVal language As System.String) As Object _
+    Implements IValueConverter.Convert
+
+        Dim bTemp As Boolean = CType(value, Boolean)
+        If parameter IsNot Nothing Then
+            Dim sParam As String = CType(parameter, String)
+            If sParam.ToUpperinvariant = "NEG" Then bTemp = Not bTemp
+        End If
+
+        If bTemp Then Return Visibility.Visible
+
+        Return Visibility.Collapsed
+
+    End Function
+
+
+    ' ConvertBack is not implemented for a OneWay binding.
+    Public Function ConvertBack(ByVal value As Object,
+    ByVal targetType As Type, ByVal parameter As Object,
+    ByVal language As System.String) As Object _
+    Implements IValueConverter.ConvertBack
+
+        Throw New NotImplementedException
+
+    End Function
+End Class
+
+' ULONG to String
+Public Class KonwersjaMAC
+    Implements IValueConverter
+
+    ' Define the Convert method to change a DateTime object to
+    ' a month string.
+    Public Function Convert(ByVal value As Object,
+            ByVal targetType As Type, ByVal parameter As Object,
+            ByVal language As System.String) As Object _
+            Implements IValueConverter.Convert
+
+        ' value is the data from the source object.
+
+        Dim uMAC As ULong = CType(value, ULong)
+        If uMAC = 0 Then Return ""
+
+        Return uMAC.ToHexBytesString()
+
+    End Function
+
+    ' ConvertBack is not implemented for a OneWay binding.
+    Public Function ConvertBack(ByVal value As Object,
+            ByVal targetType As Type, ByVal parameter As Object,
+            ByVal language As System.String) As Object _
+            Implements IValueConverter.ConvertBack
+
+        Throw New NotImplementedException
+
+    End Function
+End Class
+
+Public Class KonwersjaVal2StringFormat
+    Implements IValueConverter
+
+    ' Define the Convert method to change a DateTime object to
+    ' a month string.
+    Public Function Convert(ByVal value As Object,
+            ByVal targetType As Type, ByVal parameter As Object,
+            ByVal language As System.String) As Object _
+            Implements IValueConverter.Convert
+
+        Dim sFormat As String = ""
+        If parameter IsNot Nothing Then
+            sFormat = CType(parameter, String)
+        End If
+
+        ' value is the data from the source object.
+        If value.GetType Is GetType(Integer) Then
+            Dim temp = CType(value, Integer)
+            If sFormat = "" Then
+                Return temp.ToString
+            Else
+                Return temp.ToString(sFormat)
+            End If
+        End If
+
+        If value.GetType Is GetType(Long) Then
+            Dim temp = CType(value, Long)
+            If sFormat = "" Then
+                Return temp.ToString
+            Else
+                Return temp.ToString(sFormat)
+            End If
+        End If
+
+        If value.GetType Is GetType(Double) Then
+            Dim temp = CType(value, Double)
+            If sFormat = "" Then
+                Return temp.ToString
+            Else
+                Return temp.ToString(sFormat)
+            End If
+        End If
+
+        If value.GetType Is GetType(String) Then
+            Dim temp = CType(value, String)
+            If sFormat = "" Then
+                Return temp.ToString
+            Else
+                Return String.Format(sFormat, temp)
+            End If
+        End If
+
+        Return "???"
+
+    End Function
+
+    ' ConvertBack is not implemented for a OneWay binding.
+    Public Function ConvertBack(ByVal value As Object,
+            ByVal targetType As Type, ByVal parameter As Object,
+            ByVal language As System.String) As Object _
+            Implements IValueConverter.ConvertBack
+
+        Throw New NotImplementedException
+
+    End Function
+
+
+End Class
+
 
 #End Region

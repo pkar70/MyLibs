@@ -1,0 +1,7 @@
+﻿
+2022.04.23
+* zmiana w CmdLineArgs ze String() na List<string>
+* ClipPut trafia do VBlib (ClipPut -> FromLibClipPut; odpowiedni Init)
+* dodanie RemoveCurrentToasts()
+* nowy #Region "MAUI_ulatwiacz", Page.GoBack i Page.Navigate
+* nowy #Region "Konwertery Bindings XAML": KonwersjaVisibility, KonwersjaMAC, KonwersjaVal2StringFormat

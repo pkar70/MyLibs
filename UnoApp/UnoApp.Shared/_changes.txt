@@ -1,0 +1,3 @@
+
+2022.04.25
+* GetBuildTimestampAsync - na Uno nie może brać daty pliku Manifest, bo tego pliku nie ma; więc dla Android jest return ""

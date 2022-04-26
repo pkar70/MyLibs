@@ -1,6 +1,6 @@
 ﻿
 using System;
-//using System.Collections.Generic;
+using System.Collections.Generic;
 //using System.Text;
  using System.IO;
 //using System.Runtime.CompilerServices;
@@ -135,11 +135,11 @@ namespace p
                 string strArgs = operation?.Arguments;
 
 
-                p.k.InitLib(strArgs.Split(' ')); // mamy command line, próbujemy zrobić z tego string() (.Net Standard 1.4)
+                p.k.InitLib(strArgs.Split(' ').ToList<string>()); // mamy command line, próbujemy zrobić z tego string() (.Net Standard 1.4)
 
                 if (!string.IsNullOrEmpty(strArgs))
                 {
-                    await ObsluzCommandLine(strArgs);
+                    await ObsluzCommandLineAsync(strArgs);
                     Windows.UI.Xaml.Window.Current.Close();
                 }
                 return true;
@@ -194,7 +194,7 @@ namespace p
             return true;
         }
 
-        public async System.Threading.Tasks.Task<string> CmdLineOrRemSys(string sCommand)
+        public async System.Threading.Tasks.Task<string> CmdLineOrRemSysAsync(string sCommand)
         {
             string sResult = p.k.AppServiceStdCmd(sCommand, msLocalCmdsHelp);
             if (string.IsNullOrEmpty(sResult))
@@ -203,7 +203,7 @@ namespace p
             return sResult;
         }
 
-        public async System.Threading.Tasks.Task ObsluzCommandLine(string sCommand)
+        public async System.Threading.Tasks.Task ObsluzCommandLineAsync(string sCommand)
 
         {
             Windows.Storage.StorageFolder oFold = Windows.Storage.ApplicationData.Current.TemporaryFolder;
@@ -221,7 +221,7 @@ namespace p
                 return;
             }
 
-            string sResult = await CmdLineOrRemSys(sCommand);
+            string sResult = await CmdLineOrRemSysAsync(sCommand);
             if (string.IsNullOrEmpty(sResult))
                 sResult = "(empty - probably unrecognized command)";
 
@@ -252,7 +252,7 @@ namespace p
                 {
 
                     String sCommand = (string)oInputMsg["command"];
-                    sResult = await CmdLineOrRemSys(sCommand);
+                    sResult = await CmdLineOrRemSysAsync(sCommand);
                 }
 
                 if (sResult != "") sStatus = "OK";
@@ -276,12 +276,14 @@ namespace p
     public static partial class k
     {
 
-        public static void InitLib(string[] aCmdLineArgs, bool bUseOwnFolderIfNotSD = true)
+        public static void InitLib(List<string> aCmdLineArgs, bool bUseOwnFolderIfNotSD = true)
         {
             InitSettings(aCmdLineArgs);
 
             vb14.LibInitToast(FromLibMakeToast);
             vb14.LibInitDialogBox(FromLibDialogBoxAsync, FromLibDialogBoxYNAsync, FromLibDialogBoxInputAllDirectAsync);
+
+            vb14.LibInitClip(FromLibClipPut, FromLibClipPutHtml);
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             InitDatalogFolder(bUseOwnFolderIfNotSD);
@@ -317,7 +319,7 @@ namespace p
         #region "Clipboard"
         // -- CLIPBOARD ---------------------------------------------
 
-        public static void ClipPut(string sTxt)
+        public static void FromLibClipPut(string sTxt)
         {
             Windows.ApplicationModel.DataTransfer.DataPackage oClipCont = new Windows.ApplicationModel.DataTransfer.DataPackage
             {
@@ -327,7 +329,7 @@ namespace p
             Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(oClipCont);
         }
 
-        public static void ClipPutHtml(string sHtml)
+        public static void FromLibClipPutHtml(string sHtml)
         {
             Windows.ApplicationModel.DataTransfer.DataPackage oClipCont = new Windows.ApplicationModel.DataTransfer.DataPackage
             {
@@ -391,13 +393,13 @@ namespace p
         }
 
 
-        private static void InitSettings(string[] aCmdLineArgs)
+        private static void InitSettings(List<string> aCmdLineArgs)
         {
             string sAppName = Windows.ApplicationModel.Package.Current.DisplayName;
             string sAppDir = TryGetInstallDir();
 
             Microsoft.Extensions.Configuration.IConfigurationBuilder oBuilder = new Microsoft.Extensions.Configuration.ConfigurationBuilder();
-            oBuilder = oBuilder.AddIniRelDebugSettings(Vblib.IniLikeDefaults.sIniContent);  
+            oBuilder = oBuilder.AddIniRelDebugSettings(VBlib.IniLikeDefaults.sIniContent);  
             oBuilder = oBuilder.AddEnvironmentVariablesROConfigurationSource(sAppName, Environment.GetEnvironmentVariables()); // Environment.GetEnvironmentVariables, Std 2.0
             oBuilder = oBuilder.AddUwpSettings();
             oBuilder = oBuilder.AddJsonRwSettings(Windows.Storage.ApplicationData.Current.LocalFolder.Path,
@@ -991,12 +993,16 @@ namespace p
 
         public static async System.Threading.Tasks.Task<string> GetBuildTimestampAsync()
         {
+#if NETFX_CORE
             Windows.Storage.StorageFolder install_folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
             Windows.Storage.StorageFile manifest_file = await install_folder.GetFileAsync("AppxManifest.xml");
             DateTimeOffset modDate = (await manifest_file.GetBasicPropertiesAsync()).DateModified;
 #pragma warning disable CA1305 // Specify IFormatProvider
             return modDate.ToString("yyyy.MM.dd HH:mm");
 #pragma warning restore CA1305 // Specify IFormatProvider
+#else
+return "";
+#endif 
         }
 
 
@@ -1104,7 +1110,7 @@ namespace p
                 builder.SetTrigger(oTrigger);
                 builder.Name = sName;
 
-                if (String.IsNullOrEmpty(sName)) builder.Name = GetTriggerNamePrefix() + "_userpresent";
+                if (string.IsNullOrEmpty(sName)) builder.Name = GetTriggerNamePrefix() + "_userpresent";
 
 
                 oRet = builder.Register();
@@ -1914,6 +1920,27 @@ public static void GetSettingsBool(this Windows.UI.Xaml.Controls.AppBarToggleBut
     }
 
 
+#region "MAUI_ulatwiacz"
+
+    /// <summary>
+    /// żeby było tak samo jak w MAUI, skoro nie da się w MAUI tego zrobić
+    /// </summary>
+    public static void GoBack(this Windows.UI.Xaml.Controls.Page oPage)
+    {
+        oPage.Frame.GoBack();
+    }
+
+
+    /// <summary>
+    /// żeby było tak samo jak w MAUI, skoro nie da się w MAUI tego zrobić
+    /// </summary>
+    public static void Navigate(this Windows.UI.Xaml.Controls.Page oPage, Type sourcePageType)
+    {
+        oPage.Frame.Navigate(sourcePageType);
+    }
+
+#endregion
+
 #region "ProgressBar/Ring"
     //  dodałem 25 X 2020
 
@@ -2422,4 +2449,52 @@ namespace p
         }
     }
 
+#endregion
+
+#region "Konwertery Bindings XAML"
+
+namespace pkarConv
+{
+    // parameter = NEG robi negację
+    public class KonwersjaVisibility : Windows.UI.Xaml.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            bool bTemp = (bool)value;
+            if (parameter != null)
+            {
+                string sParam = (string)parameter;
+                if (sParam.ToUpperInvariant() == "NEG") bTemp = !bTemp;
+            }
+
+            if (bTemp) return Windows.UI.Xaml.Visibility.Visible;
+            return Windows.UI.Xaml.Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            // ConvertBack is not implemented for a OneWay binding.
+            throw new NotImplementedException();
+        }
+    }
+
+    // ULONG to String
+    public class KonwersjaMAC : Windows.UI.Xaml.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            ulong uMAC = (ulong)value;
+            if (uMAC == 0) return "";
+
+            return uMAC.ToHexBytesString();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            // ConvertBack is not implemented for a OneWay binding.
+            throw new NotImplementedException();
+        }
+    }
+
+}
 #endregion

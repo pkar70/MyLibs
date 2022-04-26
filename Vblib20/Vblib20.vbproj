@@ -5,4 +5,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)_changes.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)_tudus.txt" />
+  </ItemGroup>
+
 </Project>

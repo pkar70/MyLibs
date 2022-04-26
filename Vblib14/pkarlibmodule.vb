@@ -1,13 +1,5 @@
 ﻿Imports Microsoft.Extensions.Configuration
 
-' 2022.04.03: sync z pkarmodule, uzupelniany
-
-' 2022.02.05:
-' * HttpPageSetAgent() ustawia defaultowy, udający Edge, Agent
-
-' 2022.02: kopia tego co działa z pkarmodule.vb
-' odzyskiwany via dekompilacja
-
 ' Partial Public Class App
 ' #Region "Back button" - not in .Net
 ' #Region "RemoteSystem/Background" - not in .Net
@@ -171,7 +163,39 @@ Partial Public Module pkarlibmodule14
 
 #End Region
 
-    ' #Region "ClipBoard" - not in .Net
+#Region "ClipBoard"
+    Public Delegate Sub UIclipPut(sTxt As String)
+    Public Delegate Sub UIclipPutHtml(sHtml As String)
+    'Public Delegate Function UIclipGet() As Task(Of String)
+
+    Private moUIclipPut As UIclipPut ' = Nothing przez samą deklarację
+    Private moUIclipPutHtml As UIclipPutHtml
+    'Private moUIclipGet As UIclipGet
+
+    Public Sub LibInitClip(oUIclipPut As UIclipPut, oUIclipPutHtml As UIclipPutHtml)
+        moUIclipPut = oUIclipPut
+        moUIclipPutHtml = oUIclipPutHtml
+    End Sub
+
+
+    Public Sub ClipPut(sTxt As String)
+        moUIclipPut(sTxt)
+    End Sub
+
+    Public Sub ClipPutHtml(sHtml As String)
+        moUIclipPutHtml(sHtml)
+    End Sub
+
+    '''' <summary>
+    '''' w razie Catch() zwraca ""
+    '''' </summary>
+    'Public Async Function ClipGetAsync() As Task(Of String)
+    '    Return Await moUIclipGet
+    'End Function
+
+
+#End Region
+
 
 #Region "Settings"
 
@@ -209,7 +233,7 @@ Partial Public Module pkarlibmodule14
         SetSettingsString(sName, If(value, "True", "False"), bRoam)
     End Sub
 
-    Public Sub SetSettingsLong(sName As String, value As Long, bRoam As Boolean)
+    Public Sub SetSettingsLong(sName As String, value As Long, Optional bRoam As Boolean = False)
         SetSettingsString(sName, value.ToString(System.Globalization.CultureInfo.InvariantCulture), bRoam)
     End Sub
 
@@ -242,15 +266,19 @@ Partial Public Module pkarlibmodule14
         Return False
     End Function
 
-    Public Function GetSettingsLong(sName As String, Optional iDefault As Long = 0) As Integer
+    Public Function GetSettingsLong(sName As String, Optional iDefault As Long = 0) As Long
         Dim sRetVal As String = GetSettingsNet(sName, iDefault.ToString(System.Globalization.CultureInfo.InvariantCulture))
-        Dim iRetVal As Integer = 0
+        Dim iRetVal As Long = 0
         If Long.TryParse(sRetVal, Globalization.NumberStyles.Integer, Globalization.CultureInfo.InvariantCulture, iRetVal) Then
             Return iRetVal
         End If
         Return iDefault
     End Function
 
+    Public Sub SetSettingsCurrentDate(sName As String, Optional sFormat As String = "yyyy-MM-dd HH:mm:ss")
+        Dim sValue As String = DateTime.Now.ToString(sFormat)
+        SetSettingsString(sName, sValue)
+    End Sub
 
     ' wersja z przeskokami do UWP
 #If False Then
@@ -708,7 +736,7 @@ Partial Public Module pkarlibmodule14
                 oResp = Await moHttp.GetAsync(oUri)
             End If
         End If
-        pContent.Dispose()
+        pContent?.Dispose()
 
         Dim sPage As String
 
@@ -1105,7 +1133,7 @@ Partial Public Module Extensions
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     <CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification:="<Pending>")>
-    Public Function IndexOfOrdinal(ByVal baseString As String, value As String) As Boolean
+    Public Function IndexOfOrdinal(ByVal baseString As String, value As String) As Integer
         Return baseString.IndexOf(value, StringComparison.Ordinal)
     End Function
 
@@ -1227,8 +1255,6 @@ Partial Public Module Extensions
     End Function
 
     ' ToDebugString(ByVal oBuf As Windows.Storage.Streams.IBuffer - not in .Net
-
-
 
     <Runtime.CompilerServices.Extension()>
     Public Function ToStringWithSpaces(ByVal iInteger As Integer) As String
@@ -2108,7 +2134,7 @@ End Class
 Friend Class CommandLineROConfigurationProvider
     Inherits Microsoft.Extensions.Configuration.ConfigurationProvider
 
-    Private ReadOnly _aArgs As String()
+    Private ReadOnly _aArgs As List(Of String)
 
     Public Overrides Sub Load()
         ' niemal dosłowna kopia z
@@ -2170,7 +2196,7 @@ Friend Class CommandLineROConfigurationProvider
         Data.Remove(key)
     End Sub
 
-    Public Sub New(aArgs As String())
+    Public Sub New(aArgs As List(Of String))
         _aArgs = aArgs
     End Sub
 
@@ -2179,13 +2205,13 @@ End Class
 Friend Class CommandLineROConfigurationSource
     Implements Microsoft.Extensions.Configuration.IConfigurationSource
 
-    Private ReadOnly _aArgs As String()
+    Private ReadOnly _aArgs As List(Of String)
 
     Public Function Build(builder As IConfigurationBuilder) As IConfigurationProvider Implements IConfigurationSource.Build
         Return New CommandLineROConfigurationProvider(_aArgs)
     End Function
 
-    Public Sub New(aArgs As String())
+    Public Sub New(aArgs As List(Of String))
         _aArgs = aArgs
     End Sub
 
@@ -2203,6 +2229,9 @@ Friend Class EnvironmentVariablesROConfigurationProvider
     Private ReadOnly _sPrefix As String
     Private ReadOnly _oDict As System.Collections.IDictionary
 
+    ' używa tylko tych z prefiksem (dla app), zawierające "pkar" oraz tu podane
+    Private ReadOnly _AlwaysCopy As String = "|COMPUTERNAME|USERNAME|"
+
     Public Overrides Sub Load()
 
         For Each sVariable As DictionaryEntry In _oDict
@@ -2210,11 +2239,11 @@ Friend Class EnvironmentVariablesROConfigurationProvider
             Dim sVal As String = sVariable.Value.ToString
             If sKey.StartsWithOrdinal("pkar") Then
                 Data(sKey) = sVal
-            Else
-                If sKey.StartsWithOrdinal(_sPrefix) Then
-                    sKey = sKey.Substring(_sPrefix.Length)
-                    Data(sKey) = sVal
-                End If
+            ElseIf sKey.StartsWithOrdinal(_sPrefix) Then
+                sKey = sKey.Substring(_sPrefix.Length)
+                Data(sKey) = sVal
+            ElseIf _AlwaysCopy.Contains("|" & sKey & "|") Then
+                Data(sKey) = sVal
             End If
         Next
 
@@ -2274,7 +2303,7 @@ Partial Module Extensions
 
     <Runtime.CompilerServices.Extension()>
     <CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification:="<Pending>")>
-    Public Function AddCommandLineRO(ByVal configurationBuilder As IConfigurationBuilder, aArgs As String()) As IConfigurationBuilder
+    Public Function AddCommandLineRO(ByVal configurationBuilder As IConfigurationBuilder, aArgs As List(Of String)) As IConfigurationBuilder
         configurationBuilder.Add(New CommandLineROConfigurationSource(aArgs))
         Return configurationBuilder
     End Function
@@ -2291,5 +2320,9 @@ End Module
 
 #End Region
 
+
+
 #Enable Warning CA2007 'Consider calling ConfigureAwait On the awaited task
 #Enable Warning IDE0079 ' Remove unnecessary suppression
+
+

@@ -1,0 +1,6 @@
+﻿
+2022.02.23
+* poprawka GetSettingsLong
+* dodanie SetSettingsCurrentDate
+* zmiana w CommandLineROConfigurationProvider _aArgs ze String() na List(Of String)
+* w EnvironmentVariablesROConfigurationProvider _AlwaysCopy="|COMPUTERNAME|USERNAME|" (poza tymi z prefiksem i tymi z pkar)
