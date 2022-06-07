@@ -17,11 +17,13 @@
 ' historia:
 ' historia.pkarmodule.vb
 
+' 2022.05.02: NetIsIPavail param bMsg jest teraz optional (default: bez pytania)
 
 Imports VBlib.Extensions
 ' Imports Microsoft.Extensions.Configuration
 
 Partial Public Class App
+    Inherits Application
 
 #Region "Back button"
 
@@ -169,6 +171,11 @@ Partial Public Class App
 
 
 #End Region
+
+    Public Shared Sub OpenRateIt()
+        Dim sUri As New Uri("ms-windows-store://review/?PFN=" & Package.Current.Id.FamilyName)
+        sUri.OpenBrowser
+    End Sub
 
 End Class
 
@@ -431,12 +438,12 @@ Public Module pkar
 
 
     ' <Obsolete("Jest w .Net Standard 2.0 (lib)")>
-    Public Function NetIsIPavailable(bMsg As Boolean) As Boolean
-        If VBlib.GetSettingsBool("offline") Then Return False
+    Public Function NetIsIPavailable(Optional bMsg As Boolean = False) As Boolean
+        If Vblib.GetSettingsBool("offline") Then Return False
 
         If Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable() Then Return True
         If bMsg Then
-            VBlib.DialogBox("ERROR: no IP network available")
+            Vblib.DialogBox("ERROR: no IP network available")
         End If
         Return False
     End Function
@@ -1577,17 +1584,61 @@ Module Extensions
         VBlib.SetSettingsBool(sName, oItem.IsChecked, bRoam)
     End Sub
 
+    ''' <summary>
+    ''' Zapisanie SettingsInt z możliwością skalowania (TextBox: zł.gr to dScale = 100)
+    ''' </summary>
+    ''' <param name="oItem"></param>
+    ''' <param name="sName"></param>
+    ''' <param name="bRoam"></param>
+    ''' <param name="dScale"></param>
+    <Extension()>
+    Public Sub SetSettingsInt(ByVal oItem As TextBox, Optional sName As String = "", Optional bRoam As Boolean = False, Optional dScale As Double = 1)
+        If sName = "" Then sName = oItem.Name
+        Dim dTmp As Integer
+        If Not Double.TryParse(oItem.Text, dTmp) Then Return
+        dTmp *= dScale
+        Vblib.SetSettingsInt(sName, dTmp, bRoam)
+    End Sub
+
+    ''' <summary>
+    ''' Pobranie SettingsInt z możliwością skalowania (TextBox: zł.gr to dScale = 100)
+    ''' </summary>
+    ''' <param name="oItem"></param>
+    ''' <param name="sName"></param>
+    ''' <param name="dScale"></param>
+    <Extension()>
+    Public Sub GetSettingsInt(ByVal oItem As TextBox, Optional sName As String = "", Optional dScale As Double = 1)
+        If sName = "" Then sName = oItem.Name
+        Dim dTmp As Integer = Vblib.GetSettingsInt(sName)
+        dTmp /= dScale
+        oItem.Text = dTmp
+    End Sub
+
     <Extension()>
     Public Sub SetSettingsInt(ByVal oItem As Windows.UI.Xaml.Controls.Slider, Optional sName As String = "", Optional bRoam As Boolean = False)
         If sName = "" Then sName = oItem.Name
-        VBlib.SetSettingsInt(sName, oItem.Value, bRoam)
+        Vblib.SetSettingsInt(sName, oItem.Value, bRoam)
     End Sub
 
     <Extension()>
     Public Sub GetSettingsInt(ByVal oItem As Windows.UI.Xaml.Controls.Slider, Optional sName As String = "")
         If sName = "" Then sName = oItem.Name
-        oItem.Value = VBlib.GetSettingsInt(sName)
+        oItem.Value = Vblib.GetSettingsInt(sName)
     End Sub
+
+    <Extension()>
+    Public Sub SetSettingsDate(ByVal oItem As CalendarDatePicker, Optional sName As String = "", Optional bRoam As Boolean = False)
+        If sName = "" Then sName = oItem.Name
+        Vblib.SetSettingsDate(sName, oItem.Date.Value, bRoam)
+    End Sub
+
+    <Extension()>
+    Public Sub GetSettingsDate(ByVal oItem As CalendarDatePicker, Optional sName As String = "")
+        If sName = "" Then sName = oItem.Name
+        Dim dDTOff As DateTimeOffset = Vblib.GetSettingsDate(sName)
+        oItem.Date = dDTOff
+    End Sub
+
 
 #End Region
 

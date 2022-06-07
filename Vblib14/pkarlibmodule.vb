@@ -1,5 +1,6 @@
 ﻿Imports Microsoft.Extensions.Configuration
 
+
 ' Partial Public Class App
 ' #Region "Back button" - not in .Net
 ' #Region "RemoteSystem/Background" - not in .Net
@@ -32,60 +33,77 @@ Partial Public Module pkarlibmodule14
     '    'msLogfilePath = sLogfilePath
     'End Sub
 
+
+    Private Sub DumpMethodOrMsg(bAddMethod As Boolean, sMsg As String, iLevel As Integer)
+        ' wyłączenie do SUB poniższych, żeby był wspólny kod do liczenia głębokości
+
+        Dim sPrefix As String = ""
+        Dim iDepth As Integer = 0
+        Dim sCurrMethod As String = ""
+
+        Dim sTrace As String = Environment.StackTrace
+        If String.IsNullOrEmpty(sTrace) Then
+            sCurrMethod = "<stack is empty>"
+        Else
+            Dim subs As String() = sTrace.Split(vbCr)
+            Dim iCurrMethod As Integer = -1
+
+            For iLoop As Integer = 0 To subs.Length - 2
+                If subs(iLoop).Contains(".DumpMethodOrMsg(") Then
+                    If subs(iLoop + 1).Contains(".DumpCurrMethod(") OrElse
+                                subs(iLoop + 1).Contains(".DumpMessage(") Then
+
+                        iCurrMethod = iLoop + 2 ' bo ma pominąć: DumpMethodOrMsg oraz DumpCurrMethod, 
+                    Else
+                        iCurrMethod = iLoop + 1 ' bo ma pominąć: DumpMethodOrMsg (w Release nie ma DumpCurrMethod, kod jest optymalizowany?)
+                    End If
+
+                    Exit For
+                End If
+            Next
+
+
+            If iCurrMethod < 1 Then
+                sCurrMethod = "<bad stack?>"
+            Else
+                'Debug.WriteLine("subs(iCurrMethod)=" & subs(iCurrMethod).Trim)
+                If bAddMethod Then sCurrMethod = subs(iCurrMethod).Trim.Substring(3)    ' z pominięciem "at "
+                'Debug.WriteLine("iLoop from " & iCurrMethod + 1 & " to " & subs.Length - 1)
+                For iLoop As Integer = iCurrMethod + 1 To subs.Length - 1
+                    If subs(iLoop).Contains("System.Runtime.CompilerServices.") Then Continue For
+                    If subs(iLoop).Contains("System.Threading.Tasks.") Then Continue For
+
+                    sPrefix &= "  "
+                    iDepth += 1
+                Next
+
+            End If
+
+            'Debug.WriteLine("iDepth=" & iDepth)
+
+            '' skrócenie bardzo długiego typu:
+            '' BtWatchDump.MainPage.VB$StateMachine_13_BTwatch_Received.MoveNext() 
+            sCurrMethod = sCurrMethod.Replace(".VB$StateMachine_", ".VB$")
+
+            If sCurrMethod.EndsWithOrdinal(".MoveNext()") Then sCurrMethod = sCurrMethod.Substring(0, sCurrMethod.Length - 11)
+        End If
+
+        DebugOut(iDepth + iLevel, sPrefix & sCurrMethod & " " & sMsg)
+
+    End Sub
+
     ''' <summary>
     ''' DebugOut z nazwą aktualnej funkcji i sMsg, oraz odpowiednio głęboko cofnięte
     ''' </summary>
     Public Sub DumpCurrMethod(Optional sMsg As String = "")
-        Dim sTrace As String = Environment.StackTrace
-        If String.IsNullOrEmpty(sTrace) Then
-            Debug.WriteLine("<stack is empty>")
-            Return
-        End If
-
-        Dim subs As String() = sTrace.Split(vbCr)
-        Dim iLen As Integer = subs.Length
-        If iLen < 4 Then
-            Debug.WriteLine("<stack is za mały>")
-            Return
-        End If
-
-        Dim sPrefix As String = " "
-        For i = 1 To iLen - 6
-            sPrefix &= "  "
-        Next
-
-        ' skrócenie bardzo długiego typu:
-        ' BtWatchDump.MainPage.VB$StateMachine_13_BTwatch_Received.MoveNext() 
-        Dim sCurrMethod As String = subs(3).Trim.Substring(3)
-        sCurrMethod = sCurrMethod.Replace(".VB$StateMachine_", ".VB$")
-        If sCurrMethod.EndsWithOrdinal(".MoveNext()") Then sCurrMethod = sCurrMethod.Substring(0, sCurrMethod.Length - 11)
-
-        DebugOut(iLen - 5, sPrefix & sCurrMethod & " " & sMsg)
+        DumpMethodOrMsg(True, sMsg, 0)
     End Sub
 
     ''' <summary>
     ''' DebugOut z komunikatem, odpowiednio głęboko cofnięte wedle głębokości CallStack oraz iLevel
     ''' </summary>
     Public Sub DumpMessage(sMsg As String, Optional iLevel As Integer = 1)
-        Dim sTrace As String = Environment.StackTrace
-        If String.IsNullOrEmpty(sTrace) Then
-            DebugOut(sMsg)
-            Return
-        End If
-
-        Dim subs As String() = sTrace.Split(vbCr)
-        Dim iLen As Integer = subs.Length
-        If iLen < 4 Then
-            DebugOut(sMsg)
-            Return
-        End If
-
-        Dim sPrefix As String = ""
-        For i = 1 To iLen - 2 + iLevel
-            sPrefix &= "  "
-        Next
-
-        DebugOut(iLen - 2, sPrefix & sMsg)
+        DumpMethodOrMsg(False, sMsg, iLevel)
     End Sub
 
     ''' <summary>
@@ -98,7 +116,7 @@ Partial Public Module pkarlibmodule14
         Dim iLogLevel As Integer = GetSettingsInt("debugLogLevel", 0)  ' nawet jak nie będzie wcześniej inicjalizacji, i tak sobie poradzi
 
         If iLogLevel < logLevel Then Return
-        msCurrentLog = msCurrentLog & vbCrLf & Date.Now.ToString("yyyy-MM-dd HH:mm:ss") & " " & sMsg
+        msCurrentLog = msCurrentLog & vbCrLf & Date.Now.ToString("yyyy-MM-dd HH:mm:ss") & " " & sMsg & vbCrLf
         If msCurrentLog.Length < 2048 Then Return
         DebugOutFlush()
         msCurrentLog = ""
@@ -199,7 +217,7 @@ Partial Public Module pkarlibmodule14
 
 #Region "Settings"
 
-    Private _settingsGlobal As Microsoft.Extensions.Configuration.IConfigurationRoot
+    Friend _settingsGlobal As Microsoft.Extensions.Configuration.IConfigurationRoot
     Public Sub LibInitSettings(settings As Microsoft.Extensions.Configuration.IConfigurationRoot)
         _settingsGlobal = settings
     End Sub
@@ -236,6 +254,15 @@ Partial Public Module pkarlibmodule14
     Public Sub SetSettingsLong(sName As String, value As Long, Optional bRoam As Boolean = False)
         SetSettingsString(sName, value.ToString(System.Globalization.CultureInfo.InvariantCulture), bRoam)
     End Sub
+
+    Public Sub SetSettingsDate(sName As String, value As DateTimeOffset, Optional bRoam As Boolean = False)
+        SetSettingsString(sName, value.ToString("yyyy.MM.dd HH:mm:ss"), bRoam)
+    End Sub
+
+    Public Sub SetSettingsCurrentDate(sName As String, Optional bRoam As Boolean = False)
+        SetSettingsDate(sName, DateTimeOffset.Now, bRoam)
+    End Sub
+
 
     Private Function GetSettingsNet(sName As String, sDefault As String)
         SettingsCheckInit()
@@ -275,10 +302,18 @@ Partial Public Module pkarlibmodule14
         Return iDefault
     End Function
 
-    Public Sub SetSettingsCurrentDate(sName As String, Optional sFormat As String = "yyyy-MM-dd HH:mm:ss")
-        Dim sValue As String = DateTime.Now.ToString(sFormat)
-        SetSettingsString(sName, sValue)
-    End Sub
+    Public Function GetSettingsDate(sName As String, Optional sDefault As String = "") As DateTimeOffset
+        If sDefault = "" Then sDefault = DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")
+        Dim sRetVal As String = GetSettingsNet(sName, sDefault)
+        Dim dRetVal As DateTimeOffset
+        If DateTimeOffset.TryParseExact(sRetVal, {"yyyy.MM.dd HH:mm:ss"},
+                             Globalization.CultureInfo.InvariantCulture.DateTimeFormat,
+                             Globalization.DateTimeStyles.AllowWhiteSpaces, dRetVal) Then
+            Return dRetVal
+        End If
+
+        Return DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")
+    End Function
 
     ' wersja z przeskokami do UWP
 #If False Then
@@ -611,8 +646,16 @@ Partial Public Module pkarlibmodule14
                 moResMan = My.Resources.Resource_EN.ResourceManager
             End If
         End If
+        Dim sRet As String
 #Disable Warning CA1304 ' Specify CultureInfo
-        Dim sRet As String = moResMan.GetString(sResID)
+        Try
+            sRet = moResMan.GetString(sResID)
+        Catch ex As Exception
+            ' jakby co
+            ' bez dodania dla VBLib defLang - zdarza się zawsze w RELEASE (i dla PL i dla EN)
+            sRet = ""
+        End Try
+
 #Enable Warning CA1304 ' Specify CultureInfo
         If sRet <> "" Then Return sRet
         If sDefault <> "" Then Return sDefault
@@ -692,7 +735,7 @@ Partial Public Module pkarlibmodule14
     End Sub
 
     Public Async Function HttpPageAsync(oUri As Uri, Optional sData As String = "", Optional bReset As Boolean = False) As Task(Of String)
-        DumpCurrMethod()
+        DumpCurrMethod("uri=" & oUri.AbsoluteUri)
         If oUri Is Nothing OrElse oUri.ToString = "" Then
             sLastError = "HttpPageAsync but sUrl is empty"
             Return ""
@@ -988,6 +1031,21 @@ Partial Public Module pkarlibmodule14
 
     End Function
 
+    Public Sub AppendLogYearly(sTxt As String, Optional sFileName As String = "log")
+        Dim sFile As String = GetLogFileYearly(sFileName)
+        IO.File.AppendAllText(sFile, sTxt)
+    End Sub
+
+    Public Sub AppendLogMonthly(sTxt As String, Optional sFileName As String = "log")
+        Dim sFile As String = GetLogFileMonthly(sFileName)
+        IO.File.AppendAllText(sFile, sTxt)
+    End Sub
+
+    Public Sub AppendLogDaily(sTxt As String, Optional sFileName As String = "log")
+        Dim sFile As String = GetLogFileDaily(sFileName)
+        IO.File.AppendAllText(sFile, sTxt)
+    End Sub
+
 
 #End Region
 
@@ -1031,6 +1089,49 @@ Partial Public Module pkarlibmodule14
     ' GetDomekGeopos  - not in .Net
 
 #End Region
+
+    ''' <summary>
+    ''' Wybierze co ma być użyte - czy obiekt1 (OneDrive, ret 1), czy obiekt2 (local, ret 2), czy też są takie same (0)
+    ''' </summary>
+    ''' <param name="oDate1">data danych 1 (zwykle OneDrive)</param>
+    ''' <param name="oDate2">data danych 2 (zwykle local)</param>
+    ''' <param name="iTolerance">tolerancja w sekundach</param>
+    ''' <param name="bLastWas2">gdy oDate1 > oDate2, i bLastWas2, to kolizja</param>
+    ''' <returns></returns>
+    Public Async Function SelectOneContentChoose(oDate1 As DateTimeOffset, oDate2 As DateTimeOffset, bLastWas2 As Boolean,
+                                                 Optional iTolerance As Integer = 10,
+                                                 Optional resIdCollisionMsg As String = "msgConflictModifiedODandLocal",
+                                                 Optional resIdCollisionUse1 As String = "msgConflictUseOD",
+                                                 Optional resIdCollisionUse2 As String = "msgConflictUseLocal") As Task(Of Integer)
+
+        If Math.Abs((oDate1 - oDate2).TotalSeconds) < iTolerance Then Return 0
+
+        If oDate1.AddSeconds(iTolerance) > oDate2 Then
+            If bLastWas2 Then
+                ' ale lokalnie też zmienione i nie zapisane do OD, więc kolizja
+                If Await DialogBoxResYNAsync(resIdCollisionMsg, resIdCollisionUse1, resIdCollisionUse2) Then Return 1
+                Return 2
+            Else
+                ' nowsze OD, lokalnie nie było zapisu, więc wczytuj OD
+                Return 1
+            End If
+        End If
+
+        ' b) nowszy Roam
+        If oDate2.AddSeconds(iTolerance) > oDate1 Then
+            If bLastWas2 Then
+                ' lokalnie było zmienione i nie zapisane do OD, więc OK, używaj lokalnego
+                Return 2
+            Else
+                ' nie powinno się zdarzyć: nowsze lokalnie, ale ostatni zapis był do OneDrive
+                Return 2
+            End If
+        End If
+
+        Return 0
+
+    End Function
+
 
 End Module
 
@@ -1206,6 +1307,44 @@ Partial Public Module Extensions
         Dim iIndE As Integer = baseString.IndexOf(sEnd, StringComparison.Ordinal)
         If iIndE < 0 Then Return baseString
         Return baseString.Remove(iIndS + sStart.Length, iIndE - iIndS + 1 - sStart.Length)
+    End Function
+
+    <Runtime.CompilerServices.Extension()>
+    Public Function ToValidPath(ByVal basestring As String, Optional bDepolituj As Boolean = True, Optional cInvalidCharPlaceholder As String = "") As String
+        Dim sRet As String = basestring
+        If bDepolituj Then
+            sRet = sRet.Replace("ą", "a")
+            sRet = sRet.Replace("ć", "c")
+            sRet = sRet.Replace("ę", "e")
+            sRet = sRet.Replace("ł", "l")
+            sRet = sRet.Replace("ń", "n")
+            sRet = sRet.Replace("ó", "o")
+            sRet = sRet.Replace("ś", "s")
+            sRet = sRet.Replace("ż", "z")
+            sRet = sRet.Replace("ź", "z")
+            sRet = sRet.Replace("Ą", "a")
+            sRet = sRet.Replace("Ć", "c")
+            sRet = sRet.Replace("Ę", "E")
+            sRet = sRet.Replace("Ł", "L")
+            sRet = sRet.Replace("Ń", "N")
+            sRet = sRet.Replace("Ó", "O")
+            sRet = sRet.Replace("Ś", "S")
+            sRet = sRet.Replace("Ż", "Z")
+            sRet = sRet.Replace("Ź", "Z")
+        End If
+
+        Dim aInvChars As Char() = IO.Path.GetInvalidFileNameChars
+        For Each sInvChar As Char In aInvChars
+            sRet = sRet.Replace(sInvChar, cInvalidCharPlaceholder)
+        Next
+
+        aInvChars = IO.Path.GetInvalidPathChars
+        For Each sInvChar As Char In aInvChars
+            sRet = sRet.Replace(sInvChar, cInvalidCharPlaceholder)
+        Next
+
+        Return sRet
+
     End Function
 
     <Runtime.CompilerServices.Extension()>
@@ -2316,7 +2455,19 @@ Partial Module Extensions
         Return configurationBuilder
     End Function
 
+    <Runtime.CompilerServices.Extension()>
+    Public Function SelectSingleNode(ByVal oNode As Xml.XmlNode, sNodeName As String) As Xml.XmlNode
+        Dim oElement As Xml.XmlElement = TryCast(oNode, Xml.XmlElement)
+        If oElement Is Nothing Then Return Nothing
+
+        Dim oListEls As Xml.XmlNodeList = oElement.GetElementsByTagName("Price")
+        If oListEls.Count < 1 Then Return Nothing
+        Return oListEls(0)
+    End Function
+
 End Module
+
+
 
 #End Region
 

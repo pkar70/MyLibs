@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="msgConflictModifiedODandLocal" xml:space="preserve">
+    <value>Data modified both locally and in cloud, choose what version I should use</value>
+  </data>
+  <data name="msgConflictUseLocal" xml:space="preserve">
+    <value>Local</value>
+  </data>
+  <data name="msgConflictUseOD" xml:space="preserve">
+    <value>Cloud</value>
+  </data>
   <data name="resDlgCancel" xml:space="preserve">
     <value>Poniechaj</value>
   </data>

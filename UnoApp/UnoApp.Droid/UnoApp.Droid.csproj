@@ -96,7 +96,7 @@
     <AndroidResource Include="Resources\values\Styles.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Vblib14\Vblib14.vbproj">
+    <ProjectReference Include="..\..\Vblib14\Vblib.vbproj">
       <Project>{50a21bbf-b091-4a5d-a414-4fa3205a6f1b}</Project>
       <Name>Vblib14</Name>
     </ProjectReference>

@@ -75,6 +75,33 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Data modified both locally and in cloud, choose what version I should use.
+        '''</summary>
+        Friend Shared ReadOnly Property msgConflictModifiedODandLocal() As String
+            Get
+                Return ResourceManager.GetString("msgConflictModifiedODandLocal", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Local.
+        '''</summary>
+        Friend Shared ReadOnly Property msgConflictUseLocal() As String
+            Get
+                Return ResourceManager.GetString("msgConflictUseLocal", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Cloud.
+        '''</summary>
+        Friend Shared ReadOnly Property msgConflictUseOD() As String
+            Get
+                Return ResourceManager.GetString("msgConflictUseOD", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Poniechaj.
         '''</summary>
         Friend Shared ReadOnly Property resDlgCancel() As String

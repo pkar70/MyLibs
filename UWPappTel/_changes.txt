@@ -1,4 +1,7 @@
 ﻿
+2022.05.25
+* App.OpenRateIt()
+
 2022.04.23
 * zmiana w CmdLineArgs ze String() na List<string>
 * ClipPut trafia do VBlib (ClipPut -> FromLibClipPut; odpowiedni Init)

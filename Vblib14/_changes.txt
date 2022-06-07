@@ -1,4 +1,13 @@
-﻿
+﻿2022.06.07
+* DumpCurrMethod - poprawki, by dobrą funkcję podawało, i nie aż tak głęboko w stack
+* DumpMessage - poprawki (uwzglednianie glebokosci tak samo jak w DumpCurrMethod, bo wspolna sub-method)
+
+2022.05.17
+* SetSettingsDate, GetSettingsDate
+
+2022.04.29
+* Extension: String.ToValidPath
+
 2022.02.23
 * poprawka GetSettingsLong
 * dodanie SetSettingsCurrentDate

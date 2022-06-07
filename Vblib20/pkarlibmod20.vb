@@ -84,7 +84,7 @@ Partial Module Extensions
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function AddCommandLineRO(ByVal configurationBuilder As Microsoft.Extensions.Configuration.IConfigurationBuilder) As Microsoft.Extensions.Configuration.IConfigurationBuilder
-        configurationBuilder.Add(New CommandLineROConfigurationSource(Environment.GetCommandLineArgs))
+        configurationBuilder.Add(New CommandLineROConfigurationSource(Environment.GetCommandLineArgs.ToList))
         Return configurationBuilder
     End Function
 
@@ -105,7 +105,7 @@ Partial Module Extensions
 
         Dim sRet As String = "Dump settings (VBlib version)" & vbCrLf
 
-        For Each oProvider As IConfigurationProvider In _settingsGlobal.Providers
+        For Each oProvider As Microsoft.Extensions.Configuration.IConfigurationProvider In _settingsGlobal.Providers
             sRet = sRet & vbCrLf & "Settings known by provider " & oProvider.ToString & vbCrLf
 
             For Each sKey As String In oProvider.GetChildKeys(New List(Of String), Nothing)

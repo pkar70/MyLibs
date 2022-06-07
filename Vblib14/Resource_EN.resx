@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="msgConflictModifiedODandLocal" xml:space="preserve">
+    <value>Dane zostały zmienione zarówno lokalnie jak i w Cloud. Które powinienem użyć?</value>
+  </data>
+  <data name="msgConflictUseLocal" xml:space="preserve">
+    <value>Lokalne</value>
+  </data>
+  <data name="msgConflictUseOD" xml:space="preserve">
+    <value>Cloud</value>
+  </data>
   <data name="resDlgCancel" xml:space="preserve">
     <value>Cancel</value>
   </data>

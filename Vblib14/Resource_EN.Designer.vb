@@ -75,6 +75,33 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to Dane zostały zmienione zarówno lokalnie jak i w Cloud. Które powinienem użyć?.
+        '''</summary>
+        Friend Shared ReadOnly Property msgConflictModifiedODandLocal() As String
+            Get
+                Return ResourceManager.GetString("msgConflictModifiedODandLocal", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Lokalne.
+        '''</summary>
+        Friend Shared ReadOnly Property msgConflictUseLocal() As String
+            Get
+                Return ResourceManager.GetString("msgConflictUseLocal", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to Cloud.
+        '''</summary>
+        Friend Shared ReadOnly Property msgConflictUseOD() As String
+            Get
+                Return ResourceManager.GetString("msgConflictUseOD", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to Cancel.
         '''</summary>
         Friend Shared ReadOnly Property resDlgCancel() As String

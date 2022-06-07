@@ -271,6 +271,12 @@ namespace p
 
         #endregion
 
+        public static void OpenRateIt()
+        {
+            var sUri = new Uri("ms-windows-store://review/?PFN=" + Windows.ApplicationModel.Package.Current.Id.FamilyName);
+            sUri.OpenBrowser();
+        }
+
     }
 
     public static partial class k
