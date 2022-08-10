@@ -42,10 +42,10 @@ Partial Public Module pkarlibmodule14
         Dim sCurrMethod As String = ""
 
         Dim sTrace As String = Environment.StackTrace
-        If String.IsNullOrEmpty(sTrace) Then
+        If String.IsNullOrWhiteSpace(sTrace) Then
             sCurrMethod = "<stack is empty>"
         Else
-            Dim subs As String() = sTrace.Split(vbCr)
+            Dim subs As String() = sTrace.Split(vbCr, options:=StringSplitOptions.RemoveEmptyEntries)
             Dim iCurrMethod As Integer = -1
 
             For iLoop As Integer = 0 To subs.Length - 2
@@ -734,6 +734,11 @@ Partial Public Module pkarlibmodule14
         moHttp.DefaultRequestHeaders.UserAgent.TryParseAdd(msAgent)
     End Sub
 
+    Public Async Function HttpPageAsync(sLink As String, Optional sData As String = "", Optional bReset As Boolean = False) As Task(Of String)
+        Return Await HttpPageAsync(New Uri(sLink), sData, bReset)
+    End Function
+
+
     Public Async Function HttpPageAsync(oUri As Uri, Optional sData As String = "", Optional bReset As Boolean = False) As Task(Of String)
         DumpCurrMethod("uri=" & oUri.AbsoluteUri)
         If oUri Is Nothing OrElse oUri.ToString = "" Then
@@ -804,7 +809,7 @@ Partial Public Module pkarlibmodule14
 
 
     Public Function RemoveHtmlTags(sHtml As String) As String
-        If String.IsNullOrEmpty(sHtml) Then Return ""
+        If String.IsNullOrWhiteSpace(sHtml) Then Return ""
 
         Dim iInd0, iInd1 As Integer
 
@@ -853,7 +858,7 @@ Partial Public Module pkarlibmodule14
     ''' to na wyjściu będzie jej rezultat. Else = ""
     ''' </summary>
     Public Function LibAppServiceStdCmd(sCommand As String, sLocalCmds As String) As String
-        If String.IsNullOrEmpty(sCommand) Then Return ""
+        If String.IsNullOrWhiteSpace(sCommand) Then Return ""
 
         Dim sTmp As String
 
@@ -987,11 +992,11 @@ Partial Public Module pkarlibmodule14
     <CodeAnalysis.SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification:="<Pending>")>
     Public Function GetLogFileMonthly(sBaseName As String, sExtension As String) As String
         ' 2021.08.20: połączone z tym niżej, tu tylko ustalenie nazwy
-        If String.IsNullOrEmpty(sExtension) Then sExtension = ".txt"
+        If String.IsNullOrWhiteSpace(sExtension) Then sExtension = ".txt"
         If Not sExtension.StartsWithOrdinal(".") Then sExtension = "." & sExtension
 
         Dim sFile As String
-        If String.IsNullOrEmpty(sBaseName) Then
+        If String.IsNullOrWhiteSpace(sBaseName) Then
             sFile = Date.Now.ToString("yyyy.MM") & sExtension
         Else
             sFile = sBaseName & " " & Date.Now.ToString("yyyy.MM") & sExtension
@@ -1009,11 +1014,11 @@ Partial Public Module pkarlibmodule14
 
     <CodeAnalysis.SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification:="<Pending>")>
     Public Function GetLogFileYearly(sBaseName As String, sExtension As String) As String
-        If String.IsNullOrEmpty(sExtension) Then sExtension = ".txt"
+        If String.IsNullOrWhiteSpace(sExtension) Then sExtension = ".txt"
         If Not sExtension.StartsWithOrdinal(".") Then sExtension = "." & sExtension
 
         Dim sFile As String
-        If String.IsNullOrEmpty(sBaseName) Then
+        If String.IsNullOrWhiteSpace(sBaseName) Then
             sFile = Date.Now.ToString("yyyy") & sExtension
         Else
             sFile = sBaseName & " " & Date.Now.ToString("yyyy") & sExtension
@@ -1197,7 +1202,7 @@ Partial Public Module Extensions
 
     <Runtime.CompilerServices.Extension()>
     Public Function MacStringToULong(ByVal sStr As String) As ULong
-        If String.IsNullOrEmpty(sStr) Then Throw New ArgumentNullException(NameOf(sStr), "MacStringToULong powinno miec parametr")
+        If String.IsNullOrWhiteSpace(sStr) Then Throw New ArgumentNullException(NameOf(sStr), "MacStringToULong powinno miec parametr")
         If Not sStr.Contains(":") Then Throw New ArgumentException("MacStringToULong - nie ma dwukropków w sStr")
 
         sStr = sStr.Replace(":", "")
@@ -1210,6 +1215,29 @@ Partial Public Module Extensions
     ' GetDocumentHtml - not in .Net
     ' #Region "GPS odleglosci"
     ' DistanceTo (dla różnych typów) - not in .Net
+
+    <Runtime.CompilerServices.Extension()>
+    Public Function DePascal(ByVal input As String)
+        If String.IsNullOrWhiteSpace(input) Then Return ""
+
+        Dim result As String = ""
+        Dim letter As String = ""
+        'foreach(Char letter In input)
+        '{ if(char.isupper(letter) result = result.trim() + " ";
+        '  result += letter
+        '}
+        For i = 0 To input.Length - 1
+            letter = input.Substring(0, 1)
+            If letter.ToUpperInvariant = letter Then
+                result = result.Trim() & " "
+            End If
+            result &= letter
+        Next
+
+        Return result.Trim
+    End Function
+
+
 
     ''' <summary>
     ''' odpowiednik StartsWith(sStart, StringComparison.Ordinal)
@@ -2111,7 +2139,7 @@ Friend Class JsonRwConfigurationSource
 
     Public Sub New(sPathnameLocal As String, sPathnameRoam As String, bReadOnly As Boolean)
 
-        If String.IsNullOrEmpty(sPathnameLocal) AndAlso String.IsNullOrEmpty(sPathnameRoam) Then
+        If String.IsNullOrWhiteSpace(sPathnameLocal) AndAlso String.IsNullOrWhiteSpace(sPathnameRoam) Then
             Throw New ArgumentException("You have to use at least one real path (to file, or to folder) for JsonRwConfigurationSource constructor")
         End If
 
@@ -2123,7 +2151,7 @@ Friend Class JsonRwConfigurationSource
 
     Private Function TryFileOrPathExist(sPath As String, sDefaultFileName As String) As String
 
-        If String.IsNullOrEmpty(sPath) Then Return ""
+        If String.IsNullOrWhiteSpace(sPath) Then Return ""
 
         ' może być ścieżka w ramach appx - ale wtedy readonly
         If Not IO.Path.IsPathRooted(sPath) Then
@@ -2169,7 +2197,7 @@ Friend Class IniDefaultsConfigurationProvider
         ' load settings
         If _sIniContent = "" Then Return ' nie ma pliku, pewnie Android (wersja bez Init)
 
-        Dim aFileContent As String() = _sIniContent.Split(vbCrLf)
+        Dim aFileContent As String() = _sIniContent.Split(vbCrLf, options:=StringSplitOptions.RemoveEmptyEntries)
         LoadSection(aFileContent, "main")
 #If DEBUG Then
         LoadSection(aFileContent, "debug")
@@ -2472,6 +2500,112 @@ End Module
 #End Region
 
 
+''' <summary>
+''' klasa bazowa dla moich list
+''' </summary>
+''' <typeparam name="TYP"></typeparam>
+Public Class MojaLista(Of TYP)
+    Private _lista As List(Of TYP)
+    Private _filename As String
+
+    Public Sub New(sFolder As String, Optional sFileName As String = "items.json")
+        If String.IsNullOrWhiteSpace(sFolder) OrElse String.IsNullOrWhiteSpace(sFileName) Then
+            DebugOut(0, "FAIL MojaLista.New z pustym parametrem!")
+            Throw New ArgumentException("musi być i folder i filename podane")
+        End If
+        _lista = New List(Of TYP)
+        _filename = IO.Path.Combine(sFolder, sFileName)
+    End Sub
+
+    Public Function Load() As Boolean
+        Dim sTxt As String = ""
+        If IO.File.Exists(_filename) Then
+            sTxt = IO.File.ReadAllText(_filename)
+        End If
+
+        If sTxt Is Nothing OrElse sTxt.Length < 5 Then
+            Clear()
+            Return False
+        End If
+
+        _lista = Newtonsoft.Json.JsonConvert.DeserializeObject(sTxt, GetType(List(Of TYP)))
+        Return True
+    End Function
+
+    Public Function ZapiszCache() As Boolean
+        If _lista Is Nothing Then
+            DebugOut("ZapiszCache - glItems null")
+            Return False
+        End If
+        If _lista.Count < 1 Then
+            DebugOut("ZapiszCache - glItems.count<1")
+            Return False
+        End If
+
+        Dim sTxt As String = Newtonsoft.Json.JsonConvert.SerializeObject(_lista, Newtonsoft.Json.Formatting.Indented)
+        IO.File.WriteAllText(_filename, sTxt)
+
+        Return True
+    End Function
+
+    Public Function GetList() As List(Of TYP)
+        Return _lista
+    End Function
+
+    Public Function Count() As Integer
+        Return _lista.Count
+    End Function
+
+    Public Sub Clear()
+        _lista.Clear()
+    End Sub
+
+    Public Sub Add(oNew As TYP)
+        _lista.Add(oNew)
+    End Sub
+
+    Public Sub Remove(oDel As TYP)
+        _lista.Remove(oDel)
+    End Sub
+
+    ''' <summary>
+    '''  Znajduje itemkę wedle funkcji, jak przykład
+    '''  Find(Function(x) x.PartName.Contains("seat"))
+    ''' </summary>
+    ''' <param name="match"></param>
+    ''' <returns></returns>
+    Public Function Find(match As Predicate(Of TYP)) As TYP
+        Return _lista.Find(match)
+    End Function
+
+    ''' <summary>
+    '''  Usuwa itemkę wedle funkcji, jak przykład
+    '''  Remove(Function(x) x.PartName.Contains("seat"))
+    '''  (zabezpieczone przed nieznalezieniem)
+    ''' </summary>
+    ''' <param name="match"></param>
+    Public Sub Remove(match As Predicate(Of TYP))
+        Dim oItem As TYP = Find(match)
+        If oItem Is Nothing Then Return
+        _lista.Remove(oItem)
+    End Sub
+
+#If False Then
+    Public Function Find(iID As Integer) As TYP
+        Dim t As Type = TYP.GetType
+        For Each oItem In _lista
+            For Each oItem.GetType.
+        Next
+    End Function
+
+    Public Function Find(sID As String) As TYP
+        For Each oItem In _lista
+
+        Next
+    End Function
+#End If
+
+End Class
 
 #Enable Warning CA2007 'Consider calling ConfigureAwait On the awaited task
 #Enable Warning IDE0079 ' Remove unnecessary suppression

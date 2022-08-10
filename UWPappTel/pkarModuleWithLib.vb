@@ -19,7 +19,7 @@
 
 ' 2022.05.02: NetIsIPavail param bMsg jest teraz optional (default: bez pytania)
 
-Imports VBlib.Extensions
+Imports Vblib.Extensions
 ' Imports Microsoft.Extensions.Configuration
 
 Partial Public Class App
@@ -1698,10 +1698,10 @@ Module Extensions
     ''' żeby było tak samo jak w MAUI, skoro nie da się w MAUI tego zrobić
     ''' </summary>
     <Extension()>
-    Public Sub Navigate(ByVal oPage As Page, sourcePageType as Type)
-	oPage.Frame.Navigate(sourcePageType)
+    Public Sub Navigate(ByVal oPage As Page, sourcePageType As Type, Optional parameter As Object = Nothing)
+        oPage.Frame.Navigate(sourcePageType, parameter)
     End Sub
-#End region
+#End Region
 
     ' --- progring ------------------------
 

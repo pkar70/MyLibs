@@ -1,4 +1,17 @@
-﻿2022.06.07
+﻿
+2022.08.10
+* string.DePascal (wedle sampla ze szkoleń Sollers)
+* większość porównań z IsNullOrEmpty na IsNullOrWhiteSpace
+* czasem w Split: , options:=StringSplitOptions.RemoveEmptyEntries
+* MojaLista.Find(predykat) oraz .Remove(predykat)
+
+2022.08.01
+* Public Class MojaLista(Of TYP) - jak podstawa do wczytywania 
+
+2022.07.17
+* HttpPageAsync z String na wejściu
+
+2022.06.07
 * DumpCurrMethod - poprawki, by dobrą funkcję podawało, i nie aż tak głęboko w stack
 * DumpMessage - poprawki (uwzglednianie glebokosci tak samo jak w DumpCurrMethod, bo wspolna sub-method)
 
