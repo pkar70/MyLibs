@@ -9,6 +9,8 @@ using static VBlib.Extensions;
 using vb14 = VBlib.pkarlibmodule14;
 
 using System.Runtime.InteropServices.WindowsRuntime; // dla ToArray
+using Microsoft.Extensions.Logging;
+using VBlib;
 
 // logowanie tylko dla Uno.Droid, dla zwykłego UWP tego nie robimy
 #if !NETFX_CORE 
@@ -278,6 +280,7 @@ namespace p
         }
 
     }
+
 
     public static partial class k
     {
@@ -1532,34 +1535,34 @@ return "";
 
 #endregion
 
-        public static Windows.Devices.Geolocation.BasicGeoposition GetDomekGeopos(UInt16 iDecimalDigits = 0)
-        {
-            switch (iDecimalDigits)
-            {
-                case 1:
-                    return NewBasicGeoposition(50.0, 19.9);
-                case 2:
-                    return NewBasicGeoposition(50.01, 19.97);
-                case 3:
-                    return NewBasicGeoposition(50.019, 19.978);
-                case 4:
-                    return NewBasicGeoposition(50.0198, 19.9787);
-                case 5:
-                    return NewBasicGeoposition(50.01985, 19.97872);
-                default:
-                    return NewBasicGeoposition(50, 20);
-            }
-    }
+    //    public static Windows.Devices.Geolocation.BasicGeoposition GetDomekGeopos(UInt16 iDecimalDigits = 0)
+    //    {
+    //        switch (iDecimalDigits)
+    //        {
+    //            case 1:
+    //                return NewBasicGeoposition(50.0, 19.9);
+    //            case 2:
+    //                return NewBasicGeoposition(50.01, 19.97);
+    //            case 3:
+    //                return NewBasicGeoposition(50.019, 19.978);
+    //            case 4:
+    //                return NewBasicGeoposition(50.0198, 19.9787);
+    //            case 5:
+    //                return NewBasicGeoposition(50.01985, 19.97872);
+    //            default:
+    //                return NewBasicGeoposition(50, 20);
+    //        }
+    //}
 
-        public static Windows.Devices.Geolocation.BasicGeoposition NewBasicGeoposition(double dLat, double dLon)
-        {
-            var oPoint = new Windows.Devices.Geolocation.BasicGeoposition
-            {
-                Latitude = dLat,
-                Longitude = dLon
-            };
-            return oPoint;
-        }
+        //public static Windows.Devices.Geolocation.BasicGeoposition NewBasicGeoposition(double dLat, double dLon)
+        //{
+        //    var oPoint = new Windows.Devices.Geolocation.BasicGeoposition
+        //    {
+        //        Latitude = dLat,
+        //        Longitude = dLon
+        //    };
+        //    return oPoint;
+        //}
 
         // supress, bo dla Android i DEBUG nie ma await, ale kiedy indziej jest
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -1585,7 +1588,6 @@ return "";
 #endif
         }
     }
-}
 
 
     static partial class Extensions
@@ -1739,46 +1741,68 @@ public static void OpenBrowser(this Uri oUri, bool bForceEdge = false)
         }// jesli strona jest pusta, jest Exception
     }
 
-#region "GPS related"
+        #region "GPS related"
 
-    public static double DistanceTo(this Windows.Devices.Geolocation.Geocoordinate oGeocoord0, Windows.Devices.Geolocation.Geocoordinate oGeocoord1)
-    {
-        return oGeocoord0.Point.Position.DistanceTo(oGeocoord1.Point.Position);
-    }
-    public static double DistanceTo(this Windows.Devices.Geolocation.Geoposition oGeopos0, Windows.Devices.Geolocation.Geoposition oGeopos1)
-    {
-        return oGeopos0.Coordinate.Point.Position.DistanceTo(oGeopos1.Coordinate.Point.Position);
-    }
-
-    public static double DistanceTo(this Windows.Devices.Geolocation.BasicGeoposition oPos0, Windows.Devices.Geolocation.BasicGeoposition oPos)
+        public static MyBasicGeoposition ToMyGeopos(this Windows.Devices.Geolocation.BasicGeoposition oPos)
         {
-            int iRadix = 6371000;
-            double tLat = (oPos.Latitude - oPos0.Latitude) * Math.PI / 180;
-            double tLon = (oPos.Longitude - oPos0.Longitude) * Math.PI / 180;
-            double a = Math.Sin(tLat / 2) * Math.Sin(tLat / 2) + Math.Cos(Math.PI / 180 * oPos0.Latitude) * Math.Cos(Math.PI / 180 * oPos.Latitude) * Math.Sin(tLon / 2) * Math.Sin(tLon / 2);
-            double c = 2 * Math.Asin(Math.Min(1, Math.Sqrt(a)));
-            double d = iRadix * c;
-
-            return d;
+            return new MyBasicGeoposition(oPos.Latitude, oPos.Longitude);
         }
 
-    public static double DistanceTo(this Windows.Devices.Geolocation.BasicGeoposition oPos0, double dLatitude, double dLongitude)
-    {
-        return oPos0.DistanceTo(p.k.NewBasicGeoposition(dLatitude, dLongitude ));
-    }
+        public static Windows.Devices.Geolocation.BasicGeoposition ToWinGeopos(this MyBasicGeoposition oPos)
+        {
+            var oPoint = new Windows.Devices.Geolocation.BasicGeoposition
+            {
+                Latitude = oPos.Latitude,
+                Longitude = oPos.Longitude,
+                Altitude = oPos.Altitude
+            };
+            return oPoint;
+        }
+
+        public static Windows.Devices.Geolocation.Geopoint ToWinGeopoint(this VBlib.MyBasicGeoposition oPos)
+        {
+            return new Windows.Devices.Geolocation.Geopoint(oPos.ToWinGeopos());
+        }
+
+
+        public static double DistanceTo(this Windows.Devices.Geolocation.Geocoordinate oGeocoord0, Windows.Devices.Geolocation.Geocoordinate oGeocoord1)
+        {
+            return oGeocoord0.Point.Position.ToMyGeopos().DistanceTo(oGeocoord1.Point.Position.ToMyGeopos());
+        }
+        public static double DistanceTo(this Windows.Devices.Geolocation.Geoposition oGeopos0, Windows.Devices.Geolocation.Geoposition oGeopos1)
+        {
+            return oGeopos0.Coordinate.DistanceTo(oGeopos1.Coordinate);
+        }
+
+    //public static double DistanceTo(this Windows.Devices.Geolocation.BasicGeoposition oPos0, Windows.Devices.Geolocation.BasicGeoposition oPos)
+    //    {
+    //        int iRadix = 6371000;
+    //        double tLat = (oPos.Latitude - oPos0.Latitude) * Math.PI / 180;
+    //        double tLon = (oPos.Longitude - oPos0.Longitude) * Math.PI / 180;
+    //        double a = Math.Sin(tLat / 2) * Math.Sin(tLat / 2) + Math.Cos(Math.PI / 180 * oPos0.Latitude) * Math.Cos(Math.PI / 180 * oPos.Latitude) * Math.Sin(tLon / 2) * Math.Sin(tLon / 2);
+    //        double c = 2 * Math.Asin(Math.Min(1, Math.Sqrt(a)));
+    //        double d = iRadix * c;
+
+    //        return d;
+    //    }
+
+    //public static double DistanceTo(this Windows.Devices.Geolocation.BasicGeoposition oPos0, double dLatitude, double dLongitude)
+    //{
+    //    return oPos0.DistanceTo(p.k.NewBasicGeoposition(dLatitude, dLongitude ));
+    //}
 
 
     /// <summary>
     /// Czy punkt leży w miarę w Polsce (<500 km od środka geometrycznego Polski)
     /// </summary>
-    public static bool IsInsidePoland(this Windows.Devices.Geolocation.BasicGeoposition oPos)
-    {// https://pl.wikipedia.org/wiki/Geometryczny_%C5%9Brodek_Polski
+    //public static bool IsInsidePoland(this Windows.Devices.Geolocation.BasicGeoposition oPos)
+    //{// https://pl.wikipedia.org/wiki/Geometryczny_%C5%9Brodek_Polski
 
-        double dOdl = oPos.DistanceTo(p.k.NewBasicGeoposition(52.2159333, 19.1344222));
-        if (dOdl / 1000 > 500) return false;
+    //    double dOdl = oPos.DistanceTo(p.k.NewBasicGeoposition(52.2159333, 19.1344222));
+    //    if (dOdl / 1000 > 500) return false;
 
-        return true;    // ale to nie jest pewne, tylko: "możliwe"
-    }
+    //    return true;    // ale to nie jest pewne, tylko: "możliwe"
+    //}
 
 #endregion
 
@@ -2367,13 +2391,12 @@ public static void GetSettingsBool(this Windows.UI.Xaml.Controls.AppBarToggleBut
         }
 
 
-#endregion
+        #endregion
 
 
-
+    }
 
 }
-
 
 #region ".Net configuration - UWP settings"
 

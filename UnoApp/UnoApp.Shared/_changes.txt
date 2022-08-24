@@ -1,3 +1,7 @@
 
+2022.08.11
+* operacje typu GPS, przeniesione częściowo do VBLib, na własnym typie (skoro nie ma w .NetStd): MyBasicGeoposition
+
+
 2022.04.25
 * GetBuildTimestampAsync - na Uno nie może brać daty pliku Manifest, bo tego pliku nie ma; więc dla Android jest return ""

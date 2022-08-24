@@ -1,4 +1,12 @@
 ﻿
+2022.08.18
+* VBlib.MyBasicGeoposition.GetKrakowGeopos()
+* HttpPageReset(optional redirect as bool) - KrakTram wymaga False (do trasy tramwaju)
+
+2022.08.11
+* operacje typu GPS, na własnym typie (skoro nie ma w .NetStd): MyBasicGeoposition
+* SubstringBetween - wycięcie tego co chcemy
+
 2022.08.10
 * string.DePascal (wedle sampla ze szkoleń Sollers)
 * większość porównań z IsNullOrEmpty na IsNullOrWhiteSpace

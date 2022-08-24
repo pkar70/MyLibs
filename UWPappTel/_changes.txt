@@ -1,6 +1,12 @@
 ﻿
+2022.08.18
+* ToWinGeopoint
+
 2022.05.25
 * App.OpenRateIt()
+
+2022.05.02
+* NetIsIPavail param bMsg jest teraz optional (default: bez pytania)
 
 2022.04.23
 * zmiana w CmdLineArgs ze String() na List<string>

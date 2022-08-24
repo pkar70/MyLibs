@@ -19,6 +19,8 @@
 
 ' 2022.05.02: NetIsIPavail param bMsg jest teraz optional (default: bez pytania)
 
+Imports System
+Imports System.Runtime.CompilerServices
 Imports Vblib.Extensions
 ' Imports Microsoft.Extensions.Configuration
 
@@ -774,11 +776,14 @@ Public Module pkar
 
     End Function
 
-    Public Async Function GetBuildTimestampAsync() As Task(Of String)
-        Dim install_folder As Windows.Storage.StorageFolder = Windows.ApplicationModel.Package.Current.InstalledLocation
-        Dim manifest_file As Windows.Storage.StorageFile = Await install_folder.GetFileAsync("AppxManifest.xml")
-        Dim modDate As DateTimeOffset = (Await manifest_file.GetBasicPropertiesAsync()).DateModified
-        Return modDate.ToString("yyyy.MM.dd HH:mm")
+    Public Function GetBuildTimestamp() As String
+            Dim install_folder as string = Windows.ApplicationModel.Package.Current.InstalledLocation.Path
+            Dim sManifestPath as string = Path.Combine(install_folder, "AppxManifest.xml")
+
+            if File.Exists(sManifestPath)
+                return File.GetLastWriteTime(sManifestPath).ToString("yyyy.MM.dd HH:mm")
+
+            return ""
     End Function
 
 
@@ -989,7 +994,7 @@ Public Module pkar
     ''' </summary>
     Public Function AppServiceStdCmd(sCommand As String, sLocalCmds As String) As String
         Dim sTmp As String = VBlib.LibAppServiceStdCmd(sCommand, sLocalCmds)
-        If sTmp <> "" then return sTmp
+        If sTmp <> "" Then Return sTmp
 
         ' If sCommand.StartsWith("debug loglevel") Then - vbLib
 
@@ -1039,52 +1044,51 @@ Public Module pkar
             Case "lib istriggersregistered"
                 Return IsTriggersRegistered().ToString()
 
-            'Case "lib pkarmode 1"
-            'Case "lib pkarmode 0"
-            'Case "lib pkarmode"
+                'Case "lib pkarmode 1"
+                'Case "lib pkarmode 0"
+                'Case "lib pkarmode"
         End Select
 
         Return ""  ' oznacza: to nie jest standardowa komenda
     End Function
 
 
-'    Private Function DumpSettings() As String
-'       Dim sRoam As String = ""
-'        Try
-'            For Each oVal In Windows.Storage.ApplicationData.Current.RoamingSettings.Values
-'                sRoam = sRoam & oVal.Key & vbTab & oVal.Value.ToString() & vbCrLf
-'            Next
-'        Catch
-'        End Try
-'
-'        Dim sLocal As String = ""
-'        Try
-'            For Each oVal In Windows.Storage.ApplicationData.Current.LocalSettings.Values
-'                sLocal = sLocal & oVal.Key & vbTab & oVal.Value.ToString() & vbCrLf
-'            Next
-'        Catch
-'        End Try
-'
-'        Dim sRet As String = "Dumping Settings" & vbCrLf
-'        If sRoam <> "" Then
-'            sRet = sRet & vbCrLf & "Roaming:" & vbCrLf & sRoam
-'        Else
-'            sRet = sRet & "(no roaming settings)" & vbCrLf
-'       End If
-'
-'        If sLocal <> "" Then
-'            sRet = sRet & vbCrLf & "Local:" & vbCrLf & sLocal
-'        Else
-'            sRet = sRet & "(no local settings)" & vbCrLf
-'        End If
-'
-'        Return sRet
-'    End Function
+    '    Private Function DumpSettings() As String
+    '       Dim sRoam As String = ""
+    '        Try
+    '            For Each oVal In Windows.Storage.ApplicationData.Current.RoamingSettings.Values
+    '                sRoam = sRoam & oVal.Key & vbTab & oVal.Value.ToString() & vbCrLf
+    '            Next
+    '        Catch
+    '        End Try
+    '
+    '        Dim sLocal As String = ""
+    '        Try
+    '            For Each oVal In Windows.Storage.ApplicationData.Current.LocalSettings.Values
+    '                sLocal = sLocal & oVal.Key & vbTab & oVal.Value.ToString() & vbCrLf
+    '            Next
+    '        Catch
+    '        End Try
+    '
+    '        Dim sRet As String = "Dumping Settings" & vbCrLf
+    '        If sRoam <> "" Then
+    '            sRet = sRet & vbCrLf & "Roaming:" & vbCrLf & sRoam
+    '        Else
+    '            sRet = sRet & "(no roaming settings)" & vbCrLf
+    '       End If
+    '
+    '        If sLocal <> "" Then
+    '            sRet = sRet & vbCrLf & "Local:" & vbCrLf & sLocal
+    '        Else
+    '            sRet = sRet & "(no local settings)" & vbCrLf
+    '        End If
+    '
+    '        Return sRet
+    '    End Function
 
 
     Private Function DumpTriggers() As String
         Dim sRet As String = "Dumping Triggers" & vbCrLf & vbCrLf
-
         Try
             For Each oTask In Windows.ApplicationModel.Background.BackgroundTaskRegistration.AllTasks
                 sRet &= oTask.Value.Name & vbCrLf ' //GetType niestety nie daje rzeczywistego typu
@@ -1413,8 +1417,7 @@ Module Extensions
 
 
     <Extension()>
-    Public Sub OpenBrowser(ByVal oUri As system.uri, Optional bForceEdge As Boolean = False)
-
+    Public Sub OpenBrowser(ByVal oUri As System.Uri, Optional bForceEdge As Boolean = False)
         If bForceEdge Then
             ' tylko w FilteredRss
             Dim options = New Windows.System.LauncherOptions With
@@ -1458,54 +1461,87 @@ Module Extensions
 #Region "GPS odleglosci"
 
     <Extension()>
-    Public Function DistanceTo(ByVal oGeocoord0 As Windows.Devices.Geolocation.Geocoordinate, oGeocoord1 As Windows.Devices.Geolocation.Geocoordinate) As Integer
-        Return oGeocoord0.Point.Position.DistanceTo(oGeocoord1.Point.Position)
+    Public Function ToMyGeopos(ByVal oPos As Windows.Devices.Geolocation.BasicGeoposition) As MyBasicGeoposition
+        Return New MyBasicGeoposition(oPos.Latitude, oPos.Longitude)
     End Function
 
     <Extension()>
-    Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.Geoposition, oGeopos1 As Windows.Devices.Geolocation.Geoposition) As Integer
+    Public Function ToWinGeopoint(ByVal VBlib.MyBasicGeoposition oPos) As Windows.Devices.Geolocation.Geopoint 
+    {
+        Return New Windows.Devices.Geolocation.Geopoint(oPos.ToWinGeopos())
+    }
+
+
+    <Extension()>
+    Public Function ToWinGeopos(ByVal oPos As MyBasicGeoposition) As Windows.Devices.Geolocation.BasicGeoposition
+        Dim oPoint As New Windows.Devices.Geolocation.BasicGeoposition With
+            {
+                Latitude = oPos.Latitude,
+                Longitude = oPos.Longitude,
+                Altitude = oPos.Altitude
+            }
+        Return oPoint
+    End Function
+
+    <Extension()>
+    Public Function DistanceTo(ByVal oGeocoord0 As Windows.Devices.Geolocation.Geocoordinate, oGeocoord1 As Windows.Devices.Geolocation.Geocoordinate) As Double
+        Return oGeocoord0.Point.Position.ToMyGeopos().DistanceTo(oGeocoord1.Point.Position.ToMyGeopos())
+    End Function
+
+    <Extension()>
+    Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.Geoposition, oGeopos1 As Windows.Devices.Geolocation.Geoposition) As Double
         Return oGeopos0.Coordinate.DistanceTo(oGeopos1.Coordinate)
-
     End Function
 
-    <Extension()>
-    Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.BasicGeoposition, oGeopos1 As Windows.Devices.Geolocation.BasicGeoposition) As Integer
-        ' https://stackoverflow.com/questions/28569246/how-to-get-distance-between-two-locations-in-windows-phone-8-1
+    '<Extension()>
+    'Public Function DistanceTo(ByVal oGeocoord0 As Windows.Devices.Geolocation.Geocoordinate, oGeocoord1 As Windows.Devices.Geolocation.Geocoordinate) As Integer
+    '    Return oGeocoord0.Point.Position.DistanceTo(oGeocoord1.Point.Position)
+    'End Function
 
-        Try
-            Dim iRadix As Integer = 6371000
-            Dim tLat As Double = (oGeopos1.Latitude - oGeopos0.Latitude) * Math.PI / 180
-            Dim tLon As Double = (oGeopos1.Longitude - oGeopos0.Longitude) * Math.PI / 180
-            Dim a As Double = Math.Sin(tLat / 2) * Math.Sin(tLat / 2) +
-            Math.Cos(Math.PI / 180 * oGeopos0.Latitude) * Math.Cos(Math.PI / 180 * oGeopos1.Latitude) *
-            Math.Sin(tLon / 2) * Math.Sin(tLon / 2)
-            Dim c As Double = 2 * Math.Asin(Math.Min(1, Math.Sqrt(a)))
-            Dim d As Double = iRadix * c
+    '<Extension()>
+    'Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.Geoposition, oGeopos1 As Windows.Devices.Geolocation.Geoposition) As Integer
+    '    Return oGeopos0.Coordinate.DistanceTo(oGeopos1.Coordinate)
 
-            Return d
+    'End Function
 
-        Catch ex As Exception
-            Return 0    ' nie powinno sie nigdy zdarzyc, ale na wszelki wypadek...
-        End Try
+    '<Extension()>
+    'Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.BasicGeoposition, oGeopos1 As Windows.Devices.Geolocation.BasicGeoposition) As Integer
+    '    ' https://stackoverflow.com/questions/28569246/how-to-get-distance-between-two-locations-in-windows-phone-8-1
 
-    End Function
+    '    Try
+    '        Dim iRadix As Integer = 6371000
+    '        Dim tLat As Double = (oGeopos1.Latitude - oGeopos0.Latitude) * Math.PI / 180
+    '        Dim tLon As Double = (oGeopos1.Longitude - oGeopos0.Longitude) * Math.PI / 180
+    '        Dim a As Double = Math.Sin(tLat / 2) * Math.Sin(tLat / 2) +
+    '        Math.Cos(Math.PI / 180 * oGeopos0.Latitude) * Math.Cos(Math.PI / 180 * oGeopos1.Latitude) *
+    '        Math.Sin(tLon / 2) * Math.Sin(tLon / 2)
+    '        Dim c As Double = 2 * Math.Asin(Math.Min(1, Math.Sqrt(a)))
+    '        Dim d As Double = iRadix * c
 
-    <Extension()>
-    Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.BasicGeoposition, dLat As Double, dLong As Double) As Integer
-        Return oGeopos0.DistanceTo(NewBasicGeoposition(dLat, dLong))
-    End Function
+    '        Return d
 
-    ''' <summary>
-    ''' Czy punkt leży w miarę w Polsce (mniej niż 500 km od środka geometrycznego Polski)
-    ''' </summary>
-    <Extension()>
-    Public Function IsInsidePoland(ByVal oPos As Windows.Devices.Geolocation.BasicGeoposition) As Boolean
-        ' https://pl.wikipedia.org/wiki/Geometryczny_%C5%9Brodek_Polski
+    '    Catch ex As Exception
+    '        Return 0    ' nie powinno sie nigdy zdarzyc, ale na wszelki wypadek...
+    '    End Try
 
-        Dim dOdl As Double = oPos.DistanceTo(NewBasicGeoposition(52.2159333, 19.1344222))
-        If dOdl / 1000 > 500 Then Return False
-        Return True    ' ale to nie jest pewne, tylko: "możliwe"
-    End Function
+    'End Function
+
+    '<Extension()>
+    'Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.BasicGeoposition, dLat As Double, dLong As Double) As Integer
+    '    Return oGeopos0.DistanceTo(NewBasicGeoposition(dLat, dLong))
+    'End Function
+
+    '''' <summary>
+    '''' Czy punkt leży w miarę w Polsce (mniej niż 500 km od środka geometrycznego Polski)
+    '''' </summary>
+    '<Extension()>
+    'Public Function IsInsidePoland(ByVal oPos As Windows.Devices.Geolocation.BasicGeoposition) As Boolean
+    '    ' https://pl.wikipedia.org/wiki/Geometryczny_%C5%9Brodek_Polski
+
+    '    Dim dOdl As Double = oPos.DistanceTo(NewBasicGeoposition(52.2159333, 19.1344222))
+    '    If dOdl / 1000 > 500 Then Return False
+    '    Return True    ' ale to nie jest pewne, tylko: "możliwe"
+    'End Function
 
 #End Region
 
@@ -1643,10 +1679,10 @@ Module Extensions
 #End Region
 
     <Extension()>
-    Public Async Sub ShowAppVers(ByVal oItem As TextBlock)
+    Public Sub ShowAppVers(ByVal oItem As TextBlock)
         Dim sTxt As String = pkar.GetAppVers()
 #If DEBUG Then
-        sTxt &= " (debug " & Await GetBuildTimestampAsync() & ")"
+        sTxt &= " (debug " & GetBuildTimestamp() & ")"
 #End If
         oItem.Text = sTxt
     End Sub
@@ -1690,7 +1726,7 @@ Module Extensions
     ''' </summary>
     <Extension()>
     Public Sub GoBack(ByVal oPage As Page)
-	oPage.Frame.GoBack
+        oPage.Frame.GoBack
     End Sub
 
 
@@ -2163,9 +2199,8 @@ Public Class KonwersjaVisibility
         Dim bTemp As Boolean = CType(value, Boolean)
         If parameter IsNot Nothing Then
             Dim sParam As String = CType(parameter, String)
-            If sParam.ToUpperinvariant = "NEG" Then bTemp = Not bTemp
+            If sParam.ToUpperInvariant = "NEG" Then bTemp = Not bTemp
         End If
-
         If bTemp Then Return Visibility.Visible
 
         Return Visibility.Collapsed

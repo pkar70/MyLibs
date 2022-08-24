@@ -1,4 +1,5 @@
-﻿Imports Microsoft.Extensions.Configuration
+﻿Imports Microsoft
+Imports Microsoft.Extensions.Configuration
 
 
 ' Partial Public Class App
@@ -719,11 +720,11 @@ Partial Public Module pkarlibmodule14
         moHttp?.DefaultRequestHeaders.UserAgent.TryParseAdd(msAgent)
     End Sub
 
-    Public Sub HttpPageReset()
+    Public Sub HttpPageReset(Optional bAllowRedirects As Boolean = True)
 #Disable Warning CA2000 ' Dispose objects before losing scope
         ' będzie Dispose razem z moHttp dispose
         Dim oHandler As New Net.Http.HttpClientHandler With {
-            .AllowAutoRedirect = True
+            .AllowAutoRedirect = bAllowRedirects
         }
 #Enable Warning CA2000 ' Dispose objects before losing scope
         If moHttp IsNot Nothing Then
@@ -970,15 +971,38 @@ Partial Public Module pkarlibmodule14
 
     End Function
 
+    ''' <summary>
+    ''' Podaje nazwę pliku base + "yyyy.MM.dd" + ext
+    ''' </summary>
+    ''' <param name="sBaseName"></param>
+    ''' <param name="sExtension"></param>
+    ''' <returns></returns>
     <CodeAnalysis.SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification:="<Pending>")>
     Public Function GetLogFileDaily(sBaseName As String, sExtension As String) As String
+        Return GetLogFileDailyFilename(sBaseName, sExtension, "yyyy.MM.dd")
+    End Function
+
+    ''' <summary>
+    ''' Podaje nazwę pliku base + "yyyy.MM.dd.HH.mm" + ext
+    ''' </summary>
+    ''' <param name="sBaseName"></param>
+    ''' <param name="sExtension"></param>
+    ''' <returns></returns>
+    <CodeAnalysis.SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification:="<Pending>")>
+    Public Function GetLogFileDailyWithTime(sBaseName As String, sExtension As String) As String
+        Return GetLogFileDailyFilename(sBaseName, sExtension, "yyyy.MM.dd.HH.mm")
+    End Function
+
+    Private Function GetLogFileDailyFilename(sBaseName As String, sExtension As String, sFormatDate As String) As String
         If sExtension Is Nothing Then
             sExtension = ""
         Else
             If Not sExtension.StartsWithOrdinal(".") Then sExtension = "." & sExtension
         End If
 
-        Dim sFile As String = sBaseName & " " & Date.Now.ToString("yyyy.MM.dd") & sExtension
+        Dim sFile As String = ""
+        If sBaseName <> "" Then sFile = sFile & " " & Date.Now.ToString(sFormatDate)
+        sFile &= sExtension
         Return GetLogFileDaily(sFile)
     End Function
 
@@ -1070,30 +1094,6 @@ Partial Public Module pkarlibmodule14
         Return "other"
     End Function
 
-#Region "GPS i podobne"
-
-    <CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification:="<Pending>")>
-    Public Function GPSDistance(ByVal dLat0 As Double, ByVal dLon0 As Double, ByVal dLat1 As Double, ByVal dLon1 As Double) As Integer
-        Dim num1 As Integer
-
-        Try
-            Dim iRadix = 6371000
-            Dim tLat = (dLat1 - dLat0) * Math.PI / 180.0
-            Dim tLon = (dLon1 - dLon0) * Math.PI / 180.0
-            Dim a = 2.0 * Math.Asin(Math.Min(1.0, Math.Sqrt(Math.Sin(tLat / 2.0) *
-                Math.Sin(tLat / 2.0) + Math.Cos(Math.PI / 180.0 * dLat0) * Math.Cos(Math.PI / 180.0 * dLat1) *
-                Math.Sin(tLon / 2.0) * Math.Sin(tLon / 2.0))))
-            Return iRadix * a
-        Catch ex As Exception
-            Return 0
-        End Try
-
-        Return num1
-    End Function
-
-    ' GetDomekGeopos  - not in .Net
-
-#End Region
 
     ''' <summary>
     ''' Wybierze co ma być użyte - czy obiekt1 (OneDrive, ret 1), czy obiekt2 (local, ret 2), czy też są takie same (0)
@@ -1320,6 +1320,28 @@ Partial Public Module Extensions
         If iInd < 0 Then Return baseString
         Return baseString.Substring(0, iInd + sEnd.Length)
     End Function
+
+    ''' <summary>
+    ''' Wycina substring ze stringu, pomiędzy sStart a sEnd
+    ''' </summary>
+    ''' <param name="baseString"></param>
+    ''' <param name="sStart">prefix wycinanego (nie będzie w zwracanym)</param>
+    ''' <param name="sEnd">sufix wycinanego (nie będzie w zwracanym)</param>
+    ''' <returns>wycięty string lub Empty, jeśli nie ma któregoś końca</returns>
+    <Runtime.CompilerServices.Extension()>
+    <CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification:="<Pending>")>
+    Public Function SubstringBetween(ByVal baseString As String, sStart As String, sEnd As String) As String
+        Dim iInd As Integer = baseString.IndexOf(sStart)
+        If iInd < 0 Then Return ""
+
+        baseString = baseString.Substring(iInd + sStart.Length)
+        iInd = baseString.IndexOf(sEnd)
+        If iInd < 0 Then Return ""
+
+        Return baseString.Substring(0, iInd)
+
+    End Function
+
 
     ''' <summary>
     ''' Wycina fragment od sStart do sEnd  (włącznie z sStart/sEnd), jeśli któregoś nie ma - nie tyka
@@ -2483,12 +2505,13 @@ Partial Module Extensions
         Return configurationBuilder
     End Function
 
+    <Obsolete("to może nie działać!")>
     <Runtime.CompilerServices.Extension()>
     Public Function SelectSingleNode(ByVal oNode As Xml.XmlNode, sNodeName As String) As Xml.XmlNode
         Dim oElement As Xml.XmlElement = TryCast(oNode, Xml.XmlElement)
         If oElement Is Nothing Then Return Nothing
 
-        Dim oListEls As Xml.XmlNodeList = oElement.GetElementsByTagName("Price")
+        Dim oListEls As Xml.XmlNodeList = oElement.GetElementsByTagName(sNodeName)
         If oListEls.Count < 1 Then Return Nothing
         Return oListEls(0)
     End Function
@@ -2610,4 +2633,67 @@ End Class
 #Enable Warning CA2007 'Consider calling ConfigureAwait On the awaited task
 #Enable Warning IDE0079 ' Remove unnecessary suppression
 
+''' <summary>
+''' kopia Windows.Devices.Geolocation.BasicGeoposition, bo nic takiego nie ma w .Net
+''' </summary>
+Public Class MyBasicGeoposition
+    Public Altitude As Double
+    Public Latitude As Double
+    Public Longitude As Double
 
+    Public Sub New(lat As Double, lon As Double, alt As Double)
+        Altitude = alt
+        Longitude = lon
+        Latitude = lat
+    End Sub
+    Public Sub New(lat As Double, lon As Double)
+        Altitude = 0
+        Longitude = lon
+        Latitude = lat
+    End Sub
+
+    Public Function DistanceTo(dLatitude As Double, dLongitude As Double) As Double
+        Dim num1 As Integer
+
+        Try
+            Dim iRadix = 6371000
+            Dim tLat = (dLatitude - Latitude) * Math.PI / 180.0
+            Dim tLon = (dLongitude - Longitude) * Math.PI / 180.0
+            Dim a = 2.0 * Math.Asin(Math.Min(1.0, Math.Sqrt(Math.Sin(tLat / 2.0) *
+                Math.Sin(tLat / 2.0) + Math.Cos(Math.PI / 180.0 * Latitude) * Math.Cos(Math.PI / 180.0 * dLatitude) *
+                Math.Sin(tLon / 2.0) * Math.Sin(tLon / 2.0))))
+            Return iRadix * a
+        Catch ex As Exception
+            Return 0
+        End Try
+
+        Return num1
+    End Function
+
+
+    Public Function DistanceTo(oGeocoord As MyBasicGeoposition) As Double
+        Return DistanceTo(oGeocoord.Latitude, oGeocoord.Longitude)
+    End Function
+
+
+
+    Public Function IsInsidePoland() As Boolean
+        ' https//pl.wikipedia.org/wiki/Geometryczny_%C5%9Brodek_Polski
+
+        Dim dOdl As Double = DistanceTo(New MyBasicGeoposition(52.2159333, 19.1344222))
+        If dOdl / 1000 > 500 Then Return False
+        Return True    ' ale To nie jest pewne, tylko: "możliwe"
+    End Function
+
+    Public Shared Function GetDomekGeopos(Optional iDecimalDigits As UInteger = 0) As MyBasicGeoposition
+        Dim iDigits As Integer = iDecimalDigits
+        If iDigits > 5 Then iDigits = 0
+
+        Return New MyBasicGeoposition(Math.Round(50.01985, iDigits), Math.Round(19.97872, iDigits))
+    End Function
+
+    Public Shared Function GetKrakowGeopos() As MyBasicGeoposition
+        Return New MyBasicGeoposition(50.06138, 19.93833)
+    End Function
+
+End Class
