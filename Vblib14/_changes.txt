@@ -1,4 +1,7 @@
 ﻿
+2022.09.02
+* MojaLista :GetFileDate, :CheckIfTooOld
+
 2022.08.18
 * VBlib.MyBasicGeoposition.GetKrakowGeopos()
 * HttpPageReset(optional redirect as bool) - KrakTram wymaga False (do trasy tramwaju)

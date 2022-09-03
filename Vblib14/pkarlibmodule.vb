@@ -1,5 +1,7 @@
 ﻿Imports Microsoft
 Imports Microsoft.Extensions.Configuration
+Imports Newtonsoft.Json.Linq
+
 
 
 ' Partial Public Class App
@@ -1481,6 +1483,25 @@ Partial Public Module Extensions
         Return sTmp
     End Function
 
+    ''' <summary>
+    ''' wstawia spację tysięczną
+    ''' </summary>
+    ''' <param name="iValue"></param>
+    ''' <returns></returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function BigNumFormat(ByVal iValue As Long) As String
+        Dim sTxt As String = iValue.ToString
+        If sTxt.Length > 4 Then sTxt = sTxt.Substring(0, sTxt.Length - 3) & " " & sTxt.Substring(sTxt.Length - 3)
+        Return sTxt
+    End Function
+
+    <Runtime.CompilerServices.Extension()>
+    Public Function BigNumFormat(ByVal iValue As Integer) As String
+        Dim sTxt As String = iValue.ToString
+        If sTxt.Length > 4 Then sTxt = sTxt.Substring(0, sTxt.Length - 3) & " " & sTxt.Substring(sTxt.Length - 3)
+        Return sTxt
+    End Function
+
     ' #Region "Settingsy jako Extension" - not in .Net
     ' ShowAppVers(ByVal oItem As TextBlock) - not in .Net
     ' ShowAppVers(ByVal oPage As Page) - not in .Net
@@ -2523,15 +2544,19 @@ End Module
 #End Region
 
 
+#Region "podstawalist"
+
 ''' <summary>
 ''' klasa bazowa dla moich list
 ''' </summary>
 ''' <typeparam name="TYP"></typeparam>
 Public Class MojaLista(Of TYP)
-    Private _lista As List(Of TYP)
+    Protected _lista As List(Of TYP)
     Private _filename As String
 
     Public Sub New(sFolder As String, Optional sFileName As String = "items.json")
+        DumpCurrMethod($"sFolder={sFolder}, sFile={sFileName}")
+
         If String.IsNullOrWhiteSpace(sFolder) OrElse String.IsNullOrWhiteSpace(sFileName) Then
             DebugOut(0, "FAIL MojaLista.New z pustym parametrem!")
             Throw New ArgumentException("musi być i folder i filename podane")
@@ -2541,6 +2566,8 @@ Public Class MojaLista(Of TYP)
     End Sub
 
     Public Function Load() As Boolean
+        DumpCurrMethod()
+
         Dim sTxt As String = ""
         If IO.File.Exists(_filename) Then
             sTxt = IO.File.ReadAllText(_filename)
@@ -2555,13 +2582,15 @@ Public Class MojaLista(Of TYP)
         Return True
     End Function
 
-    Public Function ZapiszCache() As Boolean
+    Public Function Save() As Boolean
+        DumpCurrMethod()
+
         If _lista Is Nothing Then
-            DebugOut("ZapiszCache - glItems null")
+            DumpMessage("glItems null")
             Return False
         End If
         If _lista.Count < 1 Then
-            DebugOut("ZapiszCache - glItems.count<1")
+            DumpMessage("glItems.count<1")
             Return False
         End If
 
@@ -2569,6 +2598,19 @@ Public Class MojaLista(Of TYP)
         IO.File.WriteAllText(_filename, sTxt)
 
         Return True
+    End Function
+
+    Public Function GetFileDate() As Date
+        If IO.File.Exists(_filename) Then
+            Return IO.File.GetLastWriteTime(_filename)
+        Else
+            Return New Date(1970, 1, 1)
+        End If
+    End Function
+
+    Public Function IsObsolete(iDays As Integer)
+        If GetFileDate.AddDays(iDays) < Date.Now Then Return True
+        Return False
     End Function
 
     Public Function GetList() As List(Of TYP)
@@ -2630,9 +2672,13 @@ Public Class MojaLista(Of TYP)
 
 End Class
 
+#End Region
+
+
 #Enable Warning CA2007 'Consider calling ConfigureAwait On the awaited task
 #Enable Warning IDE0079 ' Remove unnecessary suppression
 
+#Region "GPS"
 ''' <summary>
 ''' kopia Windows.Devices.Geolocation.BasicGeoposition, bo nic takiego nie ma w .Net
 ''' </summary>
@@ -2697,3 +2743,5 @@ Public Class MyBasicGeoposition
     End Function
 
 End Class
+
+#End Region

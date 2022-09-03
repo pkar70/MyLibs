@@ -780,10 +780,11 @@ Public Module pkar
             Dim install_folder as string = Windows.ApplicationModel.Package.Current.InstalledLocation.Path
             Dim sManifestPath as string = Path.Combine(install_folder, "AppxManifest.xml")
 
-            if File.Exists(sManifestPath)
-                return File.GetLastWriteTime(sManifestPath).ToString("yyyy.MM.dd HH:mm")
+        If File.Exists(sManifestPath) Then
+            Return File.GetLastWriteTime(sManifestPath).ToString("yyyy.MM.dd HH:mm")
+        End If
 
-            return ""
+        Return ""
     End Function
 
 
@@ -1461,24 +1462,23 @@ Module Extensions
 #Region "GPS odleglosci"
 
     <Extension()>
-    Public Function ToMyGeopos(ByVal oPos As Windows.Devices.Geolocation.BasicGeoposition) As MyBasicGeoposition
-        Return New MyBasicGeoposition(oPos.Latitude, oPos.Longitude)
+    Public Function ToMyGeopos(ByVal oPos As Windows.Devices.Geolocation.BasicGeoposition) As Vblib.MyBasicGeoposition
+        Return New Vblib.MyBasicGeoposition(oPos.Latitude, oPos.Longitude)
     End Function
 
     <Extension()>
-    Public Function ToWinGeopoint(ByVal VBlib.MyBasicGeoposition oPos) As Windows.Devices.Geolocation.Geopoint 
-    {
+    Public Function ToWinGeopoint(ByVal oPos As Vblib.MyBasicGeoposition) As Windows.Devices.Geolocation.Geopoint
         Return New Windows.Devices.Geolocation.Geopoint(oPos.ToWinGeopos())
-    }
+    End Function
 
 
     <Extension()>
-    Public Function ToWinGeopos(ByVal oPos As MyBasicGeoposition) As Windows.Devices.Geolocation.BasicGeoposition
+    Public Function ToWinGeopos(ByVal oPos As Vblib.MyBasicGeoposition) As Windows.Devices.Geolocation.BasicGeoposition
         Dim oPoint As New Windows.Devices.Geolocation.BasicGeoposition With
             {
-                Latitude = oPos.Latitude,
-                Longitude = oPos.Longitude,
-                Altitude = oPos.Altitude
+                .Latitude = oPos.Latitude,
+                .Longitude = oPos.Longitude,
+                .Altitude = oPos.Altitude
             }
         Return oPoint
     End Function
