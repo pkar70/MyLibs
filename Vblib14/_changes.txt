@@ -1,4 +1,12 @@
-﻿
+﻿2022.09.08
+* MojaStruct jako podstawa do class z property, z DumpAsText oraz DumpAsJSON
+
+2022.09.07
+* ToStringISOsufix
+
+2022.09.06
+* integer.ToStringDHMS
+
 2022.09.02
 * MojaLista :GetFileDate, :CheckIfTooOld
 

@@ -1,4 +1,5 @@
-﻿Imports Microsoft
+﻿Imports System.Reflection
+Imports Microsoft
 Imports Microsoft.Extensions.Configuration
 Imports Newtonsoft.Json.Linq
 
@@ -560,7 +561,7 @@ Partial Public Module pkarlibmodule14
 
     Private moUIdialogBox As UIdialogBox ' = Nothing przez samą deklarację
     Private moUIdialogBoxYN As UIdialogBoxYN
-    Private moUIdialogBoxInput As UIdialogBoxInput 
+    Private moUIdialogBoxInput As UIdialogBoxInput
 
     ''' <summary>
     ''' inicjalizacja, zob. pkarModuleWithLib.InitLib
@@ -1481,6 +1482,43 @@ Partial Public Module Extensions
         sTmp &= iSecs.ToString(Globalization.CultureInfo.InvariantCulture)
 
         Return sTmp
+    End Function
+
+    <Runtime.CompilerServices.Extension()>
+    Public Function ToStringISOsufix(ByVal iValue As Long, Optional sUnit As String = "Bytes") As String
+        ' zakres integer: 2.1 Gi        (2 147 483 647)
+        ' zakres long: 9.2  (9 223 372 036 854 775 808)
+
+        If iValue < 9999 Then Return iValue.BigNumFormat & If(sUnit = "", "", " " & sUnit)
+
+        iValue = iValue / 1024 + 1
+        If iValue < 9999 Then Return iValue.BigNumFormat & " Ki" & sUnit
+
+        iValue = iValue / 1024 + 1
+        If iValue < 9999 Then Return iValue.BigNumFormat & " Mi" & sUnit
+
+        iValue = iValue / 1024 + 1
+        If iValue < 9999 Then Return iValue.BigNumFormat & " Gi" & sUnit
+
+        iValue = iValue / 1024 + 1
+        If iValue < 9999 Then Return iValue.BigNumFormat & " Ti" & sUnit
+
+        iValue = iValue / 1024 + 1
+        Return iValue.BigNumFormat & " Ei" & sUnit
+
+
+    End Function
+
+    ''' <summary>
+    ''' Max ~150 dni
+    ''' </summary>
+    ''' <param name="iSecs"></param>
+    ''' <returns></returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ToStringDHMS(ByVal iSecs As Integer) As String
+        ' integer = 2,147,483,647, z sekund na 3600 godzin, 150 dni
+        Dim temp As Long = iSecs
+        Return temp.ToStringDHMS
     End Function
 
     ''' <summary>
@@ -2674,6 +2712,30 @@ End Class
 
 #End Region
 
+#Region "Podstawa typów"
+Public MustInherit Class MojaStruct
+
+    Public Function DumpAsJSON() As String
+        Return Newtonsoft.Json.JsonConvert.SerializeObject(Me, Newtonsoft.Json.Formatting.Indented)
+    End Function
+
+    Public Function DumpAsText() As String
+        Dim oTypek As Type = Me.GetType
+        Dim sTxt As String = Me.ToString & ":" & vbCrLf
+
+        For Each oProp As PropertyInfo In oTypek.GetRuntimeProperties
+            sTxt = sTxt & oProp.Name & ":" & vbTab
+            If oProp.GetValue(Me) Is Nothing Then
+                sTxt &= " (null)"
+            Else
+                sTxt &= oProp.GetValue(Me).ToString
+            End If
+        Next
+
+        Return sTxt
+    End Function
+End Class
+#End Region
 
 #Enable Warning CA2007 'Consider calling ConfigureAwait On the awaited task
 #Enable Warning IDE0079 ' Remove unnecessary suppression
