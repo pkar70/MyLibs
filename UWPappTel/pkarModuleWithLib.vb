@@ -1504,6 +1504,11 @@ Module Extensions
 
     'End Function
 
+    <Extension()>
+    Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.BasicGeoposition, oGeopos1 As Windows.Devices.Geolocation.BasicGeoposition) As Integer
+        Return oGeopos0.ToMyGeopos.DistanceTo(oGeopos1.ToMyGeopos)
+    End Function
+
     '<Extension()>
     'Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.BasicGeoposition, oGeopos1 As Windows.Devices.Geolocation.BasicGeoposition) As Integer
     '    ' https://stackoverflow.com/questions/28569246/how-to-get-distance-between-two-locations-in-windows-phone-8-1

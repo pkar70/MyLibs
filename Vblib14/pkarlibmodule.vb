@@ -1,9 +1,12 @@
-﻿Imports System.Reflection
+﻿
+Imports System.Reflection
 Imports Microsoft
 Imports Microsoft.Extensions.Configuration
+Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
-
+' 2022.11.08
+' mybasicgeopos EmptyGeopos i IsEmpty, StringLat i StringLon (z "." w zapisie)
 
 ' Partial Public Class App
 ' #Region "Back button" - not in .Net
@@ -76,6 +79,9 @@ Partial Public Module pkarlibmodule14
                 For iLoop As Integer = iCurrMethod + 1 To subs.Length - 1
                     If subs(iLoop).Contains("System.Runtime.CompilerServices.") Then Continue For
                     If subs(iLoop).Contains("System.Threading.Tasks.") Then Continue For
+                    If subs(iLoop).Contains("System.Windows.") Then Continue For
+                    If subs(iLoop).Contains("at MS.Internal.") Then Continue For
+                    If subs(iLoop).Contains("at MS.Win32.") Then Continue For
 
                     sPrefix &= "  "
                     iDepth += 1
@@ -793,7 +799,7 @@ Partial Public Module pkarlibmodule14
         Dim sPage As String
 
         ' override dla Facebook
-        If oResp.Content.Headers.Contains("Content-Type") Then
+        If oResp.Content.Headers.Contains("oContent-Type") Then
             If oResp.Content.Headers.ContentType.CharSet = """utf-8""" Then
                 oResp.Content.Headers.ContentType.CharSet = "utf-8"
             End If
@@ -1687,7 +1693,7 @@ Partial Public Module Extensions
 
         Select Case sChar
             Case "00002a00-0000-1000-8000-00805f9b34fb"
-                Return vbTab & "known as: Device Name"
+                Return vbTab & "known as: Device SourceName"
             Case "00002a01-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: Appearance"
             Case "00002a02-0000-1000-8000-00805f9b34fb"
@@ -1769,7 +1775,7 @@ Partial Public Module Extensions
             Case "00002a28-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: Software Revision String"
             Case "00002a29-0000-1000-8000-00805f9b34fb"
-                Return vbTab & "known as: Manufacturer Name String"
+                Return vbTab & "known as: Manufacturer SourceName String"
             Case "00002a2a-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: IEEE 11073-20601 Regulatory Certification Data List"
             Case "00002a2b-0000-1000-8000-00805f9b34fb"
@@ -1955,7 +1961,7 @@ Partial Public Module Extensions
             Case "00002a89-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: Fat Burn Heart Rate Upper Limit"
             Case "00002a8a-0000-1000-8000-00805f9b34fb"
-                Return vbTab & "known as: First Name"
+                Return vbTab & "known as: First SourceName"
             Case "00002a8b-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: Five Zone Heart Rate Limits"
             Case "00002a8c-0000-1000-8000-00805f9b34fb"
@@ -1967,7 +1973,7 @@ Partial Public Module Extensions
             Case "00002a8f-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: Hip Circumference"
             Case "00002a90-0000-1000-8000-00805f9b34fb"
-                Return vbTab & "known as: Last Name"
+                Return vbTab & "known as: Last SourceName"
             Case "00002a91-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: Maximum Recommended Heart Rate"
             Case "00002a92-0000-1000-8000-00805f9b34fb"
@@ -2041,7 +2047,7 @@ Partial Public Module Extensions
             Case "00002ab4-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: Uncertainty"
             Case "00002ab5-0000-1000-8000-00805f9b34fb"
-                Return vbTab & "known as: Location Name"
+                Return vbTab & "known as: Location SourceName"
             Case "00002ab6-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: URI"
             Case "00002ab7-0000-1000-8000-00805f9b34fb"
@@ -2059,7 +2065,7 @@ Partial Public Module Extensions
             Case "00002abd-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: OTS Feature"
             Case "00002abe-0000-1000-8000-00805f9b34fb"
-                Return vbTab & "known as: Object Name"
+                Return vbTab & "known as: Object SourceName"
             Case "00002abf-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: Object Type"
             Case "00002ac0-0000-1000-8000-00805f9b34fb"
@@ -2603,7 +2609,7 @@ Public Class MojaLista(Of TYP)
         _filename = IO.Path.Combine(sFolder, sFileName)
     End Sub
 
-    Public Function Load() As Boolean
+    Public Overridable Function Load() As Boolean
         DumpCurrMethod()
 
         Dim sTxt As String = ""
@@ -2620,7 +2626,7 @@ Public Class MojaLista(Of TYP)
         Return True
     End Function
 
-    Public Function Save() As Boolean
+    Public Overridable Function Save(Optional bIgnoreNulls As Boolean = False) As Boolean
         DumpCurrMethod()
 
         If _lista Is Nothing Then
@@ -2632,7 +2638,14 @@ Public Class MojaLista(Of TYP)
             Return False
         End If
 
-        Dim sTxt As String = Newtonsoft.Json.JsonConvert.SerializeObject(_lista, Newtonsoft.Json.Formatting.Indented)
+        Dim sTxt As String
+        If bIgnoreNulls Then
+            Dim oSerSet As New Newtonsoft.Json.JsonSerializerSettings With {.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, .DefaultValueHandling = DefaultValueHandling.Ignore}
+            sTxt = Newtonsoft.Json.JsonConvert.SerializeObject(_lista, Newtonsoft.Json.Formatting.Indented, oSerSet)
+        Else
+            sTxt = Newtonsoft.Json.JsonConvert.SerializeObject(_lista, Newtonsoft.Json.Formatting.Indented)
+        End If
+
         IO.File.WriteAllText(_filename, sTxt)
 
         Return True
@@ -2749,6 +2762,7 @@ Public Class MyBasicGeoposition
     Public Latitude As Double
     Public Longitude As Double
 
+    <JsonConstructor>
     Public Sub New(lat As Double, lon As Double, alt As Double)
         Altitude = alt
         Longitude = lon
@@ -2804,6 +2818,35 @@ Public Class MyBasicGeoposition
         Return New MyBasicGeoposition(50.06138, 19.93833)
     End Function
 
+    ''' <summary>
+    ''' returns MyBasicGeoposition that can be used as empty (środek oceanu)
+    ''' </summary>
+    ''' <returns></returns>
+    Public Shared Function EmptyGeoPos() As MyBasicGeoposition
+        Return New MyBasicGeoposition(0, -150)
+    End Function
+
+    ''' <summary>
+    ''' sprawdza czy jest to MyBasicGeoposition z EmptyGeoPos
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function IsEmpty() As Boolean
+        Dim oEmpty As MyBasicGeoposition = EmptyGeoPos()
+        If Latitude <> oEmpty.Latitude Then Return False
+        If Longitude <> oEmpty.Longitude Then Return False
+        Return True
+    End Function
+
+    Private Function Double2String(sVal As Double) As String
+        Return sVal.ToString(System.Globalization.CultureInfo.InvariantCulture)
+    End Function
+    Public Function StringLat() As String
+        Return Double2String(Latitude)
+    End Function
+
+    Public Function StringLon() As String
+        Return Double2String(Longitude)
+    End Function
 End Class
 
 #End Region
