@@ -1,8 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>Nuget_Configsy</RootNamespace>
+    <RootNamespace>pkar.NetConfigs</RootNamespace>
     <TargetFramework>netstandard1.4</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <AssemblyName>NetConfigs</AssemblyName>
+    <Title>Additional Extensions.Configuration providers</Title>
+    <Authors>pkar</Authors>
+    <Company>none</Company>
+    <Description>Extensions.Configuration providers that can be used on phones (.Net Standard 1.4). JSON read/write, roaming and local, INI by content (for e.g. Android), and two read only: command line and environment variables.</Description>
+    <Copyright>Piotr Karocki</Copyright>
+    <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/Nuget-Configsy</RepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
