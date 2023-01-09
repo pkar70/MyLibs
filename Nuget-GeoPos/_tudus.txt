@@ -1,0 +1,15 @@
+﻿
+* na MyStruct
+
+* potem UWPmodule i CAST operator?
+
+* FromAnyObject(object), i Reflection sprawdzenie propertiesów, wczytanie gdy Latitude, Longitude, Altitude
+* analogicznie ToOnyObject(object), przepisanie danych do tego object
+
+
+Usage:
+EnviroStatus - tel
+PicSort - WPF
+ShopCards - tel
+KrakTram - tel
+
