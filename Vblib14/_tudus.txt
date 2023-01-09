@@ -1,4 +1,16 @@
 
+
+* double, int.IsBetween (IsInRange)
+
+* moje vblib.Extension jako Nuget (jak najwiecej)
+
+* WPF ma więcej niż .Net Std 2.0? tak zeby byl inny dependency dla telefon, UWP desktop, WPF desktop
+
+* gdzie jeszcze siega UWP, gdzie nie sięga WPF i inne? Czy robić migracje z UWPdekstop do WPFdesktop?
+[iot [Core: tylko UWP, Enterprise: WPF także], mobile, PC, XBox, surfacehub, hololens]
+
+* string.Depascal/InsertSpaces
+
 ---- NAUKA NAUKA NAUKA NAUKA NAUKA NAUKA NAUKA NAUKA -----------
 
 1) Logging, takie jak jest w Uno, bo może się to do czegoś przydać (np. DumpCurrMethod może robić dokładniejszą info?)

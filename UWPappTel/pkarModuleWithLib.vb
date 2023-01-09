@@ -264,23 +264,26 @@ Public Module pkar
     Private Sub InitSettings(aCmdLineArgs As List(Of String))
         Dim sAppName As String = Windows.ApplicationModel.Package.Current.DisplayName
 
-        Dim oBuilder As New Microsoft.Extensions.Configuration.ConfigurationBuilder()
-        oBuilder = oBuilder.AddIniRelDebugSettings(Vblib.IniLikeDefaults.sIniContent)   ' defaults.ini w głównym katalogu Project, sekcje [main] oraz [debug]
+        'Dim oBuilder As New Microsoft.Extensions.Configuration.ConfigurationBuilder()
+        'oBuilder = oBuilder.AddIniRelDebugSettings(Vblib.IniLikeDefaults.sIniContent)   ' defaults.ini w głównym katalogu Project, sekcje [main] oraz [debug]
 
         ' ale i tak jest Empty
         Dim oDict As IDictionary = Environment.GetEnvironmentVariables()    ' że, w 1.4, zwraca HashTable?
-        oBuilder = oBuilder.AddEnvironmentVariablesROConfigurationSource(sAppName, oDict) ' Environment.GetEnvironmentVariables, Std 2.0
-        oBuilder = oBuilder.AddUwpSettings()
-        oBuilder = oBuilder.AddJsonRwSettings(Windows.Storage.ApplicationData.Current.LocalFolder.Path,
-                        Windows.Storage.ApplicationData.Current.RoamingFolder.Path)
-        If aCmdLineArgs IsNot Nothing Then oBuilder = oBuilder.AddCommandLineRO(aCmdLineArgs)  ' Environment.GetCommandLineArgs, Std 1.5, ale nie w UWP?
+        'oBuilder = oBuilder.AddEnvironmentVariablesROConfigurationSource(sAppName, oDict) ' Environment.GetEnvironmentVariables, Std 2.0
+        'oBuilder = oBuilder.AddUwpSettings()
+        'oBuilder = oBuilder.AddJsonRwSettings(Windows.Storage.ApplicationData.Current.LocalFolder.Path,
+        '                Windows.Storage.ApplicationData.Current.RoamingFolder.Path)
+        'If aCmdLineArgs IsNot Nothing Then oBuilder = oBuilder.AddCommandLineRO(aCmdLineArgs)  ' Environment.GetCommandLineArgs, Std 1.5, ale nie w UWP?
 
-        Dim settings As Microsoft.Extensions.Configuration.IConfigurationRoot = oBuilder.Build
+        'Dim settings As Microsoft.Extensions.Configuration.IConfigurationRoot = oBuilder.Build
 
-        Vblib.LibInitSettings(settings)
+        ' Vblib.LibInitSettings(settings)
+        Vblib.InitSettings(sAppName, oDict, New UwpConfigurationSource(),
+                           Windows.Storage.ApplicationData.Current.LocalFolder.Path,
+                            Windows.Storage.ApplicationData.Current.RoamingFolder.Path, aCmdLineArgs)
     End Sub
 
-#If FalseThen Then
+#If False Then
 
 #Region "String"
 
@@ -1668,9 +1671,27 @@ Module Extensions
     End Sub
 
     <Extension()>
+    Public Sub SetSettingsInt(ByVal oItem As ComboBox, Optional sName As String = "", Optional bRoam As Boolean = False)
+        If sName = "" Then sName = oItem.Name
+        VBlib.SetSettingsInt(sName, oItem.SelectedIndex, bRoam)
+    End Sub
+
+    <Extension()>
+    Public Sub GetSettingsInt(ByVal oItem As ComboBox, Optional sName As String = "")
+        If sName = "" Then sName = oItem.Name
+        Dim temp As Integer = VBlib.GetSettingsInt(sName)
+        If temp < oItem.Items.Count Then
+            oItem.SelectedIndex = temp
+        Else
+            oItem.SelectedIndex = -1
+        End If
+    End Sub
+
+
+    <Extension()>
     Public Sub SetSettingsDate(ByVal oItem As CalendarDatePicker, Optional sName As String = "", Optional bRoam As Boolean = False)
         If sName = "" Then sName = oItem.Name
-        Vblib.SetSettingsDate(sName, oItem.Date.Value, bRoam)
+        VBlib.SetSettingsDate(sName, oItem.Date.Value, bRoam)
     End Sub
 
     <Extension()>

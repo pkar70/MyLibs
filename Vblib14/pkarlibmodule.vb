@@ -1,9 +1,11 @@
 ﻿
 Imports System.Reflection
+Imports System.Runtime
 Imports Microsoft
 Imports Microsoft.Extensions.Configuration
-Imports Newtonsoft.Json
-Imports Newtonsoft.Json.Linq
+'Imports Newtonsoft.Json
+'Imports Newtonsoft.Json.Linq
+' Imports pkar.NetConfigs.Extensions
 
 ' 2022.11.08
 ' mybasicgeopos EmptyGeopos i IsEmpty, StringLat i StringLon (z "." w zapisie)
@@ -227,6 +229,8 @@ Partial Public Module pkarlibmodule14
 
 #Region "Settings"
 
+#If CONFIG_NUGET_PROVIDERS Then
+    ' wersja z NUGET tylko jako Providers
     Friend _settingsGlobal As Microsoft.Extensions.Configuration.IConfigurationRoot
     Public Sub LibInitSettings(settings As Microsoft.Extensions.Configuration.IConfigurationRoot)
         _settingsGlobal = settings
@@ -239,8 +243,19 @@ Partial Public Module pkarlibmodule14
         ' w wersji .Net 2.0 mogłoby być więcej - tzn. commandline przynajmniej jeszcze
         ' na razie jest INI z appx, oraz (jako jakiekolwiek pamiętanie: InMemoryStorage. Nie jest dobre, bo będzie się plątać przy ROAM
         ' i w dodatku działa tylko na UWP :(  w Droid jest ""
-        Dim settings As Microsoft.Extensions.Configuration.IConfigurationRoot =
-                (New Microsoft.Extensions.Configuration.ConfigurationBuilder).AddIniRelDebugSettings(IniLikeDefaults.sIniContent).AddInMemoryCollection().Build()
+
+        Dim settings As Microsoft.Extensions.Configuration.IConfigurationRoot
+#If False Then
+        settings = (New Microsoft.Extensions.Configuration.ConfigurationBuilder).AddIniRelDebugSettings(IniLikeDefaults.sIniContent).AddInMemoryCollection().Build()
+#Else
+
+#If DEBUG Then
+        settings = (New Microsoft.Extensions.Configuration.ConfigurationBuilder).AddIniReleaseDebugSettings(IniLikeDefaults.sIniContent, True).AddInMemoryCollection().Build()
+#Else
+        settings = (New Microsoft.Extensions.Configuration.ConfigurationBuilder).AddIniReleaseDebugSettings(IniLikeDefaults.sIniContent, false).AddInMemoryCollection().Build()
+#End If
+
+#End If
 
     End Sub
 
@@ -324,9 +339,88 @@ Partial Public Module pkarlibmodule14
 
         Return DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss")
     End Function
+#Else
+    ' wersja z NUGET pełnym
+
+    'Public Sub LibInitSettings(settings As Microsoft.Extensions.Configuration.IConfigurationRoot)
+    '    pkar.NetConfigs.InitSettings(settings)
+    'End Sub
+
+    Public Sub InitSettings(
+                        applicationName As String, dictionaryOfEnvVars As System.Collections.IDictionary,
+                        configSource As Microsoft.Extensions.Configuration.IConfigurationSource,
+                        localJSONdirName As String, roamJSONdirNname As String,
+                        cmdLineArgs As List(Of String))
+
+
+        Dim sINIcontent As String = IniLikeDefaults.sIniContent
+#If DEBUG Then
+        Dim bIniUseDebug As Boolean = True
+#Else
+            Dim bIniUseDebug As Boolean = false
+#End If
+
+        pkar.NetConfigs.InitSettings(sINIcontent, bIniUseDebug,
+                        applicationName, dictionaryOfEnvVars,
+                        configSource,
+                        localJSONdirName, roamJSONdirNname, False,
+                        cmdLineArgs)
+
+
+    End Sub
+
+    Public Sub SetSettingsString(sName As String, value As String, Optional bRoam As Boolean = False)
+        pkar.NetConfigs.SetSettingsString(sName, value, bRoam)
+    End Sub
+
+    Public Sub SetSettingsInt(sName As String, value As Integer, Optional bRoam As Boolean = False)
+        pkar.NetConfigs.SetSettingsInt(sName, value, bRoam)
+    End Sub
+
+    Public Sub SetSettingsBool(sName As String, value As Boolean, Optional bRoam As Boolean = False)
+        pkar.NetConfigs.SetSettingsBool(sName, value, bRoam)
+    End Sub
+
+    Public Sub SetSettingsLong(sName As String, value As Long, Optional bRoam As Boolean = False)
+        pkar.NetConfigs.SetSettingsLong(sName, value, bRoam)
+    End Sub
+
+    Public Sub SetSettingsDate(sName As String, value As DateTimeOffset, Optional bRoam As Boolean = False)
+        pkar.NetConfigs.SetSettingsDate(sName, value, bRoam)
+    End Sub
+
+    Public Sub SetSettingsCurrentDate(sName As String, Optional bRoam As Boolean = False)
+        pkar.NetConfigs.SetSettingsCurrentDate(sName, bRoam)
+    End Sub
+
+
+    Public Function GetSettingsString(sName As String, Optional sDefault As String = "") As String
+        Return pkar.NetConfigs.GetSettingsString(sName, sDefault)
+    End Function
+
+    Public Function GetSettingsInt(sName As String, Optional iDefault As Integer = 0) As Integer
+        Return pkar.NetConfigs.GetSettingsInt(sName, iDefault)
+    End Function
+
+    Public Function GetSettingsBool(sName As String, Optional bDefault As Boolean = False) As Boolean
+        Return pkar.NetConfigs.GetSettingsBool(sName, bDefault)
+    End Function
+
+    Public Function GetSettingsLong(sName As String, Optional iDefault As Long = 0) As Long
+        Return pkar.NetConfigs.GetSettingsLong(sName, iDefault)
+    End Function
+
+    Public Function GetSettingsDate(sName As String, Optional sDefault As String = "") As DateTimeOffset
+        Return pkar.NetConfigs.GetSettingsDate(sName, sDefault)
+    End Function
+
+    Public Function GetSettingsDateGetSettingsDate(sName As String, dDefault As DateTimeOffset) As DateTimeOffset
+        Return pkar.NetConfigs.GetSettingsDate(sName, dDefault)
+    End Function
+#End If
 
     ' wersja z przeskokami do UWP
-#If False Then
+#If CONFIG_UWP_PROXY Then
 
     Public Delegate Function UIGetSettingsString(sName As String, defValue As String) As String
     Public Delegate Function UIGetSettingsInt(sName As String, defValue As Integer) As Integer
@@ -781,6 +875,10 @@ Partial Public Module pkarlibmodule14
             Return ""
         End Try
 
+        If Not oResp.IsSuccessStatusCode Then
+            DumpMessage($"Error code: {oResp.StatusCode}. {oResp.ReasonPhrase}")
+        End If
+
         If oResp.StatusCode = 303 Or oResp.StatusCode = 302 Or oResp.StatusCode = 301 Then
             ' redirect
             oUri = oResp.Headers.Location
@@ -804,6 +902,12 @@ Partial Public Module pkarlibmodule14
                 oResp.Content.Headers.ContentType.CharSet = "utf-8"
             End If
         End If
+
+        'override dla Auchan
+        If oResp.Content?.Headers?.ContentType?.CharSet = "utf8" Then
+            oResp.Content.Headers.ContentType.CharSet = "utf-8"
+        End If
+
         Try
             sPage = Await oResp.Content.ReadAsStringAsync()
 #Disable Warning CA1031 ' Do not catch general exception types
@@ -932,14 +1036,16 @@ Partial Public Module pkarlibmodule14
         Return ""  ' oznacza: to nie jest standardowa komenda
     End Function
 
+    <Obsolete("jak bedzie nowszy Nuget ktory to ma")>
     Private Function DumpSettings() As String
         ' GetDebugView(IConfigurationRoot) - ale to od późniejszych .Net, od platform extension 3
 
         Dim sRet As String = "Dump settings (VBlib version, v.1.4)" & vbCrLf
 
-        For Each oSett In _settingsGlobal.AsEnumerable
-            sRet = sRet & oSett.Key & vbTab & oSett.Value & vbCrLf
-        Next
+        'For Each oSett In _settingsGlobal.AsEnumerable
+        '    sRet = sRet & oSett.Key & vbTab & oSett.Value & vbCrLf
+        'Next
+
 
         Return sRet
     End Function
@@ -2135,7 +2241,7 @@ Partial Public Module Extensions
 End Module
 
 #Region ".Net Standard Settings"
-
+#If CONFIG_TU_NIE_NUGET Then
 #Region "JSON read/write"
 
 ' a) w .Net Standard 1.4 zwykły JSON nie działa
@@ -2539,8 +2645,11 @@ Friend Class EnvironmentVariablesROConfigurationSource
 End Class
 
 #End Region
+#End If
 
 Partial Module Extensions
+
+#If CONFIG_TU_NIE_NUGET Then
     <Runtime.CompilerServices.Extension()>
     <CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification:="<Pending>")>
     Public Function AddJsonRwSettings(ByVal configurationBuilder As IConfigurationBuilder, sPathnameLocal As String, sPathnameRoam As String, Optional bReadOnly As Boolean = False) As IConfigurationBuilder
@@ -2569,7 +2678,11 @@ Partial Module Extensions
         configurationBuilder.Add(New EnvironmentVariablesROConfigurationSource(sPrefix, oDict))
         Return configurationBuilder
     End Function
+#End If
+End Module
+#End Region
 
+Partial Module Extensions
     <Obsolete("to może nie działać!")>
     <Runtime.CompilerServices.Extension()>
     Public Function SelectSingleNode(ByVal oNode As Xml.XmlNode, sNodeName As String) As Xml.XmlNode
@@ -2585,11 +2698,10 @@ End Module
 
 
 
-#End Region
+
 
 
 #Region "podstawalist"
-
 ''' <summary>
 ''' klasa bazowa dla moich list
 ''' </summary>
@@ -2597,6 +2709,16 @@ End Module
 Public Class MojaLista(Of TYP)
     Protected _lista As List(Of TYP)
     Private _filename As String
+
+#If False Then
+    ' nie działa w 1.4
+    Public Sub ala()
+        Dim sAppName As String = Application.Current.MainWindow.GetType().Assembly.GetName.Name
+        Dim sLocalAppData As String = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+        sPathLocal = IO.Path.Combine(sLocalAppData, sAppName)
+
+    End Sub
+#End If
 
     Public Sub New(sFolder As String, Optional sFileName As String = "items.json")
         DumpCurrMethod($"sFolder={sFolder}, sFile={sFileName}")
@@ -2619,11 +2741,20 @@ Public Class MojaLista(Of TYP)
 
         If sTxt Is Nothing OrElse sTxt.Length < 5 Then
             Clear()
+            InsertDefaultContent()
             Return False
         End If
 
         _lista = Newtonsoft.Json.JsonConvert.DeserializeObject(sTxt, GetType(List(Of TYP)))
         Return True
+    End Function
+
+    Public Function LoadItem(sJSON As String) As TYP
+        Try
+            Return Newtonsoft.Json.JsonConvert.DeserializeObject(sJSON, GetType(TYP))
+        Catch ex As Exception
+            Return Nothing
+        End Try
     End Function
 
     Public Overridable Function Save(Optional bIgnoreNulls As Boolean = False) As Boolean
@@ -2640,7 +2771,7 @@ Public Class MojaLista(Of TYP)
 
         Dim sTxt As String
         If bIgnoreNulls Then
-            Dim oSerSet As New Newtonsoft.Json.JsonSerializerSettings With {.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, .DefaultValueHandling = DefaultValueHandling.Ignore}
+            Dim oSerSet As New Newtonsoft.Json.JsonSerializerSettings With {.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, .DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore}
             sTxt = Newtonsoft.Json.JsonConvert.SerializeObject(_lista, Newtonsoft.Json.Formatting.Indented, oSerSet)
         Else
             sTxt = Newtonsoft.Json.JsonConvert.SerializeObject(_lista, Newtonsoft.Json.Formatting.Indented)
@@ -2706,6 +2837,14 @@ Public Class MojaLista(Of TYP)
         _lista.Remove(oItem)
     End Sub
 
+    ''' <summary>
+    ''' wstaw do listy default content - gdy Load daje puste
+    ''' </summary>
+    Protected Overridable Sub InsertDefaultContent()
+
+    End Sub
+
+
 #If False Then
     Public Function Find(iID As Integer) As TYP
         Dim t As Type = TYP.GetType
@@ -2728,8 +2867,14 @@ End Class
 #Region "Podstawa typów"
 Public MustInherit Class MojaStruct
 
-    Public Function DumpAsJSON() As String
-        Return Newtonsoft.Json.JsonConvert.SerializeObject(Me, Newtonsoft.Json.Formatting.Indented)
+    Public Function DumpAsJSON(Optional bSkipDefaults As Boolean = False) As String
+        Dim oSerSet As New Newtonsoft.Json.JsonSerializerSettings
+
+        If bSkipDefaults Then
+            oSerSet.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
+            oSerSet.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore
+        End If
+        Return Newtonsoft.Json.JsonConvert.SerializeObject(Me, Newtonsoft.Json.Formatting.Indented, oSerSet)
     End Function
 
     Public Function DumpAsText() As String
@@ -2747,6 +2892,23 @@ Public MustInherit Class MojaStruct
 
         Return sTxt
     End Function
+
+    Public Function Clone() As Object
+        Dim sTxt As String = DumpAsJSON()
+        Return Newtonsoft.Json.JsonConvert.DeserializeObject(sTxt, Me.GetType)
+    End Function
+
+#If False Then
+    ' nie działa w 1.4
+    public shared function FromJSON(sJSON as string) as object
+    Dim st As New StackFrame()
+    Dim t As New StackTrace()
+    Dim t2 As Type = TryCast(t.GetFrames(1).GetMethod(), MemberInfo).DeclaringType
+    Return Newtonsoft.Json.JsonConvert.DeserializeObject(sTxt, t2)
+    End Function
+
+#End If
+
 End Class
 #End Region
 
@@ -2762,7 +2924,7 @@ Public Class MyBasicGeoposition
     Public Latitude As Double
     Public Longitude As Double
 
-    <JsonConstructor>
+    <Newtonsoft.Json.JsonConstructor>
     Public Sub New(lat As Double, lon As Double, alt As Double)
         Altitude = alt
         Longitude = lon
