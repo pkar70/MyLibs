@@ -1,4 +1,5 @@
 ﻿
+Imports System.IO
 Imports System.Reflection
 Imports System.Runtime
 Imports Microsoft
@@ -1055,6 +1056,9 @@ Partial Public Module pkarlibmodule14
 
 #End Region
 
+
+#If NUGET_DATALOG_HERE Then
+
 #Region "DataLog folder support"
     Private msDataLogRootFolder As String = ""
     Public Sub LibInitDataLog(sPath As String)
@@ -1192,6 +1196,8 @@ Partial Public Module pkarlibmodule14
 
 
 #End Region
+
+#End If
 
     ' #Region "Bluetooth debugs"  - not in .Net
     ' DebugBTGetServChar - not in .Net
@@ -1652,6 +1658,32 @@ Partial Public Module Extensions
         Return sTxt
     End Function
 
+
+    <Runtime.CompilerServices.Extension()>
+    Public Async Function IsSameStreamContent(ByVal oStream1 As Stream, oStream2 As Stream) As Task(Of Boolean)
+        ' This is not merely an optimization, as incrementing one stream's position
+        ' should Not affect the position of the other.
+        If oStream1.Equals(oStream2) Then Return True
+
+        If oStream1.Length <> oStream2.Length Then Return False
+
+        Dim oBuf1 As Byte() = New Byte(4100) {}
+        Dim oBuf2 As Byte() = New Byte(4100) {}
+
+        Do
+            Dim iBytes1 As Integer = Await oStream1.ReadAsync(oBuf1, 0, 4096)
+            Dim iBytes2 As Integer = Await oStream2.ReadAsync(oBuf2, 0, 4096)
+
+            If iBytes1 = 0 Then Return True
+
+            For iLp As Integer = 0 To iBytes1
+                If oBuf1(iLp) <> oBuf2(iLp) Then Return False
+            Next
+
+        Loop
+
+        Return True
+    End Function
     ' #Region "Settingsy jako Extension" - not in .Net
     ' ShowAppVers(ByVal oItem As TextBlock) - not in .Net
     ' ShowAppVers(ByVal oPage As Page) - not in .Net
@@ -2698,8 +2730,7 @@ End Module
 
 
 
-
-
+#If NUGET_STRUCTY_HERE Then
 
 #Region "podstawalist"
 ''' <summary>
@@ -2912,14 +2943,18 @@ Public MustInherit Class MojaStruct
 End Class
 #End Region
 
+#End If
+
 #Enable Warning CA2007 'Consider calling ConfigureAwait On the awaited task
 #Enable Warning IDE0079 ' Remove unnecessary suppression
+
+#If NUGET_GEOPOS_HERE Then
 
 #Region "GPS"
 ''' <summary>
 ''' kopia Windows.Devices.Geolocation.BasicGeoposition, bo nic takiego nie ma w .Net
 ''' </summary>
-Public Class MyBasicGeoposition
+Public Class pkar.BasicGeopos
     Public Altitude As Double
     Public Latitude As Double
     Public Longitude As Double
@@ -2955,7 +2990,7 @@ Public Class MyBasicGeoposition
     End Function
 
 
-    Public Function DistanceTo(oGeocoord As MyBasicGeoposition) As Double
+    Public Function DistanceTo(oGeocoord As pkar.BasicGeopos) As Double
         Return DistanceTo(oGeocoord.Latitude, oGeocoord.Longitude)
     End Function
 
@@ -2964,36 +2999,36 @@ Public Class MyBasicGeoposition
     Public Function IsInsidePoland() As Boolean
         ' https//pl.wikipedia.org/wiki/Geometryczny_%C5%9Brodek_Polski
 
-        Dim dOdl As Double = DistanceTo(New MyBasicGeoposition(52.2159333, 19.1344222))
+        Dim dOdl As Double = DistanceTo(New pkar.BasicGeopos(52.2159333, 19.1344222))
         If dOdl / 1000 > 500 Then Return False
         Return True    ' ale To nie jest pewne, tylko: "możliwe"
     End Function
 
-    Public Shared Function GetDomekGeopos(Optional iDecimalDigits As UInteger = 0) As MyBasicGeoposition
+    Public Shared Function GetDomekGeopos(Optional iDecimalDigits As UInteger = 0) As pkar.BasicGeopos
         Dim iDigits As Integer = iDecimalDigits
         If iDigits > 5 Then iDigits = 0
 
-        Return New MyBasicGeoposition(Math.Round(50.01985, iDigits), Math.Round(19.97872, iDigits))
+        Return New pkar.BasicGeopos(Math.Round(50.01985, iDigits), Math.Round(19.97872, iDigits))
     End Function
 
-    Public Shared Function GetKrakowGeopos() As MyBasicGeoposition
-        Return New MyBasicGeoposition(50.06138, 19.93833)
+    Public Shared Function GetKrakowGeopos() As pkar.BasicGeopos
+        Return New pkar.BasicGeopos(50.06138, 19.93833)
     End Function
 
     ''' <summary>
-    ''' returns MyBasicGeoposition that can be used as empty (środek oceanu)
+    ''' returns pkar.BasicGeopos that can be used as empty (środek oceanu)
     ''' </summary>
     ''' <returns></returns>
-    Public Shared Function EmptyGeoPos() As MyBasicGeoposition
-        Return New MyBasicGeoposition(0, -150)
+    Public Shared Function EmptyGeoPos() As pkar.BasicGeopos
+        Return New pkar.BasicGeopos(0, -150)
     End Function
 
     ''' <summary>
-    ''' sprawdza czy jest to MyBasicGeoposition z EmptyGeoPos
+    ''' sprawdza czy jest to pkar.BasicGeopos z EmptyGeoPos
     ''' </summary>
     ''' <returns></returns>
     Public Function IsEmpty() As Boolean
-        Dim oEmpty As MyBasicGeoposition = EmptyGeoPos()
+        Dim oEmpty As pkar.BasicGeopos = EmptyGeoPos()
         If Latitude <> oEmpty.Latitude Then Return False
         If Longitude <> oEmpty.Longitude Then Return False
         Return True
@@ -3012,3 +3047,5 @@ Public Class MyBasicGeoposition
 End Class
 
 #End Region
+
+#End If

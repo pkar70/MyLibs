@@ -20,6 +20,7 @@
 ' 2022.05.02: NetIsIPavail param bMsg jest teraz optional (default: bez pytania)
 
 Imports System
+Imports System.Collections.Generic
 Imports System.Runtime.CompilerServices
 Imports Vblib.Extensions
 ' Imports Microsoft.Extensions.Configuration
@@ -780,8 +781,8 @@ Public Module pkar
     End Function
 
     Public Function GetBuildTimestamp() As String
-            Dim install_folder as string = Windows.ApplicationModel.Package.Current.InstalledLocation.Path
-            Dim sManifestPath as string = Path.Combine(install_folder, "AppxManifest.xml")
+        Dim install_folder As String = Windows.ApplicationModel.Package.Current.InstalledLocation.Path
+        Dim sManifestPath as string = Path.Combine(install_folder, "AppxManifest.xml")
 
         If File.Exists(sManifestPath) Then
             Return File.GetLastWriteTime(sManifestPath).ToString("yyyy.MM.dd HH:mm")
@@ -2155,7 +2156,20 @@ End Module
 #Region ".Net configuration - UWP settings"
 
 Public Class UwpConfigurationProvider
-    Inherits Microsoft.Extensions.Configuration.ConfigurationProvider
+    Implements MsExtConfig.IConfigurationProvider
+
+    Private ReadOnly _roamPrefix1 As String = Nothing
+    Private ReadOnly _roamPrefix2 As String = Nothing
+
+    ''' <summary>
+    ''' Create Configuration Provider, for LocalSettings and RoamSettings
+    ''' </summary>
+    ''' <param name="sRoamPrefix1">prefix for RoamSettings, use NULL if want only LocalSettings</param>
+    ''' <param name="sRoamPrefix2">prefix for RoamSettings, use NULL if want only LocalSettings</param>
+    Public Sub New(Optional sRoamPrefix1 As String = "[ROAM]", Optional sRoamPrefix2 As String = Nothing)
+        _roamPrefix1 = sRoamPrefix1
+        _roamPrefix2 = sRoamPrefix2
+    End Sub
 
     Private Sub LoadData(settSource As IPropertySet)
         For Each oItem In settSource
@@ -2163,50 +2177,121 @@ Public Class UwpConfigurationProvider
         Next
     End Sub
 
-    Public Overrides Sub Load()
-        LoadData(Windows.Storage.ApplicationData.Current.RoamingSettings.Values)
-        LoadData(Windows.Storage.ApplicationData.Current.LocalSettings.Values)
+    ''' <summary>
+    ''' read current state of settings (all values); although it is not used in TryGet, but we should have Data property set for other reasons (e.g. for listing all variables)...
+    ''' </summary>
+    Public Sub Load() Implements MsExtConfig.IConfigurationProvider.Load
+        LoadData(WinAppData.Current.RoamingSettings.Values)
+        LoadData(WinAppData.Current.LocalSettings.Values)
     End Sub
 
-    Public Overrides Sub [Set](key As String, value As String)
+
+    ''' <summary>
+    ''' always set LocalSettings, and if value is prefixed with Roam prefix, also RoamSettings (prefix is stripped)
+    ''' </summary>
+    ''' <param name="key"></param>
+    ''' <param name="value"></param>
+    Public Sub [Set](key As String, value As String) Implements MsExtConfig.IConfigurationProvider.Set
         If value Is Nothing Then value = ""
 
-        If value.ToUpperInvariant().StartsWithOrdinal("[ROAM]") Then
-            value = value.Substring("[roam]".Length)
+        If _roamPrefix1 IsNot Nothing AndAlso value.ToUpperInvariant().StartsWith(_roamPrefix1, StringComparison.Ordinal) Then
+            value = value.Substring(_roamPrefix1.Length)
             Try
-                Windows.Storage.ApplicationData.Current.RoamingSettings.Values(key) = value
+                WinAppData.Current.RoamingSettings.Values(key) = value
             Catch
-                ' // za długa wartość?
+                ' probably length is too big
+            End Try
+        End If
+
+        If _roamPrefix2 IsNot Nothing AndAlso value.ToUpperInvariant().StartsWith(_roamPrefix2, StringComparison.Ordinal) Then
+            value = value.Substring(_roamPrefix2.Length)
+            Try
+                WinAppData.Current.RoamingSettings.Values(key) = value
+            Catch
+                ' probably length is too big
             End Try
         End If
 
         Data(key) = value
         Try
-            Windows.Storage.ApplicationData.Current.LocalSettings.Values(key) = value
+            WinAppData.Current.LocalSettings.Values(key) = value
         Catch
-            ' // za długa wartość?
+            ' probably length is too big
         End Try
 
     End Sub
 
+    ''' <summary>
+    ''' this is used only for iterating keys, not for Get/Set
+    ''' </summary>
+    ''' <returns></returns>
+    Protected Property Data As IDictionary(Of String, String)
+
+    ''' <summary>
+    ''' gets current Value of Key; local value overrides roaming value
+    ''' </summary>
+    ''' <returns>True if Key is found (and Value is set)</returns>
+    Public Function TryGet(key As String, ByRef value As String) As Boolean Implements MsExtConfig.IConfigurationProvider.TryGet
+
+        Dim bFound As Boolean = False
+
+        If WinAppData.Current.RoamingSettings.Values.ContainsKey(key) Then
+            value = WinAppData.Current.RoamingSettings.Values(key).ToString
+            bFound = True
+        End If
+
+        If WinAppData.Current.LocalSettings.Values.ContainsKey(key) Then
+            value = WinAppData.Current.LocalSettings.Values(key).ToString
+            bFound = True
+        End If
+
+        Return bFound
+
+    End Function
+
+    Public Function GetReloadToken() As MsExtPrim.IChangeToken Implements MsExtConfig.IConfigurationProvider.GetReloadToken
+        Return Nothing
+    End Function
+
+    Public Function GetChildKeys(earlierKeys As IEnumerable(Of String), parentPath As String) As IEnumerable(Of String) Implements MsExtConfig.IConfigurationProvider.GetChildKeys
+        ' in this configuration, we don't have structure - so just return list
+
+        Dim results As New List(Of String)
+        For Each kv As KeyValuePair(Of String, String) In Data
+            results.Add(kv.Key)
+        Next
+
+        results.Sort()
+
+        Return results
+    End Function
+
 End Class
 
 Public Class UwpConfigurationSource
-    Implements Microsoft.Extensions.Configuration.IConfigurationSource
+    Implements MsExtConfig.IConfigurationSource
 
-    Public Function Build(builder As Microsoft.Extensions.Configuration.IConfigurationBuilder) As Microsoft.Extensions.Configuration.IConfigurationProvider Implements Microsoft.Extensions.Configuration.IConfigurationSource.Build
-        Return New UwpConfigurationProvider()
+    Private ReadOnly _roamPrefix1 As String = Nothing
+    Private ReadOnly _roamPrefix2 As String = Nothing
+
+    Public Function Build(builder As MsExtConfig.IConfigurationBuilder) As MsExtConfig.IConfigurationProvider Implements MsExtConfig.IConfigurationSource.Build
+        Return New UwpConfigurationProvider(_roamPrefix1, _roamPrefix2)
     End Function
 
+    Public Sub New(Optional sRoamPrefix1 As String = "[ROAM]", Optional sRoamPrefix2 As String = Nothing)
+        _roamPrefix1 = sRoamPrefix1
+        _roamPrefix2 = sRoamPrefix2
+    End Sub
 End Class
 
 Partial Module Extensions
     <Runtime.CompilerServices.Extension()>
-    Public Function AddUwpSettings(ByVal configurationBuilder As Microsoft.Extensions.Configuration.IConfigurationBuilder) As Microsoft.Extensions.Configuration.IConfigurationBuilder
-        configurationBuilder.Add(New UwpConfigurationSource())
+    Public Function AddUwpSettings(ByVal configurationBuilder As MsExtConfig.IConfigurationBuilder, Optional sRoamPrefix1 As String = "[ROAM]", Optional sRoamPrefix2 As String = Nothing) As MsExtConfig.IConfigurationBuilder
+        configurationBuilder.Add(New UwpConfigurationSource(sRoamPrefix1, sRoamPrefix2))
         Return configurationBuilder
     End Function
 End Module
+
 
 #End Region
 
