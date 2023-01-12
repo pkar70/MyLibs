@@ -110,8 +110,20 @@ Public Class BaseList(Of TYP)
             Return False
         End If
 
-        _lista = Newtonsoft.Json.JsonConvert.DeserializeObject(sTxt, GetType(List(Of TYP)))
-        Return True
+        Try
+            _lista = Newtonsoft.Json.JsonConvert.DeserializeObject(sTxt, GetType(List(Of TYP)))
+            Return True
+        Catch ex As Exception
+        End Try
+
+        Try
+            ' if we simply Append to file, it can have last "]" missing, so we try adding it
+            _lista = Newtonsoft.Json.JsonConvert.DeserializeObject(sTxt & "]", GetType(List(Of TYP)))
+            Return True
+        Catch ex As Exception
+        End Try
+
+        Return False
     End Function
 
     ''' <summary>

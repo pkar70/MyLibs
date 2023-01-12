@@ -1,8 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>Nuget_StructList</RootNamespace>
+    <RootNamespace>pkar</RootNamespace>
     <TargetFramework>netstandard1.4</TargetFramework>
+    <AssemblyName>StructList</AssemblyName>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>Piotr Karocki</Authors>
+    <Copyright>Piotr Karocki</Copyright>
+    <Description>Base for struct/class and for lists, to add some helpers</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/Nuget-StructList</RepositoryUrl>
+    <PackageTags>list, helpers</PackageTags>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <IncludeSymbols>True</IncludeSymbols>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <Version>1.0.1</Version>
+    <PackageReleaseNotes>Added auto-closing serialized list on deserialization</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
