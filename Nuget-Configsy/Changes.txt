@@ -1,0 +1,12 @@
+﻿
+
+v.2.0.1, 2022.12.14
+ Same as 1.0.1, but for .Net Standard 2.0, so InitSettings(sINIcontent... can be simpler.
+
+v.1.0.1, 2022.12.14
+LibInitSettings->InitSettings
+InitSettings(sINIcontent...
+''' documentation
+
+v 1.0.0, 2022.12.13
+Initial version

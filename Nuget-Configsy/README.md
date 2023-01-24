@@ -1,27 +1,28 @@
 ﻿
- This package contains four of my Microsoft.Extensions.Configuration.ConfigurationProvider / ConfigurationSource pairs.
+ This package contains four of my Microsoft.Extensions.Configuration.ConfigurationProvider / ConfigurationSource pairs, and some convenient methods to Get/Set values.
 
  I was "forced" to make these version when I started to porting my UWP apps to multiplatform, and I wanted analogs of Windows.Storage.ApplicationData.Current..RoamingSettings and .LocalSettings. Also, I want it to work on phones (so it is limited to .Net Standard 1.4, last that works on Windows 10.15063)
 
- So, I have this requirements:
+ So, I have these requirements:
  * work in Plarform Uno, phones, and Win7 => .Net Standard 1.4
  * have both roam and local settings
  * can use only runtime files, not files in installation package (Android doesn't extract files from package)
 
   Basic idea: when .Set(variableName, value), and value is prefixed with "[roam]", it sets roaming setting; else sets local setting.
 
-
 # settings methods
 
 ## initialization
-Sub LibInitSettings(settings As MsExtConf.IConfigurationRoot)
 
-Without this init, you get only read/write config in temporaty JSON file (in temp directory).
+Without init, you get only read/write config in temporaty JSON file (in user temp directory).
 
-Use settings as result of something like this:
+You can init library by using fully customizable IConfigurationRoot
+
+> Sub InitSettings(settings As MsExtConf.IConfigurationRoot)
+
+where settings is result of something like this:
 
         Dim sAppName As String = Windows.ApplicationModel.Package.Current.DisplayName
-
         Dim oBuilder As New Microsoft.Extensions.Configuration.ConfigurationBuilder()
         Dim oDict As IDictionary = Environment.GetEnvironmentVariables()
         oBuilder = oBuilder.AddEnvironmentVariablesROConfigurationSource(sAppName, oDict) 
@@ -29,8 +30,47 @@ Use settings as result of something like this:
         oBuilder = oBuilder.AddJsonRwSettings(Windows.Storage.ApplicationData.Current.LocalFolder.Path,
                         Windows.Storage.ApplicationData.Current.RoamingFolder.Path)
         If aCmdLineArgs IsNot Nothing Then oBuilder = oBuilder.AddCommandLineRO(aCmdLineArgs)
-
         Dim settings As Microsoft.Extensions.Configuration.IConfigurationRoot = oBuilder.Build
+        pkar.NetConfigs.InitSettings(settings As MsExtConf.IConfigurationRoot)
+
+or use simplified form:
+
+        Sub InitSettings(sINIcontent As String, bIniUseDebug As Boolean,
+                            applicationName As String, dictionaryOfEnvVars As System.Collections.IDictionary,
+                            configSource As MsExtConf.IConfigurationSource,
+                            localJSONdirName As String, roamJSONdirNname As String, bJSONreadOnly As Boolean,
+                            cmdLineArgs As List(Of String))
+
+as this call (from UWP):
+
+        #if DEBUG
+        pkar.NetConfigs.InitSettings(sINIcontent, True,
+        #else
+        pkar.NetConfigs.InitSettings(sINIcontent, False,
+        #end if
+                    Windows.ApplicationModel.Package.Current.DisplayName, Environment.GetEnvironmentVariables(),
+                    new UwpConfigurationSource,
+                    Windows.Storage.ApplicationData.Current.LocalFolder.Path, Windows.Storage.ApplicationData.Current.RoamingFolder.Path, False,
+                    Environment.GetCommandLineArgs.ToList)
+
+or from WPF:
+
+        Dim sAssemblyFullName = System.Reflection.Assembly.GetEntryAssembly().FullName
+        Dim oAss As New AssemblyName(sAssemblyFullName)
+        Dim sAppName = oAss.Name
+
+        Dim sPathLocal As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), sAppName)
+        Dim sPathRoam As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), sAppName)
+
+        Vblib.InitSettings(
+                sAppName, Environment.GetEnvironmentVariables(),
+                Nothing,
+                sPathLocal, sPathRoam,
+                Environment.GetCommandLineArgs.ToList)
+
+
+You can use NULLs if you don't want particular ConfigurationSource
+
 
 ## setting values
 
@@ -48,6 +88,7 @@ Use settings as result of something like this:
     Function GetSettingsBool(sName As String, Optional bDefault As Boolean = False) As Boolean
     Function GetSettingsLong(sName As String, Optional iDefault As Long = 0) As Long
     Function GetSettingsDate(sName As String, Optional sDefault As String = "") As DateTimeOffset
+    Function GetSettingsDate(sName As String, dDefault As DateTimeOffset) As DateTimeOffset
 
 
 # providers
@@ -58,6 +99,7 @@ Difference with Microsoft's implementation:
 * Ms version is read-only
 * limit of this implementation: no tree of values, only flat version
 * we can have two files for values - local and roaming
+* on reading, local values overrrides roaming values
 
         IConfigurationBuilder.AddJsonRwSettings(sPathnameLocal As String, sPathnameRoam As String, Optional bReadOnly As Boolean = False)
 
@@ -112,3 +154,6 @@ e.g.
 
 
 
+You can also use my UwpConfigurationProvider from:
+https://github.com/pkar70/MyLibs/blob/ee7b8f3a7e7e28601426d4e4d20fd25f21f87628/UWPappTel/pkarModuleWithLib.vb#L2134
+(something like 'config converter' from UWP settings to .Net settings)

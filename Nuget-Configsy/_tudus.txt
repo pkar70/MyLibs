@@ -1,0 +1,98 @@
+﻿
+* InitSettings(sINIcontent... - dla wersji 2.0, mniej danych w inicjalizacji
+
+* nuget 1.x.x oraz 2.x.x, te same wersje, roznica w .Net Standard - o ile po publikacji 2.0.1 mozna dać 1.0.2
+
+* #if wersja package?
+#if NETSTANDARD2_0_OR_GREATER
+
+Dim sName = System.Reflection.Assembly.GetEntryAssembly().FullName
+
+
+
+        Dim sAssemblyFullName = System.Reflection.Assembly.GetEntryAssembly().FullName
+        Dim oAss As New AssemblyName(sAssemblyFullName)
+        Dim sName = oAss.Name
+
+* JSON z .Net zamiast Newtonsoft?
+* static FromJSON ?
+
+* gdzie się da - Shared, zeby nie bylo potrzebne new/class
+
+* local != roam, gdy takie same foldery, to ignoruje roam
+* sprawdzic pod Android
+
+* a czy Android ma jakieś settings? iOS? może dodać ich funkcjonalności?
+
+* <extension>overridable provider.CanRoam() as bool = false , i w moim =true
+* pkar.configsy.scope: temp, local, roam, machine, azure
+
+* inheritance of interfaces?
+
+* jak jest providers collection? private? protected?
+
+* jsonconfig.ResetTemp (kasowanie pliku temp) - nie trzeba, bo GetTempFilename jest, a nie GetTempPath
+* UWPconfig.DumpAsJSON - pomocnik przy migracji (ale to nie w nuget)
+
+*) InitSettings, z defaultami 2.0 dla roaming i local data
+*) strings: że nullable, czyli string? [różnica miedzy wyłączone a default]
+
+UWP telefon:
+    temp    - OK    -> GetTempFilename
+    local   - OK    -> (Windows.Storage.ApplicationData.Current.LocalFolder.Path)
+    roam    - OK    -> (Windows.Storage.ApplicationData.Current.RoamingFolder.Path)
+    machine - NOT (nie istnieje takie pojęcie)
+    onedrive - ?  (brak dostępu do ścieżki)
+
+* funkcje na wykorzystujące Scope, i zamiast [ROAM] uzywanie [ScopePrefix:x]
+* realny SET jest tylko w UWP (local/roam) oraz w JSON (Std14/UWP: temp/local/roam, Std20/UWP: OneDrive, Std21/WPF: Machine)
+* w new UWP/new JSON dodać sScopePrefix
+* migracja UWP desktop -> JSON pozwala przenieść app z UWP do .Net bez strat w config (via OneDrive)?
+
+* UWP: ścinać i [ROAM] i [Pk.SCOPE:]
+* Std2.0: Set(x, optional scope = local)
+
+* onedrive option: try folderexist catch wyłączenie onedrive
+* ustalić hierarchię dla JSON, które ważniejsze
+* JSON: jak local, to nie inne; i plik kasowany na starcie (albo, jak jest teraz, tempfilename)
+
+UWP desktop:
+    temp    - OK
+    local   - OK
+    roam    - OK
+    machine - NOT
+    onedrive - ?
+
+WPF: all
+
+UWP 16299: [15063 tego nie ma], tak samo w Vblib mamy
+C:\Users\pkar\AppData\Local\Packages\622PKar.GrajCyganie_pm8terbg0v8ky\LocalState
+C:\Users\pkar\AppData\Roaming
+C:\Users\pkar\AppData\Local\Packages\622PKar.GrajCyganie_pm8terbg0v8ky\LocalState\ProgramData
+C:\Users\pkar\Pictures
+C:\Users\pkar\Documents
+C:\Users\pkar\OneDrive
+
+C:\Users\pkar\AppData\Local\Packages\622PKar.GrajCyganie_pm8terbg0v8ky\LocalState
+C:\Users\pkar\AppData\Local\Packages\622PKar.GrajCyganie_pm8terbg0v8ky\RoamingState
+
+WPF:
+C:\Users\pkar\AppData\Local
+C:\Users\pkar\AppData\Roaming
+C:\ProgramData
+C:\Users\pkar\Pictures
+C:\Users\pkar\Documents
+C:\Users\pkar\OneDrive
+
+
+Debug.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData))
+Debug.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData))
+Debug.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
+Debug.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
+Debug.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.Personal))
+
+Debug.WriteLine(Environment.GetEnvironmentVariable("OneDriveConsumer"))
+
+Debug.WriteLine(Windows.Storage.ApplicationData.Current.LocalFolder.Path)
+Debug.WriteLine(Windows.Storage.ApplicationData.Current.RoamingFolder.Path)
+

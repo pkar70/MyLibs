@@ -23,6 +23,8 @@ Public Class EnvironmentVariablesROConfigurationProvider
             If sKey.StartsWith(_sPrefix, StringComparison.Ordinal) Then
                 sKey = sKey.Substring(_sPrefix.Length)
                 Data(sKey) = sVal
+            ElseIf sKey.StartsWith("_") Then
+                Data(sKey.Substring(1)) = sVal
             ElseIf _AlwaysCopy.Contains("|" & sKey & "|") Then
                 Data(sKey) = sVal
             End If
