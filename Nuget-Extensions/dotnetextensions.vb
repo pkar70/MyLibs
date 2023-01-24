@@ -25,7 +25,7 @@ Partial Public Module DotNetExtensions
     ''' convert input string from "PascalCase" to "normal case"
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
-    Public Function DePascal(ByVal input As String)
+    Public Function DePascal(ByVal input As String) As String
         If String.IsNullOrWhiteSpace(input) Then Return ""
 
         Dim result As String = ""
@@ -206,6 +206,7 @@ Partial Public Module DotNetExtensions
 
         Return sRet
     End Function
+
 
     ''' <summary>
     ''' try to convert string to valid filename
@@ -470,21 +471,6 @@ Partial Public Module DotNetExtensions
 
 #End Region
 
-    ''' <summary>
-    ''' Same as Clamp in .Net 7
-    ''' </summary>
-    ''' <param name="value">current value</param>
-    ''' <param name="minVal">The inclusive minimum to which value should clamp</param>
-    ''' <param name="maxVal">The inclusive maximum to which value should clamp</param>
-    ''' <returns></returns>
-    <Runtime.CompilerServices.Extension()>
-    Public Function Between(Of T)(ByVal value As T, minVal As T, maxVal As T) As T
-        If Comparer(Of T).Default.Compare(minVal, value) > 0 Then Return minVal
-        If Comparer(Of T).Default.Compare(maxVal, value) < 0 Then Return maxVal
-        Return value
-    End Function
-
-
 #Region "dates"
 
     ''' <summary>
@@ -507,14 +493,58 @@ Partial Public Module DotNetExtensions
         Return data.ToModifiedJulianDay + 2400000.5
     End Function
 
+    ''' <summary>
+    ''' Convert seconds number to "XXd HH:MM:SS", integer.max = ~150 days
+    ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function ToStringDHMS(ByVal czas As TimeSpan) As Integer
         Dim temp As Integer = Math.Round(czas.TotalSeconds)
         Return temp.ToStringDHMS
     End Function
 
+    ''' <summary>
+    ''' returns two letter abbreviation of weekday name (in Polish language)
+    ''' </summary>
+    <Runtime.CompilerServices.Extension>
+    Public Function TwoLetterWeekDayPL(ByVal oDate As Date) As String
+        Select Case oDate.DayOfWeek
+            Case DayOfWeek.Monday
+                Return "pn"
+            Case DayOfWeek.Tuesday
+                Return "wt"
+            Case DayOfWeek.Wednesday
+                Return "śr"
+            Case DayOfWeek.Thursday
+                Return "cz"
+            Case DayOfWeek.Friday
+                Return "pt"
+            Case DayOfWeek.Saturday
+                Return "sb"
+            Case DayOfWeek.Sunday
+                Return "nd"
+        End Select
+
+        Return ""
+    End Function
+
+    ''' <summary>
+    ''' return date as string in Exif 2.3 format ("yyyy.MM.dd HH:mm:ss")
+    ''' </summary>
+    ''' <param name="oDate"></param>
+    ''' <returns></returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ToExifString(ByVal oDate As Date) As String
+        Return oDate.ToString("yyyy.MM.dd HH:mm:ss")
+    End Function
+
 #End Region
 
+    ''' <summary>
+    ''' dump byte array as hex string ("0x12 0x45 ..."), max 16 bytes
+    ''' </summary>
+    ''' <param name="aArr"></param>
+    ''' <param name="iSpaces"></param>
+    ''' <returns></returns>
     <Runtime.CompilerServices.Extension()>
     <CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification:="<Pending>")>
     <CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification:="<Pending>")>
@@ -562,6 +592,12 @@ Partial Public Module DotNetExtensions
     End Function
 
 
+    ''' <summary>
+    ''' compare two streams. Warning: stream position would be changed!
+    ''' </summary>
+    ''' <param name="oStream1"></param>
+    ''' <param name="oStream2"></param>
+    ''' <returns></returns>
     <Runtime.CompilerServices.Extension()>
     Public Async Function IsSameStreamContent(ByVal oStream1 As Stream, oStream2 As Stream) As Task(Of Boolean)
         ' This is not merely an optimization, as incrementing one stream's position
@@ -586,6 +622,20 @@ Partial Public Module DotNetExtensions
         Loop
 
         Return True
+    End Function
+
+    ''' <summary>
+    ''' Same as Clamp in .Net 7
+    ''' </summary>
+    ''' <param name="value">current value</param>
+    ''' <param name="minVal">The inclusive minimum to which value should clamp</param>
+    ''' <param name="maxVal">The inclusive maximum to which value should clamp</param>
+    ''' <returns></returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Between(Of T)(ByVal value As T, minVal As T, maxVal As T) As T
+        If Comparer(Of T).Default.Compare(minVal, value) > 0 Then Return minVal
+        If Comparer(Of T).Default.Compare(maxVal, value) < 0 Then Return maxVal
+        Return value
     End Function
 
 
