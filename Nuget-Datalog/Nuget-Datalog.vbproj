@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>pkar.Datalog</RootNamespace>
+    <TargetFramework>netstandard1.4</TargetFramework>
+    <AssemblyName>Datalog</AssemblyName>
+    <Title>Datalog management helpers</Title>
+    <Authors>pkar</Authors>
+    <Company>none</Company>
+    <Description>Adds DataLog helpers - writing log of data in year, month or day log files</Description>
+    <Copyright>Piotr Karocki</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/Nuget-Datalog</RepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <IncludeSymbols>True</IncludeSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
