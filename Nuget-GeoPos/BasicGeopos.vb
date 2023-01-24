@@ -20,7 +20,6 @@ Public Class BasicGeopos
     ''' </summary>
     ''' <returns>distance in meteres</returns>
     Public Function DistanceTo(dLatitude As Double, dLongitude As Double) As Double
-        Dim num1 As Integer
 
         Try
             Dim iRadix = 6371000
@@ -29,12 +28,11 @@ Public Class BasicGeopos
             Dim a = 2.0 * Math.Asin(Math.Min(1.0, Math.Sqrt(Math.Sin(tLat / 2.0) *
                 Math.Sin(tLat / 2.0) + Math.Cos(Math.PI / 180.0 * Latitude) * Math.Cos(Math.PI / 180.0 * dLatitude) *
                 Math.Sin(tLon / 2.0) * Math.Sin(tLon / 2.0))))
-            Return iRadix * a
+            Return Math.Round(iRadix * a, 2)
         Catch ex As Exception
             Return 0
         End Try
 
-        Return num1
     End Function
 
     ''' <summary>
@@ -50,7 +48,7 @@ Public Class BasicGeopos
     ''' </summary>
     ''' <returns>distance in kilometeres</returns>
     Public Function DistanceKmTo(oGeoPos As BasicGeopos) As Double
-        Return DistanceTo(oGeoPos.Latitude, oGeoPos.Longitude) / 1000
+        Return DistanceTo(oGeoPos) / 1000
     End Function
 
     ''' <summary>
@@ -221,7 +219,7 @@ Public Class BasicGeopos
     ' ° latitude ≈ 111 km
     ' ° longitude ≈ 111 km at the equator, and 0 m on poles
 
-    Private Function Double2String(sVal As Double, iDigits As Integer) As String
+    Private Shared Function Double2String(sVal As Double, iDigits As Integer) As String
         ' 5 digits means ≈ 10 m, should be enough
         Return Math.Round(sVal, Math.Min(5, iDigits)).ToString(System.Globalization.CultureInfo.InvariantCulture)
     End Function
@@ -262,7 +260,7 @@ Public Class BasicGeopos
     End Function
 
 #Region "DMS format"
-    Private Function Double2StringDMS(dVal As Double, sFormat As String, iDigits As Integer) As String
+    Private Shared Function Double2StringDMS(dVal As Double, sFormat As String, iDigits As Integer) As String
 
         Dim iDegrees As Integer = If(dVal < 0, Math.Ceiling(dVal), Math.Floor(dVal))
         dVal -= iDegrees

@@ -1,8 +1,25 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>Nuget_GeoPos</RootNamespace>
+    <RootNamespace>pkar</RootNamespace>
     <TargetFramework>netstandard1.4</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <AssemblyName>BasicGeopos</AssemblyName>
+    <Title>Geoposition helpers library</Title>
+    <Company>pkar</Company>
+    <Description>.Net helpers for geolocation, to be used in plain .Net, without using UWP or MAUI</Description>
+    <Copyright>Piotr Karocki</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/Nuget-GeoPos</RepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <IncludeSymbols>True</IncludeSymbols>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <Authors>Piotr Karocki</Authors>
+    <PackageTags>geoposition, geolocation, helpers</PackageTags>
+    <Version>1.0.1</Version>
+    <PackageReleaseNotes>DistanceTo, in meters, is rounded to centimeters (raw calculation sometimes gives too many fractional digits)</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
