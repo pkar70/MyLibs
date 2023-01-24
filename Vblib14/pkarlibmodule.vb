@@ -4,6 +4,10 @@ Imports System.Reflection
 Imports System.Runtime
 Imports Microsoft
 Imports Microsoft.Extensions.Configuration
+
+Imports pkar.DotNetExtensions
+Imports pkar.NetConfigs
+
 'Imports Newtonsoft.Json
 'Imports Newtonsoft.Json.Linq
 ' Imports pkar.NetConfigs.Extensions
@@ -366,6 +370,29 @@ Partial Public Module pkarlibmodule14
                         configSource,
                         localJSONdirName, roamJSONdirNname, False,
                         cmdLineArgs)
+        'Dim oBuilder As New ConfigurationBuilder()
+
+        'If Not String.IsNullOrWhiteSpace(sINIcontent) Then
+        '    oBuilder = oBuilder.AddIniReleaseDebugSettings(sINIcontent, bIniUseDebug)
+        'End If
+
+        'If Not String.IsNullOrWhiteSpace(applicationName) AndAlso dictionaryOfEnvVars IsNot Nothing Then
+        '    oBuilder = oBuilder.AddEnvironmentVariablesROConfigurationSource(applicationName, dictionaryOfEnvVars) ' Environment.GetEnvironmentVariables, Std 2.0
+        'End If
+
+        'If configSource IsNot Nothing Then
+        '    oBuilder = oBuilder.Add(configSource)
+        'End If
+
+        'If Not String.IsNullOrWhiteSpace(localJSONdirName) OrElse Not String.IsNullOrWhiteSpace(roamJSONdirNname) Then
+        '    oBuilder = oBuilder.AddJsonRwSettings(localJSONdirName, roamJSONdirNname, False)
+        'End If
+
+        'If cmdLineArgs IsNot Nothing Then oBuilder = oBuilder.AddCommandLineRO(cmdLineArgs)
+
+        'Dim settings As Microsoft.Extensions.Configuration.IConfigurationRoot = oBuilder.Build
+
+        'pkar.NetConfigs.InitSettings(settings)
 
 
     End Sub
@@ -1197,6 +1224,14 @@ Partial Public Module pkarlibmodule14
 
 #End Region
 
+#Else
+    Public msDataLog As pkar.Datalog.Datalog
+    Public Sub LibInitDataLog(sPath As String)
+        If Not IO.Directory.Exists(sPath) Then IO.Directory.CreateDirectory(sPath)
+        msDataLog = New pkar.Datalog.Datalog(sPath, "")
+    End Sub
+
+
 #End If
 
     ' #Region "Bluetooth debugs"  - not in .Net
@@ -1261,8 +1296,10 @@ Partial Public Module pkarlibmodule14
 
 End Module
 
+
 Partial Public Module Extensions
 
+#If NUGET_EXTENSIONS_TUTAJ Then
     <Runtime.CompilerServices.Extension()>
     Public Function FileLen2string(ByVal iBytes As Long) As String
         If iBytes = 1 Then Return "1 byte"
@@ -1688,6 +1725,7 @@ Partial Public Module Extensions
     ' ShowAppVers(ByVal oItem As TextBlock) - not in .Net
     ' ShowAppVers(ByVal oPage As Page) - not in .Net
     ' #Region "ProgressBar/Ring" - not in .Net
+#End If
 
 #Region "Bluetooth debug strings"
 
@@ -1849,9 +1887,9 @@ Partial Public Module Extensions
             Case "00002a08-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: Date Time"
             Case "00002a09-0000-1000-8000-00805f9b34fb"
-                Return vbTab & "known as: Day of Week"
+                Return vbTab & "known as: AutoWeatherDay of Week"
             Case "00002a0a-0000-1000-8000-00805f9b34fb"
-                Return vbTab & "known as: Day Date Time"
+                Return vbTab & "known as: AutoWeatherDay Date Time"
             Case "00002a0b-0000-1000-8000-00805f9b34fb"
                 Return vbTab & "known as: Exact Time 100"
             Case "00002a0c-0000-1000-8000-00805f9b34fb"
@@ -2271,6 +2309,7 @@ Partial Public Module Extensions
 #End Region
 
 End Module
+
 
 #Region ".Net Standard Settings"
 #If CONFIG_TU_NIE_NUGET Then

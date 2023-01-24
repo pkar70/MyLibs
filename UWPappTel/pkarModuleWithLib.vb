@@ -22,8 +22,14 @@
 Imports System
 Imports System.Collections.Generic
 Imports System.Runtime.CompilerServices
-Imports Vblib.Extensions
-' Imports Microsoft.Extensions.Configuration
+Imports VBlib.Extensions
+Imports pkar
+
+Imports MsExtConfig = Microsoft.Extensions.Configuration
+Imports MsExtPrim = Microsoft.Extensions.Primitives
+
+Imports WinAppData = Windows.Storage.ApplicationData
+Imports Microsoft.Extensions.Configuration
 
 Partial Public Class App
     Inherits Application
@@ -189,12 +195,11 @@ Public Module pkar
     ''' dla nowszych:  InitLib(Environment.GetCommandLineArgs)
     ''' </summary>
     Public Sub InitLib(aCmdLineArgs As List(Of String), Optional bUseOwnFolderIfNotSD As Boolean = True)
-
         InitSettings(aCmdLineArgs)
-        Vblib.LibInitToast(AddressOf FromLibMakeToast)
-        Vblib.LibInitDialogBox(AddressOf FromLibDialogBoxAsync, AddressOf FromLibDialogBoxYNAsync, AddressOf FromLibDialogBoxInputAllDirectAsync)
+        VBlib.LibInitToast(AddressOf FromLibMakeToast)
+        VBlib.LibInitDialogBox(AddressOf FromLibDialogBoxAsync, AddressOf FromLibDialogBoxYNAsync, AddressOf FromLibDialogBoxInputAllDirectAsync)
 
-        Vblib.LibInitClip(AddressOf FromLibClipPut, AddressOf FromLibClipPutHtml)
+        VBlib.LibInitClip(AddressOf FromLibClipPut, AddressOf FromLibClipPutHtml)
 #Disable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
         InitDatalogFolder(bUseOwnFolderIfNotSD)
 #Enable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
@@ -279,7 +284,7 @@ Public Module pkar
         'Dim settings As Microsoft.Extensions.Configuration.IConfigurationRoot = oBuilder.Build
 
         ' Vblib.LibInitSettings(settings)
-        Vblib.InitSettings(sAppName, oDict, New UwpConfigurationSource(),
+        VBlib.InitSettings(sAppName, oDict, New UwpConfigurationSource(),
                            Windows.Storage.ApplicationData.Current.LocalFolder.Path,
                             Windows.Storage.ApplicationData.Current.RoamingFolder.Path, aCmdLineArgs)
     End Sub
@@ -445,11 +450,11 @@ Public Module pkar
 
     ' <Obsolete("Jest w .Net Standard 2.0 (lib)")>
     Public Function NetIsIPavailable(Optional bMsg As Boolean = False) As Boolean
-        If Vblib.GetSettingsBool("offline") Then Return False
+        If VBlib.GetSettingsBool("offline") Then Return False
 
         If Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable() Then Return True
         If bMsg Then
-            Vblib.DialogBox("ERROR: no IP network available")
+            VBlib.DialogBox("ERROR: no IP network available")
         End If
         Return False
     End Function
@@ -782,7 +787,7 @@ Public Module pkar
 
     Public Function GetBuildTimestamp() As String
         Dim install_folder As String = Windows.ApplicationModel.Package.Current.InstalledLocation.Path
-        Dim sManifestPath as string = Path.Combine(install_folder, "AppxManifest.xml")
+        Dim sManifestPath As String = Path.Combine(install_folder, "AppxManifest.xml")
 
         If File.Exists(sManifestPath) Then
             Return File.GetLastWriteTime(sManifestPath).ToString("yyyy.MM.dd HH:mm")
@@ -1466,18 +1471,18 @@ Module Extensions
 #Region "GPS odleglosci"
 
     <Extension()>
-    Public Function ToMyGeopos(ByVal oPos As Windows.Devices.Geolocation.BasicGeoposition) As Vblib.MyBasicGeoposition
-        Return New Vblib.MyBasicGeoposition(oPos.Latitude, oPos.Longitude)
+    Public Function ToMyGeopos(ByVal oPos As Windows.Devices.Geolocation.BasicGeoposition) As BasicGeopos
+        Return New BasicGeopos(oPos.Latitude, oPos.Longitude)
     End Function
 
     <Extension()>
-    Public Function ToWinGeopoint(ByVal oPos As Vblib.MyBasicGeoposition) As Windows.Devices.Geolocation.Geopoint
+    Public Function ToWinGeopoint(ByVal oPos As BasicGeopos) As Windows.Devices.Geolocation.Geopoint
         Return New Windows.Devices.Geolocation.Geopoint(oPos.ToWinGeopos())
     End Function
 
 
     <Extension()>
-    Public Function ToWinGeopos(ByVal oPos As Vblib.MyBasicGeoposition) As Windows.Devices.Geolocation.BasicGeoposition
+    Public Function ToWinGeopos(ByVal oPos As BasicGeopos) As Windows.Devices.Geolocation.BasicGeoposition
         Dim oPoint As New Windows.Devices.Geolocation.BasicGeoposition With
             {
                 .Latitude = oPos.Latitude,
@@ -1642,7 +1647,7 @@ Module Extensions
         Dim dTmp As Integer
         If Not Double.TryParse(oItem.Text, dTmp) Then Return
         dTmp *= dScale
-        Vblib.SetSettingsInt(sName, dTmp, bRoam)
+        VBlib.SetSettingsInt(sName, dTmp, bRoam)
     End Sub
 
     ''' <summary>
@@ -1654,7 +1659,7 @@ Module Extensions
     <Extension()>
     Public Sub GetSettingsInt(ByVal oItem As TextBox, Optional sName As String = "", Optional dScale As Double = 1)
         If sName = "" Then sName = oItem.Name
-        Dim dTmp As Integer = Vblib.GetSettingsInt(sName)
+        Dim dTmp As Integer = VBlib.GetSettingsInt(sName)
         dTmp /= dScale
         oItem.Text = dTmp
     End Sub
@@ -1662,13 +1667,13 @@ Module Extensions
     <Extension()>
     Public Sub SetSettingsInt(ByVal oItem As Windows.UI.Xaml.Controls.Slider, Optional sName As String = "", Optional bRoam As Boolean = False)
         If sName = "" Then sName = oItem.Name
-        Vblib.SetSettingsInt(sName, oItem.Value, bRoam)
+        VBlib.SetSettingsInt(sName, oItem.Value, bRoam)
     End Sub
 
     <Extension()>
     Public Sub GetSettingsInt(ByVal oItem As Windows.UI.Xaml.Controls.Slider, Optional sName As String = "")
         If sName = "" Then sName = oItem.Name
-        oItem.Value = Vblib.GetSettingsInt(sName)
+        oItem.Value = VBlib.GetSettingsInt(sName)
     End Sub
 
     <Extension()>
@@ -1698,13 +1703,13 @@ Module Extensions
     <Extension()>
     Public Sub GetSettingsDate(ByVal oItem As CalendarDatePicker, Optional sName As String = "")
         If sName = "" Then sName = oItem.Name
-        Dim dDTOff As DateTimeOffset = Vblib.GetSettingsDate(sName)
+        Dim dDTOff As DateTimeOffset = VBlib.GetSettingsDate(sName)
         oItem.Date = dDTOff
     End Sub
 
 
-#End Region
 
+#End Region
     <Extension()>
     Public Sub ShowAppVers(ByVal oItem As TextBlock)
         Dim sTxt As String = pkar.GetAppVers()
@@ -1753,7 +1758,7 @@ Module Extensions
     ''' </summary>
     <Extension()>
     Public Sub GoBack(ByVal oPage As Page)
-        oPage.Frame.GoBack
+        oPage.Frame.GoBack()
     End Sub
 
 
@@ -2156,6 +2161,7 @@ End Module
 #Region ".Net configuration - UWP settings"
 
 Public Class UwpConfigurationProvider
+    ' Inherits MsExtConfig.ConfigurationProvider
     Implements MsExtConfig.IConfigurationProvider
 
     Private ReadOnly _roamPrefix1 As String = Nothing
@@ -2167,6 +2173,7 @@ Public Class UwpConfigurationProvider
     ''' <param name="sRoamPrefix1">prefix for RoamSettings, use NULL if want only LocalSettings</param>
     ''' <param name="sRoamPrefix2">prefix for RoamSettings, use NULL if want only LocalSettings</param>
     Public Sub New(Optional sRoamPrefix1 As String = "[ROAM]", Optional sRoamPrefix2 As String = Nothing)
+        Data = New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase)
         _roamPrefix1 = sRoamPrefix1
         _roamPrefix2 = sRoamPrefix2
     End Sub
@@ -2250,7 +2257,7 @@ Public Class UwpConfigurationProvider
     End Function
 
     Public Function GetReloadToken() As MsExtPrim.IChangeToken Implements MsExtConfig.IConfigurationProvider.GetReloadToken
-        Return Nothing
+        Return New ConfigurationReloadToken
     End Function
 
     Public Function GetChildKeys(earlierKeys As IEnumerable(Of String), parentPath As String) As IEnumerable(Of String) Implements MsExtConfig.IConfigurationProvider.GetChildKeys

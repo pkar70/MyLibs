@@ -77,6 +77,7 @@ Partial Public Module pkarlibmodule20
 
 End Module
 
+#If False Then
 Partial Module Extensions
 
     ''' <summary>
@@ -120,3 +121,4 @@ Partial Module Extensions
     End Function
 
 End Module
+#end If

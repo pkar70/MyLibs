@@ -9,8 +9,10 @@ using static VBlib.Extensions;
 using vb14 = VBlib.pkarlibmodule14;
 
 using System.Runtime.InteropServices.WindowsRuntime; // dla ToArray
-using Microsoft.Extensions.Logging;
-using VBlib;
+//using Microsoft.Extensions.Logging;
+//using VBlib;
+
+using static pkar.DotNetExtensions;
 
 // logowanie tylko dla Uno.Droid, dla zwykłego UWP tego nie robimy
 #if !NETFX_CORE 
@@ -407,17 +409,20 @@ namespace p
             string sAppName = Windows.ApplicationModel.Package.Current.DisplayName;
             string sAppDir = TryGetInstallDir();
 
-            Microsoft.Extensions.Configuration.IConfigurationBuilder oBuilder = new Microsoft.Extensions.Configuration.ConfigurationBuilder();
-            oBuilder = oBuilder.AddIniRelDebugSettings(VBlib.IniLikeDefaults.sIniContent);  
-            oBuilder = oBuilder.AddEnvironmentVariablesROConfigurationSource(sAppName, Environment.GetEnvironmentVariables()); // Environment.GetEnvironmentVariables, Std 2.0
-            oBuilder = oBuilder.AddUwpSettings();
-            oBuilder = oBuilder.AddJsonRwSettings(Windows.Storage.ApplicationData.Current.LocalFolder.Path,
-                            Windows.Storage.ApplicationData.Current.RoamingFolder.Path);
-            if (aCmdLineArgs != null) oBuilder = oBuilder.AddCommandLineRO(aCmdLineArgs);  // Environment.GetCommandLineArgs, Std 1.5, ale nie w UWP?
+            vb14.InitSettings(sAppName, Environment.GetEnvironmentVariables(), new UwpConfigurationSource(), Windows.Storage.ApplicationData.Current.LocalFolder.Path,
+                            Windows.Storage.ApplicationData.Current.RoamingFolder.Path, aCmdLineArgs);
 
-            Microsoft.Extensions.Configuration.IConfigurationRoot settings = oBuilder.Build();
+            //Microsoft.Extensions.Configuration.IConfigurationBuilder oBuilder = new Microsoft.Extensions.Configuration.ConfigurationBuilder();
+            //oBuilder = oBuilder.AddIniRelDebugSettings(VBlib.IniLikeDefaults.sIniContent);  
+            //oBuilder = oBuilder.AddEnvironmentVariablesROConfigurationSource(sAppName, Environment.GetEnvironmentVariables()); // Environment.GetEnvironmentVariables, Std 2.0
+            //oBuilder = oBuilder.AddUwpSettings();
+            //oBuilder = oBuilder.AddJsonRwSettings(Windows.Storage.ApplicationData.Current.LocalFolder.Path,
+            //                Windows.Storage.ApplicationData.Current.RoamingFolder.Path);
+            //if (aCmdLineArgs != null) oBuilder = oBuilder.AddCommandLineRO(aCmdLineArgs);  // Environment.GetCommandLineArgs, Std 1.5, ale nie w UWP?
 
-            vb14.LibInitSettings(settings);
+            //Microsoft.Extensions.Configuration.IConfigurationRoot settings = oBuilder.Build();
+
+            //vb14.LibInitSettings(settings);
         }
 
 #if false
@@ -1743,12 +1748,12 @@ public static void OpenBrowser(this Uri oUri, bool bForceEdge = false)
 
         #region "GPS related"
 
-        public static MyBasicGeoposition ToMyGeopos(this Windows.Devices.Geolocation.BasicGeoposition oPos)
+        public static pkar.BasicGeopos ToMyGeopos(this Windows.Devices.Geolocation.BasicGeoposition oPos)
         {
-            return new MyBasicGeoposition(oPos.Latitude, oPos.Longitude);
+            return new pkar.BasicGeopos(oPos.Latitude, oPos.Longitude);
         }
 
-        public static Windows.Devices.Geolocation.BasicGeoposition ToWinGeopos(this MyBasicGeoposition oPos)
+        public static Windows.Devices.Geolocation.BasicGeoposition ToWinGeopos(this pkar.BasicGeopos oPos)
         {
             var oPoint = new Windows.Devices.Geolocation.BasicGeoposition
             {
@@ -1759,54 +1764,54 @@ public static void OpenBrowser(this Uri oUri, bool bForceEdge = false)
             return oPoint;
         }
 
-        public static Windows.Devices.Geolocation.Geopoint ToWinGeopoint(this VBlib.MyBasicGeoposition oPos)
+        public static Windows.Devices.Geolocation.Geopoint ToWinGeopoint(this pkar.BasicGeopos oPos)
         {
             return new Windows.Devices.Geolocation.Geopoint(oPos.ToWinGeopos());
         }
 
 
-        public static double DistanceTo(this Windows.Devices.Geolocation.Geocoordinate oGeocoord0, Windows.Devices.Geolocation.Geocoordinate oGeocoord1)
-        {
-            return oGeocoord0.Point.Position.ToMyGeopos().DistanceTo(oGeocoord1.Point.Position.ToMyGeopos());
-        }
-        public static double DistanceTo(this Windows.Devices.Geolocation.Geoposition oGeopos0, Windows.Devices.Geolocation.Geoposition oGeopos1)
-        {
-            return oGeopos0.Coordinate.DistanceTo(oGeopos1.Coordinate);
-        }
+        //public static double DistanceTo(this Windows.Devices.Geolocation.Geocoordinate oGeocoord0, Windows.Devices.Geolocation.Geocoordinate oGeocoord1)
+        //{
+        //    return oGeocoord0.Point.Position.ToMyGeopos().DistanceTo(oGeocoord1.Point.Position.ToMyGeopos());
+        //}
+        //public static double DistanceTo(this Windows.Devices.Geolocation.Geoposition oGeopos0, Windows.Devices.Geolocation.Geoposition oGeopos1)
+        //{
+        //    return oGeopos0.Coordinate.DistanceTo(oGeopos1.Coordinate);
+        //}
 
-    //public static double DistanceTo(this Windows.Devices.Geolocation.BasicGeoposition oPos0, Windows.Devices.Geolocation.BasicGeoposition oPos)
-    //    {
-    //        int iRadix = 6371000;
-    //        double tLat = (oPos.Latitude - oPos0.Latitude) * Math.PI / 180;
-    //        double tLon = (oPos.Longitude - oPos0.Longitude) * Math.PI / 180;
-    //        double a = Math.Sin(tLat / 2) * Math.Sin(tLat / 2) + Math.Cos(Math.PI / 180 * oPos0.Latitude) * Math.Cos(Math.PI / 180 * oPos.Latitude) * Math.Sin(tLon / 2) * Math.Sin(tLon / 2);
-    //        double c = 2 * Math.Asin(Math.Min(1, Math.Sqrt(a)));
-    //        double d = iRadix * c;
+        //public static double DistanceTo(this Windows.Devices.Geolocation.BasicGeoposition oPos0, Windows.Devices.Geolocation.BasicGeoposition oPos)
+        //    {
+        //        int iRadix = 6371000;
+        //        double tLat = (oPos.Latitude - oPos0.Latitude) * Math.PI / 180;
+        //        double tLon = (oPos.Longitude - oPos0.Longitude) * Math.PI / 180;
+        //        double a = Math.Sin(tLat / 2) * Math.Sin(tLat / 2) + Math.Cos(Math.PI / 180 * oPos0.Latitude) * Math.Cos(Math.PI / 180 * oPos.Latitude) * Math.Sin(tLon / 2) * Math.Sin(tLon / 2);
+        //        double c = 2 * Math.Asin(Math.Min(1, Math.Sqrt(a)));
+        //        double d = iRadix * c;
 
-    //        return d;
-    //    }
+        //        return d;
+        //    }
 
-    //public static double DistanceTo(this Windows.Devices.Geolocation.BasicGeoposition oPos0, double dLatitude, double dLongitude)
-    //{
-    //    return oPos0.DistanceTo(p.k.NewBasicGeoposition(dLatitude, dLongitude ));
-    //}
+        //public static double DistanceTo(this Windows.Devices.Geolocation.BasicGeoposition oPos0, double dLatitude, double dLongitude)
+        //{
+        //    return oPos0.DistanceTo(p.k.NewBasicGeoposition(dLatitude, dLongitude ));
+        //}
 
 
-    /// <summary>
-    /// Czy punkt leży w miarę w Polsce (<500 km od środka geometrycznego Polski)
-    /// </summary>
-    //public static bool IsInsidePoland(this Windows.Devices.Geolocation.BasicGeoposition oPos)
-    //{// https://pl.wikipedia.org/wiki/Geometryczny_%C5%9Brodek_Polski
+        /// <summary>
+        /// Czy punkt leży w miarę w Polsce (<500 km od środka geometrycznego Polski)
+        /// </summary>
+        //public static bool IsInsidePoland(this Windows.Devices.Geolocation.BasicGeoposition oPos)
+        //{// https://pl.wikipedia.org/wiki/Geometryczny_%C5%9Brodek_Polski
 
-    //    double dOdl = oPos.DistanceTo(p.k.NewBasicGeoposition(52.2159333, 19.1344222));
-    //    if (dOdl / 1000 > 500) return false;
+        //    double dOdl = oPos.DistanceTo(p.k.NewBasicGeoposition(52.2159333, 19.1344222));
+        //    if (dOdl / 1000 > 500) return false;
 
-    //    return true;    // ale to nie jest pewne, tylko: "możliwe"
-    //}
+        //    return true;    // ale to nie jest pewne, tylko: "możliwe"
+        //}
 
-#endregion
+        #endregion
 
-    public static string ToDebugString(this Windows.Storage.Streams.IBuffer oBuf, int iMaxLen)
+        public static string ToDebugString(this Windows.Storage.Streams.IBuffer oBuf, int iMaxLen)
     {
         string sRet = oBuf.Length + ": ";
 
