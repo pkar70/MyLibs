@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>pkar</RootNamespace>
-    <TargetFramework>netstandard1.4</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>DotNetExts</AssemblyName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Piotr Karocki</Authors>
@@ -13,7 +13,8 @@
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
     <PackageTags>extensions; string; MAC; path; integer; ISO string; SI prefixes; Julian Day</PackageTags>
-    <Version>1.1.0</Version>
+    <Version>2.0.0</Version>
+    <PackageReleaseNotes>String.DropAccents and String.ToPOSIXportableFilename (.Net Standard 2.0)</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

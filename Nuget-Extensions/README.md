@@ -18,6 +18,9 @@ This Nuget contains several extensions to .Net types, that I use in many of my p
     String.Depolit() As String
     String.ToValidPath(Optional useDepolit As Boolean = True, Optional invalidCharPlaceholder As String = "") As String
 
+    String.DropAccents // in v2.0.0
+    String.ToPOSIXportableFilename(optional replacement as string = "_") // in v2.0.0
+
 # for Integer
 
     Integer.ToStringWithSpaces() As String

@@ -240,7 +240,7 @@ Partial Public Module DotNetExtensions
     ''' POSIX allows only latin letters, digits, dot, underscore and minus.
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
-    Public Function ToPOSIXportableFilename(ByVal basestring As String) As String
+    Public Function ToPOSIXportableFilename(ByVal basestring As String, Optional replacement As String = "_") As String
         Dim FKD As String = basestring.Normalize(Text.NormalizationForm.FormKD)
         Dim sRet As String = ""
 
@@ -251,12 +251,13 @@ Partial Public Module DotNetExtensions
                 ' combining - skip
             Else
                 ' nie wiadomo co, więc podmieniamy
-                sRet &= "_"
+                sRet &= replacement
             End If
         Next
 
         Return sRet
     End Function
+
 
     ''' <summary>
     ''' try to convert string to filename, dropping accents
