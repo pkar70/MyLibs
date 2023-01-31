@@ -1,1 +1,10 @@
 ﻿
+
+v1.1.0
+* Added: Clone, FromObject, DumpAsJson; and validation of Lat/Lon/Alt in constructor
+
+v1.0.1
+* DistanceTo, in meters, is rounded to centimeters (raw calculation sometimes gives too many fractional digits)
+
+v1.0.0
+* initial release

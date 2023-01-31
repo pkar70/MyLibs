@@ -1,17 +1,39 @@
 ﻿
 
 Imports System.Globalization
+Imports System.Reflection
 
 Public Class BasicGeopos
     Public Property Altitude As Double
     Public Property Latitude As Double
     Public Property Longitude As Double
 
+    ''' <summary>
+    ''' create new object, with data validation (ArgumentOutOfRangeException would be thrown)
+    ''' </summary>
+    ''' <param name="latitude"></param>
+    ''' <param name="longitude"></param>
+    ''' <param name="altitude"></param>
     Public Sub New(latitude As Double, longitude As Double, Optional altitude As Double = 0)
         Me.Altitude = altitude
         Me.Longitude = longitude
         Me.Latitude = latitude
+
+        If altitude < -6378000 Then Throw New ArgumentOutOfRangeException("Altitude", "Altitude below center of Earth")
+        If altitude > 100000 Then Throw New ArgumentOutOfRangeException("Altitude", "Altitude above Kármán line")
+
+        If latitude < -90 OrElse latitude > 90 Then Throw New ArgumentOutOfRangeException("Latitude", "Latitude should be between -90 and 90 (degrees)")
+        If longitude < -180 OrElse longitude > 360 Then Throw New ArgumentOutOfRangeException("Longitude", "Longitude should be between -180 and 360 (degrees)")
+
     End Sub
+
+    ''' <summary>
+    ''' returns clone of current item
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function Clone()
+        Return New BasicGeopos(Latitude, Longitude, Altitude)
+    End Function
 
 #Region "various distance metering"
 
@@ -111,7 +133,7 @@ Public Class BasicGeopos
     ''' <summary>
     ''' check if current position is inside given circle
     ''' </summary>
-    Public Function IsInsideCircle(center As BasicGeopos, radius As Double)
+    Public Function IsInsideCircle(center As BasicGeopos, radius As Double) As Boolean
         Return DistanceTo(center) <= radius
     End Function
 
@@ -259,6 +281,14 @@ Public Class BasicGeopos
         Return FormatLink($"https://www.openstreetmap.org/#map={zoom}/%latitude/%longitude")
     End Function
 
+    ''' <summary>
+    ''' dumps content as one-line JSON token
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function DumpAsJson() As String
+        Return "{""Latitude"": " & Latitude & ", ""Longitude"": " & Longitude & ", ""Altitude"": " & Altitude & "}"
+    End Function
+
 #Region "DMS format"
     Private Shared Function Double2StringDMS(dVal As Double, sFormat As String, iDigits As Integer) As String
 
@@ -344,6 +374,67 @@ Public Class BasicGeopos
                       lonAsTime.Minutes + lonAsTime.Hours * 24, lonAsTime.Seconds, lonEW)
     End Function
 #End Region
+#End Region
+
+#Region "from any object"
+
+
+    ''' <summary>
+    ''' Try to construct BasicGeopos from any .Net object with Latitude, Longitude and Altitude properties or fields.
+    ''' It can be UWP BasicGeoposition, .Net Framework GeoCoordinate, or MAUI Location
+    ''' </summary>
+    ''' <returns>BasicGeopos created from input parameter, or NULL if something goes wrong (e.g. no Latitude or Longitude given - Altitude is not required)</returns>
+    Public Shared Function FromObject(anyObject As Object) As BasicGeopos
+        Dim oNew As New BasicGeopos(0, 0, 0)
+
+        Dim prop As PropertyInfo
+        Dim fld As FieldInfo
+
+        Dim bLat As Boolean = False
+        Dim bLon As Boolean = False
+
+        Try
+
+            prop = anyObject.GetType.GetRuntimeProperty("Latitude")
+            If prop IsNot Nothing Then
+                oNew.Latitude = prop.GetValue(anyObject)
+                bLat = True
+            Else
+                fld = anyObject.GetType.GetRuntimeField("Latitude")
+                If fld IsNot Nothing Then
+                    oNew.Latitude = fld.GetValue(anyObject)
+                    bLat = True
+                End If
+            End If
+
+            prop = anyObject.GetType.GetRuntimeProperty("Longitude")
+            If prop IsNot Nothing Then
+                oNew.Longitude = prop.GetValue(anyObject)
+                bLon = True
+            Else
+                fld = anyObject.GetType.GetRuntimeField("Longitude")
+                If fld IsNot Nothing Then
+                    oNew.Longitude = fld.GetValue(anyObject)
+                    bLon = True
+                End If
+            End If
+
+            prop = anyObject.GetType.GetRuntimeProperty("Altitude")
+            If prop IsNot Nothing Then
+                oNew.Altitude = prop.GetValue(anyObject)
+            Else
+                fld = anyObject.GetType.GetRuntimeField("Altitude")
+                If fld IsNot Nothing Then oNew.Altitude = fld.GetValue(anyObject)
+            End If
+
+            If bLat AndAlso bLon Then Return oNew
+
+        Catch ex As Exception
+        End Try
+
+        Return Nothing
+
+    End Function
 #End Region
 
 

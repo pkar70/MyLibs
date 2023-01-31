@@ -3,7 +3,9 @@
 
 # constructor
 
-    new BasicGeo(latitude, longitude, altitude = 0)
+    new BasicGeo(latitude, longitude, altitude = 0) // args are validated since v1.1.0
+    Function Clone  // [since v1.1.0]
+    Function FromObject(anyObject as Object)    // tries to extract data from given object [since v1.1.0]
 
 # various distance metering
 
@@ -22,7 +24,7 @@
     Function IsInsideRectangle(latMin As Double, latMax As Double, lonMin As Double, lonMax As Double) As Boolean
     Function IsInsideRectangle(oGeoPos0 As BasicGeopos, oGeoPos1 As BasicGeopos) As Boolean
 
-    Function IsInsideCircle(center As BasicGeopos, radius As Double)
+    Function IsInsideCircle(center As BasicGeopos, radius As Double) As Boolean
 
 # get centers of some regions
 
@@ -56,6 +58,7 @@
 
     Function FormatLink(sBaseLink As String) As String  // replace %lat , %long with values
     Function ToOSMLink(Optional zoom As Integer = 16)
+    Function DumpAsJson() As String // dump as one-line JSON token [since v1.1.0]
 
 ## DMS (degree, minute, second)
 

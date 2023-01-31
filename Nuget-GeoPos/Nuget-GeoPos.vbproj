@@ -18,7 +18,7 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <Authors>Piotr Karocki</Authors>
     <PackageTags>geoposition, geolocation, helpers</PackageTags>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <PackageReleaseNotes>DistanceTo, in meters, is rounded to centimeters (raw calculation sometimes gives too many fractional digits)</PackageReleaseNotes>
   </PropertyGroup>
 
