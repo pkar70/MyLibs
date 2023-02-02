@@ -28,4 +28,12 @@ And, if you want to iterate directories in log folders:
 	GetLogFolderYear() As String	// root\YYYY
 	GetLogFolderMonth() As String	// root\YYYY\MM
 
-	
+For .Net Standard 2.0 and above, you have additional constructors:
+
+	New(specialFolder As Environment.SpecialFolder, Optional sSubfolder As String = "Datalog") // in this specialfolder, folder named as application would be created
+	New(folderType As DatalogFolder, Optional sSubfolder As String = "Datalog")	// Local or Roam, works also in UWP
+	New(Optional sSubfolder As String = "Datalog")	// same as New(DatalogFolder.Local, sSubfolder)
+
+and also one utility method:
+
+	static GetAppName As String

@@ -1,13 +1,8 @@
 ﻿
 * gdzie się da - Shared, zeby nie bylo potrzebne new/class
 
-2.0: data folder automatycznie?
-pkar.datalog.folder ENUM local, roam, machine, onedrive?
 
 * jak folder dla WPF ma sie do UWP?
-
-* datalog.init(scope) ?
-* datalog.init(Environment.SpecialFolder.LocalApplicationData) ?
 
 Usage:
 TramTicket

@@ -1,4 +1,6 @@
 
+Imports System.Reflection
+
 Public Class Datalog
 
     Private msDataLogRootFolder As String = ""
@@ -29,6 +31,116 @@ Public Class Datalog
         If Not String.IsNullOrWhiteSpace(sSubfolder) Then msDataLogRootFolder = IO.Path.Combine(sRootFolder, sSubfolder)
 
     End Sub
+
+#If NETSTANDARD2_0_OR_GREATER Then
+
+    ''' <summary>
+    ''' Initialization of library: set root folder for datalog files. Inside folder folder for App would be created.
+    ''' </summary>
+    ''' <param name="specialFolder">folder ID, in this folder subfolder with application name would be created</param>
+    ''' <param name="sSubfolder">optional subfolder within specialFolder\APPNAME</param>
+    Public Sub New(specialFolder As Environment.SpecialFolder, Optional sSubfolder As String = "Datalog")
+        Dim folder As String = Environment.GetFolderPath(specialFolder)
+
+        If Not IO.Directory.Exists(folder) Then
+            Throw New InvalidOperationException($"Datalog.New: folder '{folder}' doesn't exist")
+        End If
+
+        folder = IO.Path.Combine(folder, GetAppName)
+        IO.Directory.CreateDirectory(folder)
+
+        SetRootFolder(folder)
+        If Not String.IsNullOrWhiteSpace(sSubfolder) Then msDataLogRootFolder = IO.Path.Combine(folder, sSubfolder)
+    End Sub
+
+    ''' <summary>
+    ''' Initialization of library: set root folder for datalog files. Inside folder folder for App would be created.
+    ''' </summary>
+    ''' <param name="folder">folder type (from ENUM)</param>
+    ''' <param name="sSubfolder">optional subfolder within specialFolder\APPNAME</param>
+    Public Sub New(folderType As DatalogFolder, Optional sSubfolder As String = "Datalog")
+        Dim appName As String = GetAppName()
+        Dim folder As String
+        Select Case folderType
+            Case DatalogFolder.Local
+                folder = GetLocalPathname(appName)
+            Case DatalogFolder.Roam
+                folder = GetRoamingPathname(appName)
+            Case Else
+                Throw New ArgumentException("Datalog.New: bad DatalogFolder parameter")
+        End Select
+
+        SetRootFolder(folder)
+        If Not String.IsNullOrWhiteSpace(sSubfolder) Then msDataLogRootFolder = IO.Path.Combine(folder, sSubfolder)
+    End Sub
+
+    ''' <summary>
+    ''' Initialization of library, with Local datalog (works also on UWP). Inside folder folder for App would be created.
+    ''' </summary>
+    ''' <param name="sSubfolder">optional subfolder within specialFolder\APPNAME</param>
+    Public Sub New(Optional sSubfolder As String = "Datalog")
+        FromNew(DatalogFolder.Local, sSubfolder)
+    End Sub
+
+#Region "internal init subs"
+
+    Public Shared Function GetAppName() As String
+        Dim sAssemblyFullName = System.Reflection.Assembly.GetEntryAssembly().FullName
+        Dim oAss As New AssemblyName(sAssemblyFullName)
+        Return oAss.Name
+    End Function
+
+    Private Sub FromNew(folderType As DatalogFolder, sSubfolder As String)
+        Dim appName As String = GetAppName()
+        Dim folder As String
+        Select Case folderType
+            Case DatalogFolder.Local
+                folder = GetLocalPathname(appName)
+            Case DatalogFolder.Roam
+                folder = GetRoamingPathname(appName)
+            Case Else
+                Throw New ArgumentException("Datalog.New: bad DatalogFolder parameter")
+        End Select
+
+        SetRootFolder(folder)
+        If Not String.IsNullOrWhiteSpace(sSubfolder) Then msDataLogRootFolder = IO.Path.Combine(folder, sSubfolder)
+    End Sub
+
+    Private Shared Function GetLocalPathname(sAppName As String) As String
+        Dim sPath As String = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+
+        ' UWP
+        If sPath.ToLowerInvariant.Contains("local" & IO.Path.DirectorySeparatorChar & "packages") Then
+            Return sPath
+        End If
+
+        ' WPF = C:\Users\pkar\AppData\Local
+        sPath = IO.Path.Combine(sPath, sAppName)
+        IO.Directory.CreateDirectory(sPath)
+        Return sPath
+    End Function
+
+    Private Shared Function GetRoamingPathname(sAppName As String) As String
+        ' in UWP, we got C:\Users\pkar\AppData\Roaming as a result of Environment.SpecialFolder.ApplicationData!
+        ' so we have to use work-around
+        Dim sPath As String = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+
+        If sPath.ToLowerInvariant.Contains("local" & IO.Path.DirectorySeparatorChar & "packages") Then
+            ' UWP = C:\Users\xxx\AppData\Local\Packages\xxx\LocalState)
+            Return sPath.Replace("LocalState", "RoamingState")
+        End If
+
+        ' WPF = C:\Users\pkar\AppData\Local 
+        sPath = sPath.Replace("Local", "Roaming")
+        sPath = IO.Path.Combine(sPath, sAppName)
+        IO.Directory.CreateDirectory(sPath)
+        Return sPath
+
+    End Function
+#End Region
+
+#End If
+
 
 #End Region
 
@@ -165,3 +277,21 @@ Public Class Datalog
 
 
 End Class
+
+
+#If NETSTANDARD2_0_OR_GREATER Then
+Public Enum DatalogFolder
+    ''' <summary>
+    ''' UWP: C:\Users\XX\AppData\Local\Packages\XXX\LocalState;
+    ''' WPF etc: C:\Users\XX\AppData\Local\APPNAME
+    ''' </summary>
+    Local
+    ''' <summary>
+    ''' UWP: C:\Users\XX\AppData\Local\Packages\XXX\RoamingState;
+    ''' WPF etc: C:\Users\XX\AppData\Roaming\APPNAME
+    ''' </summary>
+    Roam
+    ' Machine
+    ' OneDrive
+End Enum
+#End If
