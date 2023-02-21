@@ -1,5 +1,19 @@
 ﻿
 
+v.1.2.1
+* Added: CopyTo(object), FormatLink(base, zoomLevel), ToOSMUri, FromLink, FromOSMLink
+* Enhanced: FormatLink(base) is using also %lat
+* Fix: FromDM(double, String, double, string) correction
+
+v.1.1.3
+* Fix: ValueBetween
+
+v.1.1.2
+* Added: ToOSMLink
+
+v.1.1.1
+* now Intellisense should be working
+
 v1.1.0
 * Added: Clone, FromObject, DumpAsJson; and validation of Lat/Lon/Alt in constructor
 

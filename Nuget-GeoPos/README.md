@@ -1,16 +1,19 @@
 ﻿
  This is library for manipulating geolocation inside ClassLibs - UWP has BasicGeolocation, Android and MAUI has Location, but in .Net we have nothing.
 
-# constructor
+# constructor (and similar)
 
     new BasicGeo(latitude, longitude, altitude = 0) // args are validated since v1.1.0
     Function Clone  // [since v1.1.0]
     Function FromObject(anyObject as Object)    // tries to extract data from given object [since v1.1.0]
+    Function FromLink(baselink, link)   // tries to create BasicGeopos from map link [since v.1.2.1]
+    Function FromOSMLink(link)   // tries to create BasicGeopos from OSM link [since v.1.2.1]
 
 # various distance metering
 
     Function DistanceTo(dLatitude As Double, dLongitude As Double) As Double
     Function DistanceTo(oGeoPos As BasicGeopos) As Double
+    Function DistanceKmTo(dLatitude As Double, dLongitude As Double) As Double // [since 1.1.2]
     Function DistanceKmTo(oGeoPos As BasicGeopos) As Double
 
     Function IsNear(oGeoPos As BasicGeopos, distanceMeters As Double) As Boolean
@@ -48,6 +51,10 @@
     Function IsEmpty() As Boolean   // test if current BasicGeopos is Empty one
 
 
+# working with other .Net geolocation types
+
+    Function FromObject(anyObject as Object)    // tries to extract data from given object [since v1.1.0]
+    Sub CopyTo(anyObject as Object)             // tries to copy data to given object [since v1.2.1]
 
 # serialization etc.
 
@@ -56,8 +63,10 @@
     Function StringLat(Optional iDigits As Integer = 5) As String
     Function StringLon(Optional iDigits As Integer = 5) As String
 
-    Function FormatLink(sBaseLink As String) As String  // replace %lat , %long with values
-    Function ToOSMLink(Optional zoom As Integer = 16)
+    Function FormatLink(sBaseLink As String) As String  // replace %lat , %lon with values; since 1.2.1 also %alt
+    Function FormatLink(sBaseLink As String, zoomLevel) As String  // as above, but also %zoom [since 1.2.1]
+    Function ToOSMLink(Optional zoom As Integer = 16) As String
+    Function ToOSMUri(Optional zoom As Integer = 16) As Uri [since 1.2.1]
     Function DumpAsJson() As String // dump as one-line JSON token [since v1.1.0]
 
 ## DMS (degree, minute, second)

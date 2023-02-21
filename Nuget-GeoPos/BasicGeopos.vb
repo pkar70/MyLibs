@@ -1,7 +1,9 @@
 ﻿
 
+Imports System.Collections.Specialized
 Imports System.Globalization
 Imports System.Reflection
+Imports System.Text.RegularExpressions
 
 Public Class BasicGeopos
     Public Property Altitude As Double
@@ -74,6 +76,15 @@ Public Class BasicGeopos
     End Function
 
     ''' <summary>
+    ''' Measure distance to given coordinates (in meters)
+    ''' </summary>
+    ''' <returns>distance in kilometeres</returns>
+    Public Function DistanceKmTo(dLatitude As Double, dLongitude As Double) As Double
+        Return DistanceTo(dLatitude, dLongitude) / 1000
+    End Function
+
+
+    ''' <summary>
     ''' check if we are near given coordinates, same as DistanceTo &lt; distanceMeters
     ''' </summary>
     ''' <param name="oGeoPos"></param>
@@ -98,7 +109,7 @@ Public Class BasicGeopos
     Private Shared Function IsValueBetween(valueCurr As Double, value0 As Double, value1 As Double) As Boolean
         Dim valueMin As Double = Math.Min(value0, value1)
         Dim valueMax As Double = Math.Max(value0, value1)
-        Return valueCurr >= valueMin AndAlso valueCurr >= valueMax
+        Return valueCurr >= valueMin AndAlso valueCurr <= valueMax
     End Function
 
     ''' <summary>
@@ -249,7 +260,7 @@ Public Class BasicGeopos
     ''' <summary>
     ''' return Latitude as string with iDigits decimal digits
     ''' </summary>
-    ''' <param name="iDigits">decimal digits (max 5)</param>
+    ''' <param name="iDigits">decimal digits (max 5, means ≈ 10 m)</param>
     Public Function StringLat(Optional iDigits As Integer = 5) As String
         Return Double2String(Latitude, iDigits)
     End Function
@@ -257,29 +268,125 @@ Public Class BasicGeopos
     ''' <summary>
     ''' return Longitude as string with iDigits decimal digits
     ''' </summary>
-    ''' <param name="iDigits">decimal digits (max 5)</param>
+    ''' <param name="iDigits">decimal digits (max 5, means ≈ 10 m)</param>
     Public Function StringLon(Optional iDigits As Integer = 5) As String
         Return Double2String(Longitude, iDigits)
     End Function
 
     ''' <summary>
-    ''' insert Latitude and Longitude into string (%lat, %lon)
+    ''' insert Latitude, Longitude and Altitude into string (%lat, %lon, %alt)
     ''' </summary>
     ''' <param name="sBaseLink">base link, use %lat and %lon as placeholders</param>
     Public Function FormatLink(sBaseLink As String) As String
-        sBaseLink = sBaseLink.Replace("%latitude", StringLat)
-        sBaseLink = sBaseLink.Replace("%longitude", StringLon)
+        sBaseLink = sBaseLink.Replace("%lat", StringLat)
+        sBaseLink = sBaseLink.Replace("%lon", StringLon)
+        sBaseLink = sBaseLink.Replace("%alt", Altitude)
         Return sBaseLink
+    End Function
+
+    ''' <summary>
+    ''' insert Latitude, Longitude, Altitude and given zoomLevel into string (%lat, %lon, %alt, %zoom)
+    ''' </summary>
+    ''' <param name="sBaseLink">base link, use %lat and %lon as placeholders</param>
+    Public Function FormatLink(sBaseLink As String, zoomLevel As Integer) As String
+        sBaseLink = sBaseLink.Replace("%lat", StringLat)
+        sBaseLink = sBaseLink.Replace("%lon", StringLon)
+        sBaseLink = sBaseLink.Replace("%alt", StringLon)
+        sBaseLink = sBaseLink.Replace("%zoom", zoomLevel)
+        Return sBaseLink
+    End Function
+
+    ''' <summary>
+    ''' tries to create new BasicGeopos from link
+    ''' </summary>
+    ''' <param name="baselink">base link (with %lat, %lon, %zoom)</param>
+    ''' <param name="link">real link (with data)</param>
+    ''' <returns>NULL, or BasicGeopos with Latitude and Longitude set from link</returns>
+    Public Shared Function FromLink(baselink As String, link As String) As BasicGeopos
+        If link.Length < 15 Then Return Nothing
+
+        Dim iLat As Integer = baselink.IndexOf("%lat")
+        Dim iLon As Integer = baselink.IndexOf("%lon")
+
+        Dim sRegMask As String = baselink.Replace("%lon", "([\.0-9]*)").
+            Replace("%lat", "([\.0-9]*)").
+            Replace("%zoom", "[0-9]*")
+
+        Dim result As Match = Regex.Match(link, sRegMask, RegexOptions.IgnoreCase)
+
+        If Not result.Success Then Return Nothing
+
+        Try
+            If iLat < iLon Then
+                Return New BasicGeopos(result.Groups(1).Value, result.Groups(2).Value)
+            Else
+                Return New BasicGeopos(result.Groups(2).Value, result.Groups(1).Value)
+            End If
+
+        Catch ex As Exception
+            Return Nothing
+        End Try
+
+    End Function
+
+
+    Private Const _OSMlink As String = "https://www.openstreetmap.org/#map=%zoom/%lat/%long"
+
+    ''' <summary>
+    ''' returns link to OpenStreetMap from current geoposition
+    ''' </summary>
+    ''' <param name="zoom">zoom level to be used</param>
+    Public Function ToOSMLink(Optional zoom As Integer = 16) As String
+        zoom = Math.Min(zoom, 19)
+        Return FormatLink(_OSMlink, zoom)
     End Function
 
     ''' <summary>
     ''' returns link to OpenStreetMap from current geoposition
     ''' </summary>
     ''' <param name="zoom">zoom level to be used</param>
-    Public Function ToOSMLink(Optional zoom As Integer = 16)
-        zoom = Math.Min(zoom, 19)
-        Return FormatLink($"https://www.openstreetmap.org/#map={zoom}/%latitude/%longitude")
+    Public Function ToOSMUri(Optional zoom As Integer = 16) As Uri
+        Return New Uri(ToOSMLink(zoom))
     End Function
+
+
+    ''' <summary>
+    ''' tries to create new BasicGeopos from OSM link
+    ''' </summary>
+    ''' <param name="link"></param>
+    ''' <returns></returns>
+    Public Shared Function FromOSMLink(link As String) As BasicGeopos
+        Return FromLink(_OSMlink, link)
+    End Function
+
+
+#If False Then
+    ''' <summary>
+    ''' returns link to map service from current geoposition
+    ''' </summary>
+    ''' <param name="mapService">which map service should be used</param>
+    ''' <param name="zoom">zoom level to be used</param>
+    Public Function FormatLink(mapBaseLinks As String(), mapService As String, Optional zoom As Integer = 16)
+        zoom = Math.Min(zoom, 19)
+        Select Case mapService
+            Case 
+        End Select
+
+        Return FormatLink($"https://www.openstreetmap.org/#map=%zoom/%lat/%long", zoom)
+    End Function
+
+    Public Shared Function GetFromLink()
+
+    End Function
+
+    ' raczej jako Dictionary
+    Public Shared ReadOnly MapServices As String() =
+        {"https://www.openstreetmap.org/#map=%zoom/%lat/%lon",
+        "https://bing.com/maps/default.aspx?lvl=%zoom&cp=%lat~%lon",
+        "https://www.google.pl/maps/@%lat,%lon,%zoomz",
+        "https://mapa.wirtualneszlaki.pl/#%zoom/%lat/%lon",
+        "https://www.arcgis.com/home/webmap/viewer.html?center=%lon,%lat&level=%zoom"}
+#End If
 
     ''' <summary>
     ''' dumps content as one-line JSON token
@@ -288,6 +395,7 @@ Public Class BasicGeopos
     Public Function DumpAsJson() As String
         Return "{""Latitude"": " & Latitude & ", ""Longitude"": " & Longitude & ", ""Altitude"": " & Altitude & "}"
     End Function
+#End Region
 
 #Region "DMS format"
     Private Shared Function Double2StringDMS(dVal As Double, sFormat As String, iDigits As Integer) As String
@@ -342,7 +450,7 @@ Public Class BasicGeopos
     ''' <param name="lonEW">longitude "E" or "W"</param>
     Public Shared Function FromDMS(latD As Integer, latM As Double, latS As Double, latSN As String, lonD As Integer, lonM As Double, lonS As Double, lonEW As String) As BasicGeopos
         If latSN = "S" Then latD = -latD
-        If lonEW = "E" Then lonD = -lonD
+        If lonEW = "W" Then lonD = -lonD
 
         Return New BasicGeopos(latD + 1 / 60 * latM + 1 / 3600 * latS, lonD + 1 / 60 * lonM + 1 / 3600 * lonS)
     End Function
@@ -363,25 +471,26 @@ Public Class BasicGeopos
     ''' <summary>
     ''' create new BasicGeopos, from DMS-formatted values
     ''' </summary>
-    ''' <param name="latD">latitude degrees</param>
+    ''' <param name="latD">latitude degrees, decimal part: minutes (so 1.59 + 0.01 = 2.00)</param>
     ''' <param name="latSN">latitude "S" or "N" </param>
-    ''' <param name="lonD">longitude degrees</param>
+    ''' <param name="lonD">longitude degrees, decimal part: minutes (so 1.59 + 0.01 = 2.00)</param>
     ''' <param name="lonEW">longitude "E" or "W"</param>
-    Public Shared Function FromDM(latD As Double, latSW As String, lonD As Double, lonEW As String) As BasicGeopos
-        Dim latAsTime As TimeSpan = TimeSpan.FromMinutes(latD)
-        Dim lonAsTime As TimeSpan = TimeSpan.FromMinutes(lonD)
-        Return FromDM(latAsTime.Minutes + latAsTime.Hours * 24, latAsTime.Seconds, latSW,
-                      lonAsTime.Minutes + lonAsTime.Hours * 24, lonAsTime.Seconds, lonEW)
+    Public Shared Function FromDM(latD As Double, latSN As String, lonD As Double, lonEW As String) As BasicGeopos
+
+        Dim latDegree As Double = Math.Floor(latD)
+        Dim latMin As Double = 100 * (latD - latDegree) * 100 / 60
+        Dim lonDegree As Double = Math.Floor(lonD)
+        Dim lonMin As Double = 100 * (lonD - lonDegree) * 100 / 60
+
+        Return FromDM(latDegree, latMin, latSN, lonDegree, lonMin, lonEW)
     End Function
 #End Region
-#End Region
 
-#Region "from any object"
-
+#Region "from/to any object"
 
     ''' <summary>
     ''' Try to construct BasicGeopos from any .Net object with Latitude, Longitude and Altitude properties or fields.
-    ''' It can be UWP BasicGeoposition, .Net Framework GeoCoordinate, or MAUI Location
+    ''' It can be UWP BasicGeoposition, .Net Framework GeoCoordinate, or MAUI Location (or even your own types)
     ''' </summary>
     ''' <returns>BasicGeopos created from input parameter, or NULL if something goes wrong (e.g. no Latitude or Longitude given - Altitude is not required)</returns>
     Public Shared Function FromObject(anyObject As Object) As BasicGeopos
@@ -435,9 +544,49 @@ Public Class BasicGeopos
         Return Nothing
 
     End Function
+
+    ''' <summary>
+    ''' Try to copy Latitude, Longitude and Altitude to any .Net object (to Properties or Fields).
+    ''' It can be UWP BasicGeoposition, .Net Framework GeoCoordinate, or MAUI Location (or even your own types)
+    ''' </summary>
+    ''' <param name="anyObject">Object to insert values into</param>
+    Public Sub CopyTo(anyObject As Object)
+
+        Dim prop As PropertyInfo
+
+        prop = anyObject.GetType.GetRuntimeProperty("Latitude")
+        If prop IsNot Nothing Then prop.SetValue(anyObject, Latitude)
+
+        prop = anyObject.GetType.GetRuntimeProperty("Longitude")
+        If prop IsNot Nothing Then prop.SetValue(anyObject, Longitude)
+
+        prop = anyObject.GetType.GetRuntimeProperty("Altitude")
+        If prop IsNot Nothing Then prop.SetValue(anyObject, Altitude)
+
+        Dim fld As FieldInfo
+
+        fld = anyObject.GetType.GetRuntimeField("Latitude")
+        If fld IsNot Nothing Then fld.SetValue(anyObject, Latitude)
+
+        fld = anyObject.GetType.GetRuntimeField("Longitude")
+        If fld IsNot Nothing Then fld.SetValue(anyObject, Longitude)
+
+        fld = anyObject.GetType.GetRuntimeField("Altitude")
+        If fld IsNot Nothing Then fld.SetValue(anyObject, Altitude)
+
+    End Sub
+
 #End Region
 
 
 End Class
 
-
+#If False Then
+Public Enum MapService
+    OpenStreetMap
+    Bing
+    Google
+    WirtSzlaki
+    ArcGis
+End Enum
+#end if
