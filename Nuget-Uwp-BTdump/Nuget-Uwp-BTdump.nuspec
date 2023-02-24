@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>BTdump</id>
+    <version>1.0.0</version>
+    <authors>pkar</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">GPL-3.0-or-later</license>
+    <projectUrl>https://github.com/pkar70/MyLibs/Nuget-Uwp-BTdump/</projectUrl>
+    <description>Various debug helpers for Bluetooth</description>
+    <releaseNotes>Initial release.</releaseNotes>
+    <copyright>Piotr Karocki</copyright>
+    <tags>Bluetooth dump debug</tags>
+  </metadata>
+</package>
