@@ -478,9 +478,9 @@ Public Class BasicGeopos
     Public Shared Function FromDM(latD As Double, latSN As String, lonD As Double, lonEW As String) As BasicGeopos
 
         Dim latDegree As Double = Math.Floor(latD)
-        Dim latMin As Double = 100 * (latD - latDegree) * 100 / 60
+        Dim latMin As Double = 100 * (latD - latDegree)
         Dim lonDegree As Double = Math.Floor(lonD)
-        Dim lonMin As Double = 100 * (lonD - lonDegree) * 100 / 60
+        Dim lonMin As Double = 100 * (lonD - lonDegree)
 
         Return FromDM(latDegree, latMin, latSN, lonDegree, lonMin, lonEW)
     End Function
