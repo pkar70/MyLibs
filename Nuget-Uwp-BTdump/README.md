@@ -25,8 +25,8 @@ Rest of methods returns object or NULL when error occurs. In this case, error me
 
  All extensions are meant to return debug string, with dumped object data.
 
-    ToDebugString(ByVal oBuf As Windows.Storage.Streams.IBuffer, iMaxLen As Integer)**
-    ToDebugString(ByVal oBuf As Windows.Storage.Streams.IBuffer) // same as above, but iMaxLen is set to 16
+    ToDebugString(ByVal oBuf As Windows.Storage.Streams.IBuffer, iMaxLen As Integer)
+    ToDebugString(ByVal oBuf As Windows.Storage.Streams.IBuffer)** // same as above, but iMaxLen is set to 16
     ToDebugString(ByVal oAdv As BluetoothLEAdvertisement)
     ToDebugStringAsync(ByVal oDescriptor As GattDescriptor)
     ToDebugString(ByVal oProp As GattCharacteristicProperties)
@@ -34,6 +34,6 @@ Rest of methods returns object or NULL when error occurs. In this case, error me
     ToDebusStringAsync(ByVal oServ As GattDeviceService)
     ToDebusStringAsync(ByVal oDevice As BluetoothLEDevice)**
 
-** means DefaultOverload, the one and only visibile in JavaScript.
+** means DefaultOverload, the one and only visible in JavaScript.
 
-This Nuget uses my DotNetExtensions (for dumping GUIDs). But DotNetExtensions is universal (uses .Net Standard 1.4), and this Nuget is only for UWP.
+This Nuget uses my DotNetExtensions (for dumping GUIDs). I moved dumping GUIDs to DotNetExtensions, as DotNetExtensions is universal (uses .Net Standard 1.4), and this Nuget is only for UWP.
