@@ -173,8 +173,8 @@ Partial Public Class App
 
         Await args.Request.SendResponseAsync(oResultMsg)
 
-        messageDeferral.Complete()
-        moTaskDeferal.Complete()
+        messageDeferral?.Complete()
+        moTaskDeferal?.Complete()
 
     End Sub
 
@@ -583,6 +583,7 @@ Public Module pkar
 
     End Function
 
+#If BT_HERE Then
     ''' <summary>
     ''' Zwraca true/false czy State (po call) jest taki jak bOn; wymaga devCap=radios
     ''' </summary>
@@ -615,7 +616,7 @@ Public Module pkar
 
         Return True
     End Function
-
+#End If
 #End Region
 
 #End Region
@@ -1205,7 +1206,7 @@ Public Module pkar
 
 #End Region
 
-
+#If BT_DUMP_HERE Then
 #Region "Bluetooth debugs"
 
     Public Async Function DebugBTGetServChar(uMAC As ULong,
@@ -1265,8 +1266,9 @@ Public Module pkar
 
 #End Region
 
+#End If
 
-
+#If BASIC_GEO Then
     Public Function GetDomekGeopos(Optional iDecimalDigits As UInt16 = 0) As Windows.Devices.Geolocation.BasicGeoposition
         Select Case iDecimalDigits
             Case 1
@@ -1291,6 +1293,7 @@ Public Module pkar
             .Longitude = dLon
         }
     End Function
+#End If
 
     Public Async Function IsFullVersion() As Task(Of Boolean)
 #If DEBUG Then
@@ -1560,6 +1563,7 @@ Module Extensions
 #End Region
 
 
+#If BT_DUMP_HERE Then
     <Extension()>
     Public Function ToDebugString(ByVal oBuf As Windows.Storage.Streams.IBuffer, iMaxLen As Integer) As String
         Dim sRet As String = oBuf.Length & ": "
@@ -1571,6 +1575,7 @@ Module Extensions
 
         Return sRet & vbCrLf
     End Function
+#End If
 
 
 #Region "Settingsy jako Extension"
@@ -1955,6 +1960,8 @@ Module Extensions
 
 #End Region
 
+#If BT_DUMP_HERE Then
+
 #Region "Bluetooth debug strings"
 
     <Extension()>
@@ -2155,6 +2162,9 @@ Module Extensions
 
 
 #End Region
+
+#End If
+
 End Module
 
 
