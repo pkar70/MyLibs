@@ -11,10 +11,11 @@
     Function DumpAsText() As String     // dump of all properties' values (in something like table)
     Function DumpAsJSON(Optional bSkipDefaults As Boolean = False) As String    // similar, but gives full dump of tree of properties as JSON dump
 
-* one method you can utilize in code, and sometimes even you can love it:
+* methods you can utilize in code, and sometimes even you can love it:
 
     Function Clone() As Object  // deep Clone of item (dump to JSON and read it to new item)
-
+    Sub CopyFrom(anyObject)     // copy all properties/fields from anyObject, if their names matches
+    Sub CopyTo(anyObject)       // copy all properties/fields to anyObject, if their names matches
 
 # BaseList
 

@@ -49,16 +49,94 @@ Public MustInherit Class BaseStruct
         Return Newtonsoft.Json.JsonConvert.DeserializeObject(sTxt, Me.GetType)
     End Function
 
-#If NETSTANDARD2_0_OR_GREATER Then
-    
-    Public shared function FromJSON(sJSON as string) as object
-    Dim st As New StackFrame()
-    Dim t As New StackTrace()
-    Dim t2 As Type = TryCast(t.GetFrames(1).GetMethod(), MemberInfo).DeclaringType
-        Return Newtonsoft.Json.JsonConvert.DeserializeObject(sJSON, t2)
-    End Function
+    ''' <summary>
+    ''' copy all properties and fields from current object into given object, if such properties/fields exists
+    ''' </summary>
+    ''' <param name="anyObject">destination object</param>
+    Public Sub CopyTo(anyObject As Object)
+        If anyObject Is Nothing Then Return
 
-#End If
+        For Each oPropFrom As PropertyInfo In Me.GetType.GetRuntimeProperties
+
+            For Each oPropTo As PropertyInfo In anyObject.GetType.GetRuntimeProperties
+                If oPropFrom.Name = oPropTo.Name Then
+                    oPropTo.SetValue(anyObject, oPropFrom.GetValue(Me))
+                    Exit For
+                End If
+            Next
+
+            For Each oFldTo As FieldInfo In anyObject.GetType.GetRuntimeFields
+                If oPropFrom.Name = oFldTo.Name Then
+                    oFldTo.SetValue(anyObject, oPropFrom.GetValue(Me))
+                    Exit For
+                End If
+            Next
+        Next
+
+        For Each oFieldFrom As FieldInfo In Me.GetType.GetRuntimeFields
+
+            For Each oPropTo As PropertyInfo In anyObject.GetType.GetRuntimeProperties
+                If oFieldFrom.Name = oPropTo.Name Then
+                    oPropTo.SetValue(anyObject, oFieldFrom.GetValue(Me))
+                    Exit For
+                End If
+            Next
+
+            For Each oFldTo As FieldInfo In anyObject.GetType.GetRuntimeFields
+                If oFieldFrom.Name = oFldTo.Name Then
+                    oFldTo.SetValue(anyObject, oFieldFrom.GetValue(Me))
+                    Exit For
+                End If
+            Next
+        Next
+
+
+    End Sub
+
+    ''' <summary>
+    ''' copy all properties and fields from given object into current object, if such properties/fields exists
+    ''' </summary>
+    ''' <param name="anyObject">destination object</param>
+    Public Sub CopyFrom(anyObject As Object)
+        If anyObject Is Nothing Then Return
+
+        For Each oPropTo As PropertyInfo In Me.GetType.GetRuntimeProperties
+
+            For Each oPropFrom As PropertyInfo In anyObject.GetType.GetRuntimeProperties
+                If oPropTo.Name = oPropFrom.Name Then
+                    oPropTo.SetValue(Me, oPropFrom.GetValue(anyObject))
+                    Exit For
+                End If
+            Next
+
+            For Each oFldFrom As FieldInfo In anyObject.GetType.GetRuntimeFields
+                If oPropTo.Name = oFldFrom.Name Then
+                    oPropTo.SetValue(Me, oFldFrom.GetValue(anyObject))
+                    Exit For
+                End If
+            Next
+        Next
+
+        For Each oFieldTo As FieldInfo In Me.GetType.GetRuntimeFields
+
+            For Each oPropFrom As PropertyInfo In anyObject.GetType.GetRuntimeProperties
+                If oFieldTo.Name = oPropFrom.Name Then
+                    oFieldTo.SetValue(Me, oPropFrom.GetValue(anyObject))
+                    Exit For
+                End If
+            Next
+
+            For Each oFldFrom As FieldInfo In anyObject.GetType.GetRuntimeFields
+                If oFieldTo.Name = oFldFrom.Name Then
+                    oFieldTo.SetValue(Me, oFldFrom.GetValue(anyObject))
+                    Exit For
+                End If
+            Next
+        Next
+
+    End Sub
+
+
 
 End Class
 
