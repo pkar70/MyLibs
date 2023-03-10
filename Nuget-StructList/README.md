@@ -39,6 +39,7 @@
 ## operations on data file
 
     Overridable Function Load() As Boolean
+    Overridable Function Import(string) As Boolean [since 1.2.0]
     Overridable Function Save(Optional bIgnoreNulls As Boolean = False) As Boolean
     Function GetFileDate() As Date
     Function IsObsolete(iDays As Integer)
@@ -58,4 +59,48 @@
 
     Function LoadItem(sJSON As String) As TYP
 
+
+# BaseDict [since 1.2.0]
+
+ It is base for dictionary backed by JSON file; in many cases your app would be relieved from Nugetting JSON.
+ Using:
+ 
+    VB: Class YourList Inherits BaseDict(Of TypeOfKey, TypeOfValue)
+    C#: class YourList : BaseDict<TKey, TValue>
+
+ Maybe you would like to override one method, called by Load if file is empty. In overrided method you can add default entries to dictionary.
+ 
+    Protected Overridable Sub InsertDefaultContent()
+
+## constructor
+
+ You have to give folder for file, and you can override default file name.
+
+     New(sFolder As String, Optional sFileName As String = "items.json")
+
+## operations on data file
+
+    Overridable Function Load() As Boolean
+    Overridable Function Import(string) As Boolean
+    Overridable Function Save(Optional bIgnoreNulls As Boolean = False) As Boolean
+    Function GetFileDate() As Date
+    Function IsObsolete(iDays As Integer)
+
+
+## proxies for internal list
+
+    Function GetDictionary() As Dictionary(Of TKEY, TVALUE)
+    Function Count() As Integer
+    Sub Clear()
+    Function TryAdd(oNew As KeyValuePair(Of TKEY, TVALUE)) As Boolean
+    Function ContainsKey(key As TKEY) As Boolean
+    Function TryAdd(key As TKEY, value As TVALUE) As Boolean
+    Sub Remove(oDel As KeyValuePair(Of TKEY, TVALUE))
+    Sub Remove(key As TKEY)
+    Function Item(key As TKEY) As TVALUE
+    Function TryGetValue(key As TKEY, ByRef value As TVALUE) As Boolean
+
+## other functions
+
+    Function LoadItem(sJSON As String) As TYP
 

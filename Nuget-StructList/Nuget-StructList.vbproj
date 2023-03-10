@@ -7,17 +7,17 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>Piotr Karocki</Authors>
     <Copyright>Piotr Karocki</Copyright>
-    <Description>Base for struct/class and for lists, to add some helpers</Description>
+    <Description>Base for struct/class, lists and dictionaries, to add some helpers</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/Nuget-StructList</RepositoryUrl>
-    <PackageTags>list, helpers</PackageTags>
+    <PackageTags>struct, list, dictionary, helpers</PackageTags>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
-    <Version>1.1.0</Version>
-    <PackageReleaseNotes>Added CopyTo and CopyFrom any object</PackageReleaseNotes>
+    <Version>1.2.0</Version>
+    <PackageReleaseNotes>Added BaseDict class and BaseList.Import method</PackageReleaseNotes>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
