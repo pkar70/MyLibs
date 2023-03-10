@@ -38,6 +38,7 @@
     GetPolandCenter()
     GetKrakowCenter()
     Empty() // <=> (0,-150), middle of ocean; to make some scenarios easier
+    GetCenter(locations As List(Of BasicGeopos))    // since 1.2.3
 
 # tests if we are inside one of these
 
@@ -49,7 +50,6 @@
     Function IsInsideKrakow() As Boolean
 
     Function IsEmpty() As Boolean   // test if current BasicGeopos is Empty one
-
 
 # working with other .Net geolocation types
 
@@ -79,4 +79,11 @@
     FromDM(latD As Integer, latM As Double, latSW As String, lonD As Integer, lonM As Double, lonEW As String)
     FromDM(latD As Double, latSW As String, lonD As Double, lonEW As String)
 
+# Working with BasicGeopos lists
+
+ These functions are not related to one geopoint, so they are defined as shared/static.
+
+    Public Shared Function GetCenter(locations As List(Of BasicGeopos)) As BasicGeopos  // [since v1.2.3]
+    Public Shared Function GetCorners(locations As List(Of BasicGeopos)) As List(Of BasicGeopos)    // [since v1.2.3]
+    Public Shared Function GetCornersAndCenter(locations As List(Of BasicGeopos)) As List(Of BasicGeopos)   // [since v1.2.3]
 

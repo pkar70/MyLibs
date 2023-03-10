@@ -13,9 +13,9 @@ Public Class BasicGeopos
     ''' <summary>
     ''' create new object, with data validation (ArgumentOutOfRangeException would be thrown)
     ''' </summary>
-    ''' <param name="latitude"></param>
-    ''' <param name="longitude"></param>
-    ''' <param name="altitude"></param>
+    ''' <param name="latitude">Latitude, -90 to 90</param>
+    ''' <param name="longitude">Longitude, -180 to 360</param>
+    ''' <param name="altitude">Altitude, -6378000 to 100000</param>
     Public Sub New(latitude As Double, longitude As Double, Optional altitude As Double = 0)
         Me.Altitude = altitude
         Me.Longitude = longitude
@@ -245,7 +245,6 @@ Public Class BasicGeopos
     End Function
 
 #End Region
-
 
 #Region "ToStrings"
 
@@ -546,8 +545,8 @@ Public Class BasicGeopos
     End Function
 
     ''' <summary>
-    ''' Try to copy Latitude, Longitude and Altitude to any .Net object (to Properties or Fields).
-    ''' It can be UWP BasicGeoposition, .Net Framework GeoCoordinate, or MAUI Location (or even your own types)
+    ''' Try to copy Latitude, Longitude and Altitude to any .Net object (to Properties).
+    ''' It can be .Net Framework GeoCoordinate, or MAUI Location (or even your own types)
     ''' </summary>
     ''' <param name="anyObject">Object to insert values into</param>
     Public Sub CopyTo(anyObject As Object)
@@ -563,6 +562,7 @@ Public Class BasicGeopos
         prop = anyObject.GetType.GetRuntimeProperty("Altitude")
         If prop IsNot Nothing Then prop.SetValue(anyObject, Altitude)
 
+        ' to niestety nie działa - nie zmienia...
         Dim fld As FieldInfo
 
         fld = anyObject.GetType.GetRuntimeField("Latitude")
@@ -575,6 +575,58 @@ Public Class BasicGeopos
         If fld IsNot Nothing Then fld.SetValue(anyObject, Altitude)
 
     End Sub
+
+#End Region
+
+#Region "center and corners from list"
+    ''' <summary>
+    ''' Return GeoCenter point for list of locations (using Latitude, Longitude and Altitude)
+    ''' </summary>
+    Public Shared Function GetCenter(locations As List(Of BasicGeopos)) As BasicGeopos
+        Return GetCornersAndCenter(locations).Item(2)
+    End Function
+
+    ''' <summary>
+    ''' return NorthWest and SouthEast corners for list of locations. Also return altitude minimum (in NW) and maximum (in SE). It can be used for creating UWP GeoboundingBox.
+    ''' </summary>
+    Public Shared Function GetCorners(locations As List(Of BasicGeopos)) As List(Of BasicGeopos)
+
+        Dim oSE As New BasicGeopos(90, -180, -6378000)
+        Dim oNW As New BasicGeopos(-90, 360, 100000)
+
+        For Each loc As BasicGeopos In locations
+            oNW.Altitude = Math.Min(oNW.Altitude, loc.Altitude)
+            oNW.Latitude = Math.Max(oNW.Latitude, loc.Latitude)
+            oNW.Longitude = Math.Min(oNW.Longitude, loc.Longitude)
+
+            oSE.Altitude = Math.Max(oSE.Altitude, loc.Altitude)
+            oSE.Latitude = Math.Min(oSE.Latitude, loc.Latitude)
+            oSE.Longitude = Math.Max(oSE.Longitude, loc.Longitude)
+
+        Next
+
+        Return New List(Of BasicGeopos) From {oNW, oSE}
+
+    End Function
+
+    ''' <summary>
+    ''' return NorthWest, SouthEast corners and center point for list of locations. Also return altitude minimum (in NW) and maximum (in SE)
+    ''' </summary>
+    Public Shared Function GetCornersAndCenter(locations As List(Of BasicGeopos)) As List(Of BasicGeopos)
+
+        Dim corners As List(Of BasicGeopos) = GetCorners(locations)
+        Dim GeoNW As BasicGeopos = corners.Item(0)
+        Dim GeoSE As BasicGeopos = corners.Item(1)
+
+        Dim GeoCenter As New BasicGeopos(
+            GeoSE.Latitude + (GeoNW.Latitude - GeoSE.Latitude) / 2,
+            GeoNW.Longitude + (GeoSE.Longitude - GeoNW.Longitude) / 2,
+            GeoNW.Altitude + (GeoSE.Altitude - GeoNW.Altitude) / 2)
+
+
+        Return New List(Of BasicGeopos) From {GeoNW, GeoSE, GeoCenter}
+
+    End Function
 
 #End Region
 
