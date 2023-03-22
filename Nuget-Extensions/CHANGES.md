@@ -5,6 +5,11 @@
 * String.DropAccents
 * String.ToPOSIXportableFilename(optional replacement as string = "_")
 
+1.1.3
+* correction in DePascal
+* TwoLetterWeekDayPL(True), if you want "sr" and not "śr"
+* Bluetooth GUID debugs: AsGattReservedDescriptorName, AsGattReservedServiceName, AsGattReservedCharacteristicName
+
 1.1.0
 * added two functions:
  * TwoLetterWeekDayPL(Date)

@@ -5,7 +5,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>DotNetExts</AssemblyName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Authors>Piotr Karocki</Authors>
+    <Authors>pkar</Authors>
     <Description>Various class extensions, to make some programming tasks easier</Description>
     <Copyright>Piotr Karocki</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -13,8 +13,10 @@
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
     <PackageTags>extensions; string; MAC; path; integer; ISO string; SI prefixes; Julian Day</PackageTags>
-    <Version>2.0.0</Version>
-    <PackageReleaseNotes>String.DropAccents and String.ToPOSIXportableFilename (.Net Standard 2.0)</PackageReleaseNotes>
+    <Version>2.1.3</Version>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <PackageReleaseNotes>TwoLetterWeekDayPL(depolit), correction in DePascal, Bluetooth GUIDs</PackageReleaseNotes>
+    <Company>none</Company>
   </PropertyGroup>
 
   <ItemGroup>

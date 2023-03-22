@@ -1,5 +1,10 @@
 ﻿
 This Nuget contains several extensions to .Net types, that I use in many of my programs.
+There are two branches:
+* v1, for .Net Standard 1.4 (working also in UWP apps for phones)
+* v2, for .Net Standard 2.0 (if you can afford dropping support for phones)
+
+If some extension is added in v1.x.y, then it would be present also in v2.x.y (not in e.g. 2.0.0)
 
 # for String
 
@@ -18,8 +23,10 @@ This Nuget contains several extensions to .Net types, that I use in many of my p
     String.Depolit() As String
     String.ToValidPath(Optional useDepolit As Boolean = True, Optional invalidCharPlaceholder As String = "") As String
 
-    String.DropAccents // in v2.0.0
-    String.ToPOSIXportableFilename(optional replacement as string = "_") // in v2.0.0
+    String.DropAccents // in v2.x.x
+    String.ToPOSIXportableFilename(optional replacement as string = "_") // in v2.x.x
+    String.TransliterateCyrilicToLatin(ByVal basestring As String) As String	// in v2.x.x
+    String.Function TransliterateGreekToLatin(ByVal basestring As String) As String	// in v2.x.x
 
 # for Integer
 
@@ -44,10 +51,18 @@ This Nuget contains several extensions to .Net types, that I use in many of my p
     Date.ToJulianDay() As Integer
     Date.ToModifiedJulianDay() As Double
     TimeSpan.ToStringDHMS() As Integer
-    Date.TwoLetterWeekDayPL() As String
+    Date.TwoLetterWeekDayPL(Optional bezOgonkow As Boolean = False) As String // ['bezOgonkow' since x.1.3]
     Date.ToExifString() As String
 
+# for GUIDs
+    These are for Bluetooth debugging
+
+    GUID.AsGattReservedDescriptorName As String // [since x.1.3]
+    GUID.AsGattReservedServiceName As String // [since x.1.3]
+    GUID.AsGattReservedCharacteristicName As String // [since x.1.3]
+
 # other
+
     Function Between(Of T)(ByVal value As T, minVal As T, maxVal As T) As T
     Byte().ToDebugString(iSpaces As Integer) As String
     Stream.IsSameStreamContent(oStream2 As Stream) As Task(Of Boolean)
