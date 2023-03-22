@@ -229,6 +229,15 @@ Partial Public Module DotNetExtensions
 
     End Function
 
+    ''' <summary>
+    ''' same as Not string.Contains, making expressions look nicer
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function NotContains(ByVal basestring As String, value As String) As Boolean
+        Return Not basestring.Contains(value)
+    End Function
+
+
 
 #If NETSTANDARD2_0_OR_GREATER Then
 
@@ -254,6 +263,40 @@ Partial Public Module DotNetExtensions
 
         Return sRet
     End Function
+
+    ''' <summary>
+    ''' try to convert string to valid filename (very strict: POSIX portable filename, see IEEE 1003.1, 3.282), dropping accents etc., and all other characters change to '_'
+    ''' POSIX allows only latin letters, digits, dot, underscore and minus.
+    ''' <paramref name="useTransliteration">True, if first transliteration should be performed (string.Transliterate*ToLatin)</paramref>
+    ''' <paramref name="replacement">String that would be used as a replacement for invalid characters</paramref>
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ToPOSIXportableFilename(ByVal basestring As String, useTransliteration As Boolean, Optional replacement As String = "_") As String
+        Dim FKD As String = basestring.Normalize(Text.NormalizationForm.FormKD)
+
+        If useTransliteration Then
+            FKD = basestring.TransliterateCyrilicToLatin
+            FKD = basestring.TransliterateGreekToLatin
+            FKD = basestring.Normalize(Text.NormalizationForm.FormKD)
+            FKD = basestring.DropAccents
+        End If
+
+        Dim sRet As String = ""
+
+        For Each cTmp As Char In FKD
+            If "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-".Contains(cTmp) Then
+                sRet &= cTmp
+            ElseIf AscW(cTmp) >= &H300 AndAlso AscW(cTmp) < &H36F Then
+                ' combining - skip
+            Else
+                ' nie wiadomo co, więc podmieniamy
+                sRet &= replacement
+            End If
+        Next
+
+        Return sRet
+    End Function
+
 
 
     ''' <summary>
@@ -283,6 +326,7 @@ Partial Public Module DotNetExtensions
 
         Return sRet
     End Function
+#End If
 
     ''' <summary>
     ''' transliterate Cyrilic to Latin, according to ISO 9
@@ -450,9 +494,6 @@ Partial Public Module DotNetExtensions
 
         Return sRet
     End Function
-
-
-#End If
 
 
 #End Region

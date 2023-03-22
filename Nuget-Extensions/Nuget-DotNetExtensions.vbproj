@@ -13,10 +13,11 @@
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
     <PackageTags>extensions; string; MAC; path; integer; ISO string; SI prefixes; Julian Day</PackageTags>
-    <Version>2.1.3</Version>
+    <Version>2.2.1</Version>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
-	  <PackageReleaseNotes>TwoLetterWeekDayPL(depolit), correction in DePascal, Bluetooth GUIDs</PackageReleaseNotes>
+	  <PackageReleaseNotes>string.transliterating, string.NotContains</PackageReleaseNotes>
     <Company>none</Company>
+    <PackageId>pkar.$(AssemblyName)</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

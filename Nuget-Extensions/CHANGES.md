@@ -1,4 +1,8 @@
-﻿
+﻿x.2.1
+* added:
+* String.TransliterateCyrilicToLatin, TransliterateGreekToLatin
+* String.ToPOSIXportableFilename(useTransliterate, optional replacement)
+* String.NotContains
 
 2.0.0
 * version for .Net Standard 2.0

@@ -22,11 +22,13 @@ If some extension is added in v1.x.y, then it would be present also in v2.x.y (n
     String.RemoveBetween(sStart As String, sEnd As String) As String
     String.Depolit() As String
     String.ToValidPath(Optional useDepolit As Boolean = True, Optional invalidCharPlaceholder As String = "") As String
+    String.NotContains(value As String) As Boolean
 
     String.DropAccents // in v2.x.x
     String.ToPOSIXportableFilename(optional replacement as string = "_") // in v2.x.x
-    String.TransliterateCyrilicToLatin(ByVal basestring As String) As String	// in v2.x.x
-    String.Function TransliterateGreekToLatin(ByVal basestring As String) As String	// in v2.x.x
+    String.TransliterateCyrilicToLatin(ByVal basestring As String) As String	// since vx.2.1
+    String.TransliterateGreekToLatin(ByVal basestring As String) As String	// since vx.2.1
+    String.ToPOSIXportableFilename(useTransliteration As Boolean, optional replacement as string = "_") // since v2.2.1
 
 # for Integer
 
