@@ -1,4 +1,8 @@
 ﻿
+v.1.2.3
+* GetCorners(List); GetCenter(List); GetCornersAndCenter(List)
+
+v1.2.2
 
 v.1.2.1
 * Added: CopyTo(object), FormatLink(base, zoomLevel), ToOSMUri, FromLink, FromOSMLink

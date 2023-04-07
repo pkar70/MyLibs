@@ -21,12 +21,39 @@ Public Class BasicGeopos
         Me.Longitude = longitude
         Me.Latitude = latitude
 
-        If altitude < -6378000 Then Throw New ArgumentOutOfRangeException("Altitude", "Altitude below center of Earth")
-        If altitude > 100000 Then Throw New ArgumentOutOfRangeException("Altitude", "Altitude above Kármán line")
+        ValidateRanges()
 
-        If latitude < -90 OrElse latitude > 90 Then Throw New ArgumentOutOfRangeException("Latitude", "Latitude should be between -90 and 90 (degrees)")
-        If longitude < -180 OrElse longitude > 360 Then Throw New ArgumentOutOfRangeException("Longitude", "Longitude should be between -180 and 360 (degrees)")
+    End Sub
 
+
+    ''' <summary>
+    ''' create new object, with data validation (ArgumentOutOfRangeException would be thrown), from strings. If any parameter cannot be converted to Double, values from BasicGeopos.Empty() would be used.
+    ''' </summary>
+    ''' <param name="latitude">Latitude, -90 to 90</param>
+    ''' <param name="longitude">Longitude, -180 to 360</param>
+    ''' <param name="altitude">Altitude, -6378000 to 100000</param>
+    Public Sub New(latitude As String, longitude As String, Optional altitude As String = "0")
+        ' najpierw defaulty
+        Dim emptyGeo As BasicGeopos = Empty()
+        Me.Altitude = emptyGeo.Altitude
+        Me.Longitude = emptyGeo.Longitude
+        Me.Latitude = emptyGeo.Latitude
+
+        If Not Double.TryParse(latitude, Me.Latitude) Then Me.Latitude = emptyGeo.Latitude
+        If Not Double.TryParse(longitude, Me.Longitude) Then Me.Longitude = emptyGeo.Longitude
+        If Not Double.TryParse(altitude, Me.Altitude) Then Me.Altitude = emptyGeo.Altitude
+
+        ValidateRanges()
+
+    End Sub
+
+
+    Private Sub ValidateRanges()
+        If Altitude < -6378000 Then Throw New ArgumentOutOfRangeException("Altitude", "Altitude below center of Earth")
+        If Altitude > 100000 Then Throw New ArgumentOutOfRangeException("Altitude", "Altitude above Kármán line")
+
+        If Latitude < -90 OrElse Latitude > 90 Then Throw New ArgumentOutOfRangeException("Latitude", "Latitude should be between -90 and 90 (degrees)")
+        If Longitude < -180 OrElse Longitude > 360 Then Throw New ArgumentOutOfRangeException("Longitude", "Longitude should be between -180 and 360 (degrees)")
     End Sub
 
     ''' <summary>
@@ -273,6 +300,14 @@ Public Class BasicGeopos
     End Function
 
     ''' <summary>
+    ''' return Altitude as string with iDigits decimal digits
+    ''' </summary>
+    ''' <param name="iDigits">decimal digits (max 5))</param>
+    Private Function StringAlt(Optional iDigits As Integer = 0) As String
+        Return Double2String(Altitude, iDigits)
+    End Function
+
+    ''' <summary>
     ''' insert Latitude, Longitude and Altitude into string (%lat, %lon, %alt)
     ''' </summary>
     ''' <param name="sBaseLink">base link, use %lat and %lon as placeholders</param>
@@ -300,7 +335,7 @@ Public Class BasicGeopos
     ''' </summary>
     ''' <param name="baselink">base link (with %lat, %lon, %zoom)</param>
     ''' <param name="link">real link (with data)</param>
-    ''' <returns>NULL, or BasicGeopos with Latitude and Longitude set from link</returns>
+    ''' <returns>NULL, or BasicGeopos with Latitude and Longitude set from link (no altitude nor zoom)</returns>
     Public Shared Function FromLink(baselink As String, link As String) As BasicGeopos
         If link.Length < 15 Then Return Nothing
 
@@ -358,34 +393,67 @@ Public Class BasicGeopos
         Return FromLink(_OSMlink, link)
     End Function
 
+#Region "dictionary of services"
+    ''' <summary>
+    ''' dictionary of mapservices, as (string,string) = (name of service , link for FormatLink function)
+    ''' Default version contains: osm, bing, google, wirtszlaki, arcgis
+    ''' </summary>
+    Public Shared MapServices As New Dictionary(Of String, String) From
+        {
+        {"openstreetmap", "https://www.openstreetmap.org/#map=%zoom/%lat/%lon"},
+        {"bing", "https://bing.com/maps/default.aspx?lvl=%zoom&cp=%lat~%lon"},
+        {"google", "https://www.google.pl/maps/@%lat,%lon,%zoomz"},
+        {"wirtszlaki", "https://mapa.wirtualneszlaki.pl/#%zoom/%lat/%lon"},
+        {"arcgis", "https://www.arcgis.com/home/webmap/viewer.html?center=%lon,%lat&level=%zoom"}
+        }
 
-#If False Then
+
     ''' <summary>
     ''' returns link to map service from current geoposition
     ''' </summary>
-    ''' <param name="mapService">which map service should be used</param>
+    ''' <param name="mapService">which map service should be used (see MapServices)</param>
     ''' <param name="zoom">zoom level to be used</param>
-    Public Function FormatLink(mapBaseLinks As String(), mapService As String, Optional zoom As Integer = 16)
+    ''' <returns>Link for selected service, or for OSM if service is unknown</returns>
+    Public Function ToLink(mapService As String, Optional zoom As Integer = 16) As String
         zoom = Math.Min(zoom, 19)
-        Select Case mapService
-            Case 
-        End Select
 
-        Return FormatLink($"https://www.openstreetmap.org/#map=%zoom/%lat/%long", zoom)
+        mapService = mapService.ToLowerInvariant
+        Dim baseLink As String = ""
+        If Not MapServices.TryGetValue(mapService, baseLink) Then Return ToOSMLink(zoom)
+
+        Return FormatLink(baseLink, zoom)
     End Function
 
-    Public Shared Function GetFromLink()
-
+    ''' <summary>
+    ''' returns link to map service from current geoposition
+    ''' </summary>
+    ''' <param name="mapService">which map service should be used (see MapServices)</param>
+    ''' <param name="zoom">zoom level to be used</param>
+    ''' <returns>Link for selected service, or for OSM if service is unknown</returns>
+    Public Function ToUri(mapService As String, Optional zoom As Integer = 16) As Uri
+        Return New Uri(ToLink(mapService, zoom))
     End Function
 
-    ' raczej jako Dictionary
-    Public Shared ReadOnly MapServices As String() =
-        {"https://www.openstreetmap.org/#map=%zoom/%lat/%lon",
-        "https://bing.com/maps/default.aspx?lvl=%zoom&cp=%lat~%lon",
-        "https://www.google.pl/maps/@%lat,%lon,%zoomz",
-        "https://mapa.wirtualneszlaki.pl/#%zoom/%lat/%lon",
-        "https://www.arcgis.com/home/webmap/viewer.html?center=%lon,%lat&level=%zoom"}
-#End If
+    ''' <summary>
+    ''' tries to create new BasicGeopos from link, using URL of all services from MapServices
+    ''' </summary>
+    ''' <param name="link">real link (with data)</param>
+    ''' <returns>NULL, or BasicGeopos with Latitude and Longitude set from link (no altitude nor zoom)</returns>
+    Public Shared Function GetFromLink(link As String) As BasicGeopos
+
+        For Each oService As KeyValuePair(Of String, String) In MapServices
+            Dim ret As BasicGeopos = FromLink(oService.Value, link)
+            If ret IsNot Nothing Then Return ret
+        Next
+
+        Return Nothing
+    End Function
+
+#End Region
+
+
+
+
 
     ''' <summary>
     ''' dumps content as one-line JSON token

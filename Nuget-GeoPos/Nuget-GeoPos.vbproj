@@ -18,10 +18,11 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <Authors>pkar</Authors>
     <PackageTags>geoposition, geolocation, helpers</PackageTags>
-    <Version>1.2.3</Version>
-    <PackageReleaseNotes>Added GetCorners(List); GetCenter(List); GetCornersAndCenter(List)</PackageReleaseNotes>
+    <Version>1.2.4</Version>
+    <PackageReleaseNotes>Added ctor(string,string,string), StringAlt(), From/To any service, and changed ID of Nuget</PackageReleaseNotes>
     <SymbolPackageFormat>symbols.nupkg</SymbolPackageFormat>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <PackageId>pkar.$(AssemblyName)</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

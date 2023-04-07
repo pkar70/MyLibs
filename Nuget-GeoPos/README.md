@@ -4,6 +4,7 @@
 # constructor (and similar)
 
     new BasicGeo(latitude, longitude, altitude = 0) // args are validated since v1.1.0
+    new BasicGeo(latitude As String, longitude As String, altitude  As String = "0") // since v1.2.4
     Function Clone  // [since v1.1.0]
     Function FromObject(anyObject as Object)    // tries to extract data from given object [since v1.1.0]
     Function FromLink(baselink, link)   // tries to create BasicGeopos from map link [since v.1.2.1]
@@ -62,12 +63,19 @@
 
     Function StringLat(Optional iDigits As Integer = 5) As String
     Function StringLon(Optional iDigits As Integer = 5) As String
+    Function StringAlt() As String // since 1.2.4
 
     Function FormatLink(sBaseLink As String) As String  // replace %lat , %lon with values; since 1.2.1 also %alt
     Function FormatLink(sBaseLink As String, zoomLevel) As String  // as above, but also %zoom [since 1.2.1]
     Function ToOSMLink(Optional zoom As Integer = 16) As String
     Function ToOSMUri(Optional zoom As Integer = 16) As Uri [since 1.2.1]
     Function DumpAsJson() As String // dump as one-line JSON token [since v1.1.0]
+
+
+    Shared MapServices As Dictionary(Of String, String)    // since 1.2.4
+    Function ToLink(mapService As String, Optional zoom As Integer = 16) As String // since 1.2.4
+    Function ToUri(mapService As String, Optional zoom As Integer = 16) As Uri // since 1.2.4
+    Function GetFromLink(link As String) As BasicGeopos // since 1.2.4
 
 ## DMS (degree, minute, second)
 
