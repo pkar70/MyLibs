@@ -303,7 +303,7 @@ Public Class BasicGeopos
     ''' return Altitude as string with iDigits decimal digits
     ''' </summary>
     ''' <param name="iDigits">decimal digits (max 5))</param>
-    Private Function StringAlt(Optional iDigits As Integer = 0) As String
+    Public Function StringAlt(Optional iDigits As Integer = 0) As String
         Return Double2String(Altitude, iDigits)
     End Function
 

@@ -1,4 +1,13 @@
 ﻿
+v1.2.5
+* Fix: StringAlt()
+
+v.1.2.4
+* changed ID of Nuget
+* Added: new(string,string,string)
+* Added: StringAlt()
+* Added: ToLink, ToUri, FromLink, using any service (defined in MapServices)
+
 v.1.2.3
 * GetCorners(List); GetCenter(List); GetCornersAndCenter(List)
 
