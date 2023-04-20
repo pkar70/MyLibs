@@ -1,3 +1,4 @@
+Imports System.Reflection
 Imports MsExtConf = Microsoft.Extensions.Configuration
 
 
@@ -10,31 +11,157 @@ Imports MsExtConf = Microsoft.Extensions.Configuration
 Public Class JsonRwConfigurationProvider
     Inherits Microsoft.Extensions.Configuration.ConfigurationProvider
 
-    Private ReadOnly _sPathnameLocal As String
-    Private ReadOnly _sPathnameRoam As String
-    Private ReadOnly _bReadOnly As Boolean
+    Private ReadOnly _sPathnameLocal As String = Nothing
+    Private ReadOnly _sPathnameRoam As String = Nothing
+    Private ReadOnly _sPathnameTemp As String = Nothing
 
+    Protected DataTemp As New Dictionary(Of String, String)
     Protected DataRoam As New Dictionary(Of String, String)
 
-    Friend Sub New(sPathnameLocal As String, sPathnameRoam As String, bReadOnly As Boolean)
+#If NETCOREAPP3_1_OR_GREATER Or NET48_OR_GREATER Then
+    Private ReadOnly _sPathnameMachine As String = Nothing
+    Private ReadOnly _sPathnameOneDrive As String = Nothing
+    Protected DataMachine As New Dictionary(Of String, String)
+    Protected DataOneDrive As New Dictionary(Of String, String)
+#End If
+
+    Private ReadOnly _bReadOnly As Boolean
+
+    Private Const JSON_FILENAME As String = "AppSettings.json"
+
+    Public Sub New(sPathnameLocal As String, sPathnameRoam As String, bReadOnly As Boolean)
         _sPathnameLocal = sPathnameLocal
         _sPathnameRoam = sPathnameRoam
         _bReadOnly = bReadOnly
     End Sub
 
+    Public Sub New(bUseTemp As Boolean, sPathnameLocal As String, sPathnameRoam As String, bReadOnly As Boolean)
+        _sPathnameLocal = sPathnameLocal
+        _sPathnameRoam = sPathnameRoam
+        _bReadOnly = bReadOnly
+
+        If bUseTemp Then _sPathnameTemp = IO.Path.GetTempFileName()
+    End Sub
+
+#If NETSTANDARD2_0_OR_GREATER Then
+    Public Sub New(bUseTemp As Boolean, bUseLocal As Boolean, bUseRoam As Boolean, bReadOnly As Boolean)
+
+        Dim sAppName As String = GetAppName()
+
+        _bReadOnly = bReadOnly
+        If bUseTemp Then _sPathnameTemp = IO.Path.Combine(IO.Path.GetTempPath, sAppName & ".json")
+        If bUseLocal Then _sPathnameLocal = GetLocalPathname(sAppName)
+        If bUseRoam Then _sPathnameRoam = GetRoamingPathname(sAppName)
+
+    End Sub
+
+    Private Shared Function GetLocalPathname(sAppName As String) As String
+        Dim sPath As String = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+
+        If sPath.ToLowerInvariant.Contains("local" & IO.Path.DirectorySeparatorChar & "packages") Then
+            ' UWP = C:\Users\xxx\AppData\Local\Packages\xxx\LocalState)
+            Return IO.Path.Combine(sPath, JSON_FILENAME)
+        End If
+
+        ' WPF = C:\Users\pkar\AppData\Local
+        sPath = IO.Path.Combine(sPath, sAppName)
+            IO.Directory.CreateDirectory(sPath)
+        Return IO.Path.Combine(sPath, JSON_FILENAME)
+    End Function
+
+    Private Shared Function GetRoamingPathname(sAppName As String) As String
+        ' in UWP, we got C:\Users\pkar\AppData\Roaming as a result of Environment.SpecialFolder.ApplicationData!
+        ' so we have to use work-around
+        Dim sPath As String = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+
+        If sPath.ToLowerInvariant.Contains("local" & IO.Path.DirectorySeparatorChar & "packages") Then
+            ' UWP = C:\Users\xxx\AppData\Local\Packages\xxx\LocalState)
+            sPath = sPath.Replace("LocalState", "RoamingState")
+            Return IO.Path.Combine(sPath, JSON_FILENAME)
+        End If
+
+        ' WPF = C:\Users\pkar\AppData\Local 
+        sPath = sPath.Replace("Local", "Roaming")
+            sPath = IO.Path.Combine(sPath, sAppName)
+            IO.Directory.CreateDirectory(sPath)
+        Return IO.Path.Combine(sPath, JSON_FILENAME)
+
+    End Function
+
+    Private Shared Function GetAppName() As String
+        Dim sAssemblyFullName = System.Reflection.Assembly.GetEntryAssembly().FullName
+        Dim oAss As New AssemblyName(sAssemblyFullName)
+        Return oAss.Name
+    End Function
+
+#If NETCOREAPP3_1_OR_GREATER Or NET48_OR_GREATER Then
+        Public Sub New(bUseTemp As Boolean, bUseLocal As Boolean, bUseRoam As Boolean, bUseMachine as boolean, bUseOneDrive as boolean, bReadOnly As Boolean)
+
+        Dim sAppName As String = GetAppName()
+
+        _bReadOnly = bReadOnly
+        If bUseTemp Then _sPathnameTemp = IO.Path.Combine(IO.Path.GetTempPath, sAppName & ".json")
+        If bUseLocal Then _sPathnameLocal = GetLocalPathname(sAppName)
+        If bUseRoam Then _sPathnameRoam = GetRoamingPathname(sAppName)
+if bUseMachine then
+_sPathnameMachine = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
+            _sPathnameMachine = IO.Path.Combine(_sPathnameMachine, sAppName)
+            IO.Directory.CreateDirectory(_sPathnameMachine)
+        _sPathnameMachine = IO.Path.Combine(_sPathnameMachine, JSON_FILENAME)
+end if
+
+if bUseOneDrive then
+_sPathnameOneDrive = Environment.GetEnvironmentVariable("OneDriveConsumer")
+if not string.isnullorwhitespace(_sPathnameOneDrive) then
+            _sPathnameOneDrive = IO.Path.Combine(_sPathnameOneDrive, "Apps", sAppName)
+            IO.Directory.CreateDirectory(_sPathnameOneDrive)
+        _sPathnameOneDrive = IO.Path.Combine(_sPathnameOneDrive, JSON_FILENAME)
+        end if
+end if
+
+
+
+end sub
+
+
+
+#End If
+
+
+#End If
+
+
+
+
     Public Overrides Sub Load()
 
-        ' load settings
+        ' temp: nie odczytujemy
 
-        If _sPathnameLocal <> "" AndAlso IO.File.Exists(_sPathnameLocal) Then
+        ' load settings
+        If Not String.IsNullOrWhiteSpace(_sPathnameLocal) AndAlso IO.File.Exists(_sPathnameLocal) Then
             Dim sFileContent As String = IO.File.ReadAllText(_sPathnameLocal)
             Data = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(sFileContent)
         End If
 
-        If _sPathnameRoam <> "" AndAlso IO.File.Exists(_sPathnameRoam) Then
+        If Not String.IsNullOrWhiteSpace(_sPathnameRoam) AndAlso IO.File.Exists(_sPathnameRoam) Then
             Dim sFileContent As String = IO.File.ReadAllText(_sPathnameRoam)
             DataRoam = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(sFileContent)
         End If
+
+
+#If NETCOREAPP3_1_OR_GREATER Or NET48_OR_GREATER Then
+        If Not String.IsNullOrWhiteSpace(_sPathnameMachine) AndAlso IO.File.Exists(_sPathnameMachine) Then
+            Dim sFileContent As String = IO.File.ReadAllText(_sPathnameMachine)
+            DataMachine = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(sFileContent)
+        End If
+
+                If Not String.IsNullOrWhiteSpace(_sPathnameOneDrive) AndAlso IO.File.Exists(_sPathnameOneDrive) Then
+            Dim sFileContent As String = IO.File.ReadAllText(_sPathnameOneDrive)
+            DataOneDrive = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, String))(sFileContent)
+        End If
+
+#End If
+
 
     End Sub
 
@@ -43,10 +170,14 @@ Public Class JsonRwConfigurationProvider
         If _bReadOnly Then
             Data.Remove(key)
             DataRoam.Remove(key)
+#If NETCOREAPP3_1_OR_GREATER Or NET48_OR_GREATER Then
+            DataMachine.Remove(key)
+            DataOneDrive.Remove(key)
+#End If
             Return
         End If
 
-        If _sPathnameRoam <> "" Then
+        If Not String.IsNullOrWhiteSpace(_sPathnameRoam) Then
             ' interpretujemy [roam]
             If value.ToLower.StartsWith("[roam]", StringComparison.Ordinal) Then
                 ' wersja ROAM
@@ -58,7 +189,7 @@ Public Class JsonRwConfigurationProvider
 
         End If
 
-        If _sPathnameLocal <> "" Then
+        If Not String.IsNullOrWhiteSpace(_sPathnameLocal) Then
             Data(key) = value
             Dim sJson As String = Newtonsoft.Json.JsonConvert.SerializeObject(Data, Newtonsoft.Json.Formatting.Indented)
             IO.File.WriteAllText(_sPathnameLocal, sJson)
@@ -67,10 +198,16 @@ Public Class JsonRwConfigurationProvider
     End Sub
 
     Public Overrides Function TryGet(key As String, ByRef value As String) As Boolean
-        Dim bRoam As Boolean = DataRoam.TryGetValue(key, value)
-        Dim bLocal As Boolean = Data.TryGetValue(key, value)
 
-        Return (bLocal Or bRoam)
+        If Data.TryGetValue(key, value) Then Return True
+        If DataRoam.TryGetValue(key, value) Then Return True
+
+#If NETCOREAPP3_1_OR_GREATER Or NET48_OR_GREATER Then
+        If DataOneDrive.TryGetValue(key, value) Then Return True
+        If DataMachine.TryGetValue(key, value) Then Return True
+#End If
+
+        Return False
 
     End Function
 

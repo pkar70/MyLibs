@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>pkar.NetConfigs</RootNamespace>
-    <TargetFramework>netstandard1.4</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <AssemblyName>NetConfigs</AssemblyName>
     <Title>Additional Extensions.Configuration providers</Title>
@@ -14,8 +14,10 @@
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>1.0.3</Version>
-    <PackageReleaseNotes>Environment vars starting in "_" are treated as "for all" apps</PackageReleaseNotes>
+    <Version>2.0.3</Version>
+    <PackageReleaseNotes>Changed ID of package</PackageReleaseNotes>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <PackageId>pkar.$(AssemblyName)</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

@@ -83,7 +83,7 @@ Public Module GetSet
     ''' <param name="bUseCmdLineArgs">(5) CmdLine source, True if should be used, False if not</param>
     Public Sub InitSettings(sINIcontent As String, bIniUseDebug As Boolean,
                             applicationName As String,
-                            configSource As MsExtConf.IConfigurationSource,
+                            configSource As IConfigurationSource,
                             localJSONdirName As String, roamJSONdirNname As String, Optional bJSONreadOnly As Boolean = False,
                             Optional bUseCmdLineArgs As Boolean = True)
 
@@ -116,7 +116,7 @@ Public Module GetSet
     Private Sub SettingsCheckInit()
         If _settingsGlobal IsNot Nothing Then Return
 
-        Debug.WriteLine("Settings calls without LibInitSettings, using only temporary values")
+        Debug.WriteLine("Nuget.Configs call without InitSettings, using only temporary values")
         InitSettings("", False, "", Nothing, Nothing, IO.Path.GetTempFileName, Nothing, False, Nothing)
 
     End Sub
@@ -309,7 +309,7 @@ Public Module GetSet
 
 End Module
 
-Public Enum Scope
+Public Enum ConfigScope
     temp
     local
     roam

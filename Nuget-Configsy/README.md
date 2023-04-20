@@ -10,6 +10,9 @@
 
   Basic idea: when .Set(variableName, value), and value is prefixed with "[roam]", it sets roaming setting; else sets local setting.
 
+  See also my pkar.uwp.configs Nuget, as a wrapper with many extensions for UI elements
+
+
 # settings methods
 
 ## initialization
@@ -41,7 +44,7 @@ or use simplified form:
                             localJSONdirName As String, roamJSONdirNname As String, bJSONreadOnly As Boolean,
                             cmdLineArgs As List(Of String))
 
-as this call (from UWP):
+as in this call (from UWP):
 
         #if DEBUG
         pkar.NetConfigs.InitSettings(sINIcontent, True,
@@ -150,8 +153,6 @@ e.g.
     oBuilder = oBuilder.AddCommandLineRO(Environment.GetCommandLineArgs.ToList)
 
 (Environment.GetCommandLineArgs() is visible in UWP app, but not in .Net Standard 1.4)
-
-
 
 
 You can also use my UwpConfigurationProvider from:

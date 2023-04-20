@@ -1,5 +1,8 @@
 ﻿
 
+vx.0.3
+ Same as x.0.2, but changed Nuget id, also provided info about Nuget pkar.uwp.configs
+
 v.2.0.1, 2022.12.14
  Same as 1.0.1, but for .Net Standard 2.0, so InitSettings(sINIcontent... can be simpler.
 

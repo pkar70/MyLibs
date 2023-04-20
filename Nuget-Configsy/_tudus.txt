@@ -3,9 +3,6 @@
 
 * nuget 1.x.x oraz 2.x.x, te same wersje, roznica w .Net Standard - o ile po publikacji 2.0.1 mozna dać 1.0.2
 
-* #if wersja package?
-#if NETSTANDARD2_0_OR_GREATER
-
 Dim sName = System.Reflection.Assembly.GetEntryAssembly().FullName
 
 
@@ -25,7 +22,6 @@ Dim sName = System.Reflection.Assembly.GetEntryAssembly().FullName
 * a czy Android ma jakieś settings? iOS? może dodać ich funkcjonalności?
 
 * <extension>overridable provider.CanRoam() as bool = false , i w moim =true
-* pkar.configsy.scope: temp, local, roam, machine, azure
 
 * inheritance of interfaces?
 
@@ -69,6 +65,7 @@ UWP 16299: [15063 tego nie ma], tak samo w Vblib mamy
 C:\Users\pkar\AppData\Local\Packages\622PKar.GrajCyganie_pm8terbg0v8ky\LocalState
 C:\Users\pkar\AppData\Roaming
 C:\Users\pkar\AppData\Local\Packages\622PKar.GrajCyganie_pm8terbg0v8ky\LocalState\ProgramData
+
 C:\Users\pkar\Pictures
 C:\Users\pkar\Documents
 C:\Users\pkar\OneDrive
@@ -76,23 +73,29 @@ C:\Users\pkar\OneDrive
 C:\Users\pkar\AppData\Local\Packages\622PKar.GrajCyganie_pm8terbg0v8ky\LocalState
 C:\Users\pkar\AppData\Local\Packages\622PKar.GrajCyganie_pm8terbg0v8ky\RoamingState
 
+%temp% = C:\Users\pkar\AppData\Local\Packages\dbd69e1b-2ef8-4710-ad83-0dfa96068276_29h2h8fr1dtty\AC\Temp
+
+
 WPF:
 C:\Users\pkar\AppData\Local
 C:\Users\pkar\AppData\Roaming
 C:\ProgramData
+
 C:\Users\pkar\Pictures
 C:\Users\pkar\Documents
 C:\Users\pkar\OneDrive
+
+--
+--
 
 
 Debug.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData))
 Debug.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData))
 Debug.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
+
 Debug.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures))
 Debug.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.Personal))
-
 Debug.WriteLine(Environment.GetEnvironmentVariable("OneDriveConsumer"))
 
 Debug.WriteLine(Windows.Storage.ApplicationData.Current.LocalFolder.Path)
 Debug.WriteLine(Windows.Storage.ApplicationData.Current.RoamingFolder.Path)
-
