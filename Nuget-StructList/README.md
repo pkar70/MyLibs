@@ -6,12 +6,12 @@
 # BaseStruct
 
  It is base for class/struct you use in your code. If your class inherits from BaseStruct, you will get:
- * two debugging helpers, to dump properties values:
+two debugging helpers, to dump properties values:
 
     Function DumpAsText() As String     // dump of all properties' values (in something like table)
     Function DumpAsJSON(Optional bSkipDefaults As Boolean = False) As String    // similar, but gives full dump of tree of properties as JSON dump
 
-* methods you can utilize in code, and sometimes even you can love it:
+methods you can utilize in code, and sometimes even you can love it:
 
     Function Clone() As Object  // deep Clone of item (dump to JSON and read it to new item)
     Sub CopyFrom(anyObject)     // copy all properties/fields from anyObject, if their names matches
@@ -19,7 +19,7 @@
 
 # BaseList
 
- It is base for lists backed by JSON file; in many cases your app would be relieved from Nugetting JSON.
+ It is base for lists backed by JSON file; in many cases your app would be relieved from Nugetting JSON. It uses ObservableList as internal data storage.
  Using:
  
     VB: Class YourList Inherits BaseList(Of YourClass)
@@ -47,7 +47,7 @@
 
 ## proxies for internal list
 
-    Function GetList() As List(Of TYP)
+    Function GetList() As ObservableList(Of TYP)
     Function Count() As Integer
     Sub Clear()
     Sub Add(oNew As TYP)
@@ -103,4 +103,31 @@
 ## other functions
 
     Function LoadItem(sJSON As String) As TYP
+
+
+# ObservableList
+
+ This is only partial implementation of ObservableList - it sends only CollectionChanged (not PropertyChanged).
+Also, not every method of List manipulation is monitored. 
+
+    Class ObservableList(Of TYP) Inherits List(Of TYP) Implements INotifyCollectionChanged, INotifyPropertyChanged
+
+    Public Event CollectionChanged As NotifyCollectionChangedEventHandler 
+    Public Event PropertyChanged As PropertyChangedEventHandler 
+
+ These operations on ObservableList sends apropriate CollectionChanged event:
+
+    Clear()
+    Add(item As TYP)
+    AddRange(collection As IEnumerable(Of TYP))
+    Remove(item As TYP)
+    RemoveAll(match As Predicate(Of TYP))
+    RemoveAt(index As Int32)
+    RemoveRange(index As Int32, count As Int32)
+    Reverse()
+    Reverse(index As Int32, count As Int32)
+    Sort()
+    Sort(compar As Comparison(Of TYP))
+    Sort(compar As IComparer(Of TYP))
+    Sort(index As Int32, count As Int32, compar As IComparer(Of TYP))
 

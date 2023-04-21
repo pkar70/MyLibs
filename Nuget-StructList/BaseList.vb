@@ -1,25 +1,47 @@
 
-Imports Newtonsoft.Json.Linq
 ''' <summary>
 ''' simple "database class", using JSON file
 ''' </summary>
 ''' <typeparam name="TYP">Type of elements</typeparam>
 Public Class BaseList(Of TYP)
-    Protected _lista As List(Of TYP)
-    Private _filename As String
+
+    Private _lista As ObservableList(Of TYP)
+    Private ReadOnly _filename As String
+    Private _copyFilename As String
 
     ''' <summary>
     ''' create new list, and use given file in given folder as data backing
     ''' </summary>
-    Public Sub New(sFolder As String, Optional sFileName As String = "items.json")
+    Public Sub New(folder As String, Optional fileName As String = "items.json")
 
-        If String.IsNullOrWhiteSpace(sFolder) OrElse String.IsNullOrWhiteSpace(sFileName) Then
+        If String.IsNullOrWhiteSpace(folder) OrElse String.IsNullOrWhiteSpace(fileName) Then
             Throw New ArgumentException("you have to provide both folder and filename")
         End If
-        _lista = New List(Of TYP)
-        _filename = IO.Path.Combine(sFolder, sFileName)
+        _lista = New ObservableList(Of TYP)
+        _filename = IO.Path.Combine(folder, fileName)
     End Sub
 
+    ''' <summary>
+    ''' Create copy of data file in given folder. Since this call, saving would save file to both folders.
+    ''' </summary>
+    ''' <param name="folderForCopy">Folder for copy of data file, or String.Empty or NULL if no copy should be maintained</param>
+    Public Sub MaintainCopy(folderForCopy As String)
+
+        If String.IsNullOrEmpty(folderForCopy) Then
+            _copyFilename = ""
+            Return
+        End If
+
+        _copyFilename = _filename.Replace(IO.Path.GetDirectoryName(_filename), folderForCopy)
+        IO.File.Copy(_filename, _copyFilename, True)
+
+        TryMakeCopy()
+    End Sub
+
+    Private Sub TryMakeCopy()
+        If String.IsNullOrEmpty(_copyFilename) Then Return
+        IO.File.Copy(_filename, _copyFilename, True)
+    End Sub
 
     ''' <summary>
     ''' This method is called when Load ends with empty list - override it to fill default entries
@@ -59,9 +81,9 @@ Public Class BaseList(Of TYP)
     ''' load list from string
     ''' </summary>
     ''' <returns>False if string cannot be deserialized</returns>
-    Public Overridable Function Import(JsonContent As String) As Boolean
+    Public Overridable Function Import(jsonContent As String) As Boolean
         Try
-            _lista = Newtonsoft.Json.JsonConvert.DeserializeObject(JsonContent, GetType(List(Of TYP)))
+            _lista = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonContent, GetType(ObservableList(Of TYP)))
             Return True
         Catch ex As Exception
         End Try
@@ -104,6 +126,7 @@ Public Class BaseList(Of TYP)
         End If
 
         IO.File.WriteAllText(_filename, sTxt)
+        TryMakeCopy()
 
         Return True
     End Function
@@ -120,10 +143,10 @@ Public Class BaseList(Of TYP)
     End Function
 
     ''' <summary>
-    ''' check if file last write was more than iDays  ago
+    ''' check if file last write was more than days  ago
     ''' </summary>
-    Public Function IsObsolete(iDays As Integer)
-        If GetFileDate.AddDays(iDays) < Date.Now Then Return True
+    Public Function IsObsolete(days As Integer)
+        If GetFileDate.AddDays(days) < Date.Now Then Return True
         Return False
     End Function
 #End Region
@@ -133,7 +156,7 @@ Public Class BaseList(Of TYP)
     ''' get internal list of items
     ''' </summary>
     ''' <returns></returns>
-    Public Function GetList() As List(Of TYP)
+    Public Function GetList() As ObservableList(Of TYP)
         Return _lista
     End Function
 
@@ -154,17 +177,17 @@ Public Class BaseList(Of TYP)
     ''' <summary>
     ''' add new item to the end of list
     ''' </summary>
-    ''' <param name="oNew"></param>
-    Public Sub Add(oNew As TYP)
-        _lista.Add(oNew)
+    ''' <param name="item"></param>
+    Public Sub Add(item As TYP)
+        _lista.Add(item)
     End Sub
 
     ''' <summary>
     ''' remove first occurence of given item
     ''' </summary>
-    ''' <param name="oDel"></param>
-    Public Sub Remove(oDel As TYP)
-        _lista.Remove(oDel)
+    ''' <param name="item"></param>
+    Public Sub Remove(item As TYP)
+        _lista.Remove(item)
     End Sub
 
     ''' <summary>

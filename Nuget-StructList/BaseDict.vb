@@ -4,7 +4,8 @@
 ''' </summary>
 Public Class BaseDict(Of TKEY, TVALUE)
     Protected _lista As Dictionary(Of TKEY, TVALUE)
-    Private _filename As String
+    Private ReadOnly _filename As String
+    Private _copyFilename As String
 
     ''' <summary>
     ''' create new Dictionary, and use given file in given folder as data backing
@@ -18,6 +19,27 @@ Public Class BaseDict(Of TKEY, TVALUE)
         _filename = IO.Path.Combine(sFolder, sFileName)
     End Sub
 
+    ''' <summary>
+    ''' Create copy of data file in given folder. Since this call, saving would save file to both folders.
+    ''' </summary>
+    ''' <param name="folderForCopy">Folder for copy of data file, or String.Empty or NULL if no copy should be maintained</param>
+    Public Sub MaintainCopy(folderForCopy As String)
+
+        If String.IsNullOrEmpty(folderForCopy) Then
+            _copyFilename = ""
+            Return
+        End If
+
+        _copyFilename = _filename.Replace(IO.Path.GetDirectoryName(_filename), folderForCopy)
+        IO.File.Copy(_filename, _copyFilename, True)
+
+        TryMakeCopy()
+    End Sub
+
+    Private Sub TryMakeCopy()
+        If String.IsNullOrEmpty(_copyFilename) Then Return
+        IO.File.Copy(_filename, _copyFilename, True)
+    End Sub
 
     ''' <summary>
     ''' This method is called when Load ends with empty list - override it to fill default entries
@@ -103,6 +125,7 @@ Public Class BaseDict(Of TKEY, TVALUE)
         End If
 
         IO.File.WriteAllText(_filename, sTxt)
+        TryMakeCopy()
 
         Return True
     End Function

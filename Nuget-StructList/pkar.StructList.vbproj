@@ -16,9 +16,10 @@
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
-    <Version>1.2.0</Version>
-    <PackageReleaseNotes>Added BaseDict class and BaseList.Import method</PackageReleaseNotes>
+    <Version>1.4.0</Version>
+    <PackageReleaseNotes>Added Base[List|Dict].MaintainCopy</PackageReleaseNotes>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <PackageId>pkar.$(AssemblyName)</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
