@@ -75,29 +75,49 @@ Public Module GetSet
     ''' </summary>
     ''' <param name="sINIcontent">(1) INI source; Content of INI file, NULL or "" if you don't want to use it</param>
     ''' <param name="bIniUseDebug">True if [debug] section is to be used ([main] is used always)</param>
-    ''' <param name="applicationName">(2) Environment variables; prefix for variables (for UWP, it should be Windows.ApplicationModel.Package.Current.DisplayName), NULL if you don't want to use this source</param>
+    ''' <param name="bUseEnvVars">(2) True if Environment variables should be used (prefixed with app name)</param>
     ''' <param name="configSource">(3) additional source, can be UWPConfigurationSource; use NULL if you don't want it</param>
-    ''' <param name="localJSONdirName">(4) JSON source; folder for local JSON file</param>
-    ''' <param name="roamJSONdirNname">folder for roaming JSON file</param>
-    ''' <param name="bJSONreadOnly">True if .Set should be ignored (as in Microsoft implementation)</param>
+    ''' <param name="JsonUseTemp">(4) JSON source; True if temporary (per session) file should be used</param>
+    ''' <param name="JsonUseLocal">True if local file should be used (UWP: C:\Users\xxx\AppData\Local\Packages\xxx\LocalState, WPF: C:\Users\xxx\AppData\Local\xxx)</param>
+    ''' <param name="JsonUseRoam">True if roaming file should be used (UWP: C:\Users\xxx\AppData\Local\Packages\xxx\RoamingState, WPF: C:\Users\xxx\AppData\Roaming\xxx)</param>
+    ''' <param name="JsonReadOnly">True if .Set should be ignored (as in Microsoft implementation)</param>
     ''' <param name="bUseCmdLineArgs">(5) CmdLine source, True if should be used, False if not</param>
     Public Sub InitSettings(sINIcontent As String, bIniUseDebug As Boolean,
-                            applicationName As String,
+                            bUseEnvVars As Boolean,
                             configSource As IConfigurationSource,
-                            localJSONdirName As String, roamJSONdirNname As String, Optional bJSONreadOnly As Boolean = False,
+                            JsonUseTemp As Boolean, JsonUseLocal As Boolean, JsonUseRoam As Boolean,
+                            Optional JsonReadOnly As Boolean = False,
                             Optional bUseCmdLineArgs As Boolean = True)
 
-        Dim dictionaryOfEnvVars As System.Collections.IDictionary = Nothing
-        If Not String.IsNullOrWhiteSpace(applicationName) Then dictionaryOfEnvVars = Environment.GetEnvironmentVariables()
+
+        Dim oBuilder As New ConfigurationBuilder()
+
+        If Not String.IsNullOrWhiteSpace(sINIcontent) Then
+            oBuilder = oBuilder.AddIniReleaseDebugSettings(sINIcontent, bIniUseDebug)
+        End If
+
+        Dim sAppName As String = JsonRwConfigurationProvider.GetAppName
+
+        Dim dictionaryOfEnvVars As IDictionary = Environment.GetEnvironmentVariables()
+        If bUseEnvVars AndAlso dictionaryOfEnvVars IsNot Nothing Then
+            oBuilder = oBuilder.AddEnvironmentVariablesROConfigurationSource(sAppName, dictionaryOfEnvVars) ' Environment.GetEnvironmentVariables, Std 2.0
+        End If
+
+        If configSource IsNot Nothing Then
+            oBuilder = oBuilder.Add(configSource)
+        End If
+
+        If (JsonUseTemp Or JsonUseLocal Or JsonUseRoam) Then
+            oBuilder = oBuilder.AddJsonRwSettings(JsonUseTemp, JsonUseLocal, JsonUseRoam, JsonReadOnly)
+        End If
 
         Dim cmdLineArgs As List(Of String) = Nothing
         If bUseCmdLineArgs Then cmdLineArgs = Environment.GetCommandLineArgs.ToList
+        If cmdLineArgs IsNot Nothing Then oBuilder = oBuilder.AddCommandLineRO(cmdLineArgs)
 
-        InitSettings(sINIcontent, bIniUseDebug,
-                            applicationName, dictionaryOfEnvVars,
-                            configSource,
-                            localJSONdirName, roamJSONdirNname, bJSONreadOnly,
-                            cmdLineArgs)
+        Dim settings As Microsoft.Extensions.Configuration.IConfigurationRoot = oBuilder.Build
+
+        InitSettings(settings)
 
     End Sub
 

@@ -75,6 +75,21 @@ or from WPF:
 You can use NULLs if you don't want particular ConfigurationSource
 
 
+For .Net Standard 2.0 and above, you can also use simpler form:
+
+    Public Sub InitSettings(sINIcontent As String, bIniUseDebug As Boolean,
+                            bUseEnvVars As Boolean,
+                            configSource As IConfigurationSource,
+                            JsonUseTemp As Boolean, JsonUseLocal As Boolean, JsonUseRoam As Boolean,
+                            Optional JsonReadOnly As Boolean = False,
+                            Optional bUseCmdLineArgs As Boolean = True)
+
+It can use three JSON sources: 
+* temporary (per session) file
+* local file (UWP: C:\Users\xxx\AppData\Local\Packages\xxx\LocalState, WPF: C:\Users\xxx\AppData\Local\xxx)
+* roaming file (UWP: C:\Users\xxx\AppData\Local\Packages\xxx\RoamingState, WPF: C:\Users\xxx\AppData\Roaming\xxx)
+
+
 ## setting values
 
     Sub SetSettingsString(sName As String, value As String, Optional bRoam As Boolean = False)
@@ -111,6 +126,11 @@ At least one pathname should be not null.
 e.g.
     
         oBuilder.AddJsonRwSettings(Windows.Storage.ApplicationData.Current.LocalFolder.Path, Windows.Storage.ApplicationData.Current.RoamingFolder.Path);
+
+For .Net Standard 2.0 and above, you can also use simpler form:
+
+       oBuilder.AddJsonRwSettings(bUseTemp As Boolean, bUseLocal As Boolean, bUseRoam As Boolean, Optional bReadOnly As Boolean = False);
+
 
 ## IniDefaultsConfigurationProvider
 Difference with Microsoft's implementation:

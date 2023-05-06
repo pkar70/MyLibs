@@ -63,9 +63,9 @@ Public Class JsonRwConfigurationProvider
             Return IO.Path.Combine(sPath, JSON_FILENAME)
         End If
 
-        ' WPF = C:\Users\pkar\AppData\Local
+        ' WPF = C:\Users\xxx\AppData\Local
         sPath = IO.Path.Combine(sPath, sAppName)
-            IO.Directory.CreateDirectory(sPath)
+        IO.Directory.CreateDirectory(sPath)
         Return IO.Path.Combine(sPath, JSON_FILENAME)
     End Function
 
@@ -80,15 +80,15 @@ Public Class JsonRwConfigurationProvider
             Return IO.Path.Combine(sPath, JSON_FILENAME)
         End If
 
-        ' WPF = C:\Users\pkar\AppData\Local 
+        ' WPF = C:\Users\xxx\AppData\Local 
         sPath = sPath.Replace("Local", "Roaming")
-            sPath = IO.Path.Combine(sPath, sAppName)
-            IO.Directory.CreateDirectory(sPath)
+        sPath = IO.Path.Combine(sPath, sAppName)
+        IO.Directory.CreateDirectory(sPath)
         Return IO.Path.Combine(sPath, JSON_FILENAME)
 
     End Function
 
-    Private Shared Function GetAppName() As String
+    Protected Friend Shared Function GetAppName() As String
         Dim sAssemblyFullName = System.Reflection.Assembly.GetEntryAssembly().FullName
         Dim oAss As New AssemblyName(sAssemblyFullName)
         Return oAss.Name
@@ -219,9 +219,24 @@ Public Class JsonRwConfigurationSource
     Private ReadOnly _sPathnameLocal As String
     Private ReadOnly _sPathnameRoam As String
     Private _bReadOnly As Boolean
+    Private ReadOnly _buildMode As Integer
+    Private ReadOnly _useTemp As Boolean
+    Private ReadOnly _useLocal As Boolean
+    Private ReadOnly _useRoam As Boolean
 
     Public Function Build(builder As MsExtConf.IConfigurationBuilder) As MsExtConf.IConfigurationProvider Implements MsExtConf.IConfigurationSource.Build
-        Return New JsonRwConfigurationProvider(_sPathnameLocal, _sPathnameRoam, _bReadOnly)
+
+        Select Case _buildMode
+            Case 1
+                Return New JsonRwConfigurationProvider(_sPathnameLocal, _sPathnameRoam, _bReadOnly)
+#If NETSTANDARD2_0_OR_GREATER Then
+            Case 2
+                Return New JsonRwConfigurationProvider(_useTemp, _useLocal, _useRoam, _bReadOnly)
+#End If
+        End Select
+
+        Throw New NotImplementedException("Bad _buildMode in Build (internal error)")
+
     End Function
 
     Public Sub New(sPathnameLocal As String, sPathnameRoam As String, bReadOnly As Boolean)
@@ -230,11 +245,31 @@ Public Class JsonRwConfigurationSource
             Throw New ArgumentException("You have to use at least one real path (to file, or to folder) for JsonRwConfigurationSource constructor")
         End If
 
+        _buildMode = 1
+
         _bReadOnly = bReadOnly  ' przed poni¿szymi, bo poni¿sze w³¹cza r/o gdy jest to plik w appx
         _sPathnameLocal = TryFileOrPathExist(sPathnameLocal, "AppSettings.json")
         _sPathnameRoam = TryFileOrPathExist(sPathnameRoam, "AppRoamSettings.json")
 
     End Sub
+
+#If NETSTANDARD2_0_OR_GREATER Then
+    Public Sub New(bUseTemp As Boolean, bUseLocal As Boolean, bUseRoam As Boolean, bReadOnly As Boolean)
+
+        If Not (bUseTemp Or bUseLocal Or bUseRoam) Then
+            Throw New ArgumentException("You have to enable at least one datafile for JsonRwConfigurationSource constructor")
+        End If
+
+        _buildMode = 2
+
+        _bReadOnly = bReadOnly  ' przed poni¿szymi, bo poni¿sze w³¹cza r/o gdy jest to plik w appx
+        _useTemp = bUseTemp
+        _useLocal = bUseLocal
+        _useRoam = bUseRoam
+    End Sub
+#End If
+
+
 
     Private Function TryFileOrPathExist(sPath As String, sDefaultFileName As String) As String
 

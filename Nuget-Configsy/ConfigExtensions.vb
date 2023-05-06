@@ -16,6 +16,25 @@ Public Module Extensions
         Return configurationBuilder
     End Function
 
+#If NETSTANDARD2_0_OR_GREATER Then
+    ''' <summary>
+    ''' Add JSON read/write configuration source
+    ''' </summary>
+    ''' <param name="configurationBuilder"></param>
+    ''' <param name="bUseTemp">True if temporary (per session) file should be used</param>
+    ''' <param name="bUseLocal">True if local file should be used (UWP: C:\Users\xxx\AppData\Local\Packages\xxx\LocalState, WPF: C:\Users\xxx\AppData\Local\xxx)</param>
+    ''' <param name="bUseRoam">True if roaming file should be used (UWP: C:\Users\xxx\AppData\Local\Packages\xxx\RoamingState, WPF: C:\Users\xxx\AppData\Roaming\xxx)</param>
+    ''' <param name="bReadOnly">True if .Set should be ignored (as in Microsoft implementation)</param>
+    ''' <returns></returns>
+    <Runtime.CompilerServices.Extension()>
+    <CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification:="<Pending>")>
+    Public Function AddJsonRwSettings(ByVal configurationBuilder As MsExtConf.IConfigurationBuilder, bUseTemp As Boolean, bUseLocal As Boolean, bUseRoam As Boolean, Optional bReadOnly As Boolean = False) As MsExtConf.IConfigurationBuilder
+        configurationBuilder.Add(New JsonRwConfigurationSource(bUseTemp, bUseLocal, bUseRoam, bReadOnly))
+        Return configurationBuilder
+    End Function
+#End If
+
+
     ''' <summary>
     ''' Add INI (read-only) configuration source
     ''' </summary>

@@ -14,8 +14,8 @@
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>2.0.3</Version>
-    <PackageReleaseNotes>Changed ID of package</PackageReleaseNotes>
+    <Version>2.0.5</Version>
+    <PackageReleaseNotes>Some simplification for .Net Std 2.0</PackageReleaseNotes>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <PackageId>pkar.$(AssemblyName)</PackageId>
   </PropertyGroup>

@@ -1,4 +1,10 @@
 ﻿
+v2.0.4
+ Change visible only for .Net Standard 2.0 and above:
+ * JsonRwConfigurationSource.New(bUseTemp As Boolean, bUseLocal As Boolean, bUseRoam As Boolean, bReadOnly As Boolean)
+ * extension: AddJsonRwSettings(ByVal configurationBuilder As MsExtConf.IConfigurationBuilder, bUseTemp As Boolean, bUseLocal As Boolean, bUseRoam As Boolean, Optional bReadOnly As Boolean = False) As MsExtConf.IConfigurationBuilder
+ * InitSettings(sINIcontent As String, bIniUseDebug As Boolean, bUseEnvVars As Boolean, configSource As IConfigurationSource, JsonUseTemp As Boolean, JsonUseLocal As Boolean, JsonUseRoam As Boolean,Optional JsonReadOnly As Boolean = False, Optional bUseCmdLineArgs As Boolean = True)
+
 
 vx.0.3
  Same as x.0.2, but changed Nuget id, also provided info about Nuget pkar.uwp.configs
