@@ -1,4 +1,8 @@
-﻿2022.09.08
+﻿
+2023.02.26
+* przejście na Nugety moje
+
+2022.09.08
 * MojaStruct jako podstawa do class z property, z DumpAsText oraz DumpAsJSON
 
 2022.09.07

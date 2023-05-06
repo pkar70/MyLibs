@@ -1,3 +1,4 @@
+https://learn.microsoft.com/en-us/nuget/hosting-packages/local-feeds
 
 
 * double, int.IsBetween (IsInRange)
@@ -8,8 +9,6 @@
 
 * gdzie jeszcze siega UWP, gdzie nie sięga WPF i inne? Czy robić migracje z UWPdekstop do WPFdesktop?
 [iot [Core: tylko UWP, Enterprise: WPF także], mobile, PC, XBox, surfacehub, hololens]
-
-* string.Depascal/InsertSpaces
 
 ---- NAUKA NAUKA NAUKA NAUKA NAUKA NAUKA NAUKA NAUKA -----------
 
