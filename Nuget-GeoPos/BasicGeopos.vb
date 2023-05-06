@@ -10,6 +10,19 @@ Public Class BasicGeopos
     Public Property Latitude As Double
     Public Property Longitude As Double
 
+
+    ''' <summary>
+    ''' create new object, as we don't know any data, it is same as Empty()
+    ''' </summary>
+    Public Sub New()
+        ' this is required for JSON deserialization, as we have more than one ctor: New(double) and New(string)
+        Dim emptyGeo As BasicGeopos = Empty()
+        Me.Altitude = emptyGeo.Altitude
+        Me.Longitude = emptyGeo.Longitude
+        Me.Latitude = emptyGeo.Latitude
+    End Sub
+
+
     ''' <summary>
     ''' create new object, with data validation (ArgumentOutOfRangeException would be thrown)
     ''' </summary>
@@ -453,8 +466,6 @@ Public Class BasicGeopos
 
 
 
-
-
     ''' <summary>
     ''' dumps content as one-line JSON token
     ''' </summary>
@@ -467,10 +478,12 @@ Public Class BasicGeopos
 #Region "DMS format"
     Private Shared Function Double2StringDMS(dVal As Double, sFormat As String, iDigits As Integer) As String
 
+        ' od .Net Core 3.0 jest Round(x,x,ToZero)
         Dim iDegrees As Integer = If(dVal < 0, Math.Ceiling(dVal), Math.Floor(dVal))
-        dVal -= iDegrees
+        Dim sRet As String = sFormat.Replace("%d", iDegrees.ToString(System.Globalization.CultureInfo.InvariantCulture))
 
-        Dim sRet As String = sFormat.Replace("%d", dVal.ToString(System.Globalization.CultureInfo.InvariantCulture))
+        dVal = Math.Abs(dVal)
+        dVal -= iDegrees
 
         If sFormat.Contains("%s") Then
             Dim iMins As Integer = Math.Floor(dVal * 10.0 / 6.0)
@@ -502,6 +515,20 @@ Public Class BasicGeopos
     ''' <returns></returns>
     Public Function StringLonDM(Optional sFormat As String = "%d°%m′%s″", Optional iDigits As Integer = 5) As String
         Return Double2StringDMS(Longitude, sFormat, iDigits)
+    End Function
+
+    ''' <summary>
+    ''' return string with DMS format using iDigits decimal digits
+    ''' </summary>
+    ''' <param name="sFormat">format of value, use %ad %am %as as placeholders for lAtitude data, and %od %om %os as placeholders for lOngitude data</param>
+    ''' <param name="iDigits">decimal digits (max 5)</param>
+    ''' <returns></returns>
+    Public Function StringDM(sFormat As String, Optional iDigits As Integer = 5)
+        Dim ret As String = sFormat.Replace("%ad", "%d").Replace("%am", "%m").Replace("%as", "%s")
+        ret = Double2StringDMS(Latitude, ret, iDigits)
+        ret = ret.Replace("%od", "%d").Replace("%om", "%m").Replace("%os", "%s")
+        ret = Double2StringDMS(Longitude, ret, iDigits)
+        Return ret
     End Function
 
     ''' <summary>
@@ -698,6 +725,29 @@ Public Class BasicGeopos
 
 #End Region
 
+#Region "some EXIF related"
+
+    ''' <summary>
+    ''' create BasicGeopos from EXIF-format string 
+    ''' </summary>
+    ''' <param name="exifString">string formatted as "±lat±lon±alt", can be suffixed with "/"</param>
+    ''' <returns>BasicGeopos with data from string, or NULL</returns>
+    Public Shared Function FromExifString(exifString As String) As BasicGeopos
+        Dim iInd As Integer = exifString.IndexOfAny({"+", "-"}, 2)
+        If iInd < 1 Then Return Nothing
+        exifString = exifString.Replace("/", "") ' nie wiem po co on tam jest, ale jest
+
+        Dim sLat As String = exifString.Substring(0, iInd)
+        Dim sLon As String = exifString.Substring(iInd)
+        iInd = sLon.IndexOfAny({"+", "-"}, 2)
+        Dim sAlt As String = "0"
+        If iInd > 0 Then
+            sAlt = sLon.Substring(iInd)
+            sLon = sLon.Substring(0, iInd)
+        End If
+        Return New BasicGeopos(sLat, sLon, sAlt)
+    End Function
+#End Region
 
 End Class
 

@@ -18,8 +18,8 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <Authors>pkar</Authors>
     <PackageTags>geoposition, geolocation, helpers</PackageTags>
-    <Version>1.2.5</Version>
-    <PackageReleaseNotes>Added ctor(string,string,string), StringAlt(), From/To any service, and changed ID of Nuget</PackageReleaseNotes>
+    <Version>1.2.7</Version>
+    <PackageReleaseNotes>Fix: StringLatDM, StringLonDM; Add: ToStringDM(), FromExifString()</PackageReleaseNotes>
     <SymbolPackageFormat>symbols.nupkg</SymbolPackageFormat>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <PackageId>pkar.$(AssemblyName)</PackageId>

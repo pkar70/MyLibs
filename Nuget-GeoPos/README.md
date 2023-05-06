@@ -1,14 +1,18 @@
 ﻿
  This is library for manipulating geolocation inside ClassLibs - UWP has BasicGeolocation, Android and MAUI has Location, but in .Net we have nothing.
+ For file that can be included in your project to map between UWP structs/classes, see https://github.com/pkar70/MyLibs/blob/master/UWPappTel/UwpGeopos.vb (it cannot be packed to Nuget, as UWP Runtime Libraries doesn't allow types defined outside of WinRT)
+
 
 # constructor (and similar)
 
     new BasicGeo(latitude, longitude, altitude = 0) // args are validated since v1.1.0
     new BasicGeo(latitude As String, longitude As String, altitude  As String = "0") // since v1.2.4
+    new BasicGeo()  // since v1.2.6
     Function Clone  // [since v1.1.0]
     Function FromObject(anyObject as Object)    // tries to extract data from given object [since v1.1.0]
     Function FromLink(baselink, link)   // tries to create BasicGeopos from map link [since v.1.2.1]
     Function FromOSMLink(link)   // tries to create BasicGeopos from OSM link [since v.1.2.1]
+    FromExifString(String) // tries to create BasicGepos from EXIF formatted string [since v1.2.7]
 
 # various distance metering
 
@@ -81,6 +85,7 @@
 
     Function StringLatDM(Optional sFormat As String = "%d°%m′%s″", Optional iDigits As Integer = 5) As String
     Function StringLonDM(Optional sFormat As String = "%d°%m′%s″", Optional iDigits As Integer = 5) As String
+    Functoin ToStringDM(format, Optional iDigits = 5) As String
 
 ### and constructors
     FromDMS(latD As Integer, latM As Double, latS As Double, latSN As String, lonD As Integer, lonM As Double, lonS As Double, lonEW As String) 

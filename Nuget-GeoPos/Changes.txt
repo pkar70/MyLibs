@@ -1,4 +1,11 @@
 ﻿
+v1.2.7
+* Fix: StringLatDM, StringLonDM
+* Add: ToStringDM(), FromExifString()
+
+v1.2.6
+* Added: new BasicGeoPos(), as fix to allow deserialization
+
 v1.2.5
 * Fix: StringAlt()
 
