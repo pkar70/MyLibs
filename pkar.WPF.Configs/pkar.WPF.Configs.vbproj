@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <RootNamespace>pkar.WPF.Configs</RootNamespace>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>pkar.WPF.Configs</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  <Title>Helpers for retrieving/storing config data from UI</Title>
+  <Authors>pkar</Authors>
+  <Company>none</Company>
+  <Copyright>Piotr Karocki</Copyright>
+  <Description>This Nuget adds UI extensions helpers to transfer data between UI elements and .Net configuration. It is similar to my other Nuget: pkar.Uwp.Config</Description>
+  <PackageReadmeFile>README.md</PackageReadmeFile>
+  <RepositoryType>https://github.com/pkar70/MyLibs/pkar.WPF.Configs</RepositoryType>
+  <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+  <IncludeSymbols>True</IncludeSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Changes.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Changes.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="pkar.NetConfigs" Version="2.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
