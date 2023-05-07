@@ -175,6 +175,4 @@ e.g.
 (Environment.GetCommandLineArgs() is visible in UWP app, but not in .Net Standard 1.4)
 
 
-You can also use my UwpConfigurationProvider from:
-https://github.com/pkar70/MyLibs/blob/ee7b8f3a7e7e28601426d4e4d20fd25f21f87628/UWPappTel/pkarModuleWithLib.vb#L2134
-(something like 'config converter' from UWP settings to .Net settings)
+For UWP, you can use Nuget pkar.UWP.config (which can use settings from UWP ApplicationData, and provides nice extensions for storing/retrieving UI data)
