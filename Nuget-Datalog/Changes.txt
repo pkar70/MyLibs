@@ -1,1 +1,7 @@
 ﻿
+TODO:
+uwp.datalog - czy tez tak mozna? init via Uwp.datalog, a zapisywanie bezposrednio?
+uwp.datalog.static lastPath, i datalog() daje wedle tej ostatniej?
+
+v_x.0.1
+* Change of ID, from Datalog to pkar.dotnet.Datalog - no functional change

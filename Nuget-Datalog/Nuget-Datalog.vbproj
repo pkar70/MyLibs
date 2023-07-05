@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>pkar.Datalog</RootNamespace>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>pkar</RootNamespace>
+    <TargetFramework>netstandard1.4</TargetFramework>
     <AssemblyName>Datalog</AssemblyName>
     <Title>Datalog management helpers</Title>
     <Authors>pkar</Authors>
@@ -15,6 +15,11 @@
     <IncludeSymbols>True</IncludeSymbols>
     <Version>2.0.0</Version>
     <PackageReleaseNotes>Version for .Net Standard 2.0 - additional constructors</PackageReleaseNotes>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <SymbolPackageFormat>symbols.nupkg</SymbolPackageFormat>
+    <EnableNETAnalyzers>False</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

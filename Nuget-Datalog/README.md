@@ -37,3 +37,8 @@ For .Net Standard 2.0 and above, you have additional constructors:
 and also one utility method:
 
 	static GetAppName As String
+
+Version 2.x works with UWP for phones (15063, Lumia 532), if you use trick from:
+https://gist.github.com/WamWooWam/e72e5137606f7c59ed657db6587cd5e8
+
+You can also use Nuget pkar.uwp.datalog - almost same as this Nuget, but writes log to memory card (external storage).

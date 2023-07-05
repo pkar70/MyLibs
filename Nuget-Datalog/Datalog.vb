@@ -1,5 +1,4 @@
 
-Imports System.Reflection
 
 Public Class Datalog
 
@@ -36,6 +35,7 @@ Public Class Datalog
 
     ''' <summary>
     ''' Initialization of library: set root folder for datalog files. Inside folder folder for App would be created.
+    ''' This works also with forced appmanifest min version 15035
     ''' </summary>
     ''' <param name="specialFolder">folder ID, in this folder subfolder with application name would be created</param>
     ''' <param name="sSubfolder">optional subfolder within specialFolder\APPNAME</param>
@@ -55,6 +55,7 @@ Public Class Datalog
 
     ''' <summary>
     ''' Initialization of library: set root folder for datalog files. Inside folder folder for App would be created.
+    ''' This works also with forced appmanifest min version 15035
     ''' </summary>
     ''' <param name="folder">folder type (from ENUM)</param>
     ''' <param name="sSubfolder">optional subfolder within specialFolder\APPNAME</param>
@@ -76,6 +77,7 @@ Public Class Datalog
 
     ''' <summary>
     ''' Initialization of library, with Local datalog (works also on UWP). Inside folder folder for App would be created.
+    ''' This works also with forced appmanifest min version 15035
     ''' </summary>
     ''' <param name="sSubfolder">optional subfolder within specialFolder\APPNAME</param>
     Public Sub New(Optional sSubfolder As String = "Datalog")
@@ -84,9 +86,10 @@ Public Class Datalog
 
 #Region "internal init subs"
 
+' this works also with forced appmanifest min version 15035 
     Public Shared Function GetAppName() As String
         Dim sAssemblyFullName = System.Reflection.Assembly.GetEntryAssembly().FullName
-        Dim oAss As New AssemblyName(sAssemblyFullName)
+        Dim oAss As New System.Reflection.AssemblyName(sAssemblyFullName)
         Return oAss.Name
     End Function
 
@@ -106,7 +109,8 @@ Public Class Datalog
         If Not String.IsNullOrWhiteSpace(sSubfolder) Then msDataLogRootFolder = IO.Path.Combine(folder, sSubfolder)
     End Sub
 
-    Private Shared Function GetLocalPathname(sAppName As String) As String
+' this works also with forced appmanifest min version 15035
+Private Shared Function GetLocalPathname(sAppName As String) As String
         Dim sPath As String = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
 
         ' UWP
@@ -120,6 +124,7 @@ Public Class Datalog
         Return sPath
     End Function
 
+' this works also with forced appmanifest min version 15035
     Private Shared Function GetRoamingPathname(sAppName As String) As String
         ' in UWP, we got C:\Users\pkar\AppData\Roaming as a result of Environment.SpecialFolder.ApplicationData!
         ' so we have to use work-around
@@ -283,6 +288,7 @@ End Class
 Public Enum DatalogFolder
     ''' <summary>
     ''' UWP: C:\Users\XX\AppData\Local\Packages\XXX\LocalState;
+    ''' UWP phone: C:\Data\Users\DefApps\AppData\Local\Packages
     ''' WPF etc: C:\Users\XX\AppData\Local\APPNAME
     ''' </summary>
     Local
