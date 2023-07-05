@@ -1,4 +1,7 @@
 ﻿
+v1.2.8
+* Add: GeoUri support (in ToLink, ToUri, FromLink), as mapservice geouri and geouriAlt (with altitude)
+
 v1.2.7
 * Fix: StringLatDM, StringLonDM
 * Add: ToStringDM(), FromExifString()

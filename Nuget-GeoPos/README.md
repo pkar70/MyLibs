@@ -1,8 +1,7 @@
 ﻿
  This is library for manipulating geolocation inside ClassLibs - UWP has BasicGeolocation, Android and MAUI has Location, but in .Net we have nothing.
  For file that can be included in your project to map between UWP structs/classes, see https://github.com/pkar70/MyLibs/blob/master/UWPappTel/UwpGeopos.vb (it cannot be packed to Nuget, as UWP Runtime Libraries doesn't allow types defined outside of WinRT)
-
-
+  
 # constructor (and similar)
 
     new BasicGeo(latitude, longitude, altitude = 0) // args are validated since v1.1.0
@@ -100,3 +99,13 @@
     Public Shared Function GetCorners(locations As List(Of BasicGeopos)) As List(Of BasicGeopos)    // [since v1.2.3]
     Public Shared Function GetCornersAndCenter(locations As List(Of BasicGeopos)) As List(Of BasicGeopos)   // [since v1.2.3]
 
+
+Known mapservices:
+* arcgis
+* bing
+* google
+* openstreetmap
+* wirtszlaki (https://mapa.wirtualneszlaki.pl/)
+// since v1.2.8:
+* geouri (geo: without altitude)
+* geouriAlt (geo: with altitude)

@@ -350,14 +350,23 @@ Public Class BasicGeopos
     ''' <param name="link">real link (with data)</param>
     ''' <returns>NULL, or BasicGeopos with Latitude and Longitude set from link (no altitude nor zoom)</returns>
     Public Shared Function FromLink(baselink As String, link As String) As BasicGeopos
-        If link.Length < 15 Then Return Nothing
+        If link.Length < 10 Then Return Nothing
 
         Dim iLat As Integer = baselink.IndexOf("%lat")
         Dim iLon As Integer = baselink.IndexOf("%lon")
 
         Dim sRegMask As String = baselink.Replace("%lon", "([\.0-9]*)").
             Replace("%lat", "([\.0-9]*)").
-            Replace("%zoom", "[0-9]*")
+            Replace("%zoom", "[0-9]*").
+            Replace("%alt", "[0-9]*")
+
+        ' special case: geouri
+        ' geo:lat,lon[,alt][;u=uncertainty]
+        If link.Substring(0, 4).ToLower = "geo:" Then
+            ' remove uncertainty
+            Dim iInd As Integer = link.IndexOf(";")
+            If iInd > 0 Then link = link.Substring(0, iInd)
+        End If
 
         Dim result As Match = Regex.Match(link, sRegMask, RegexOptions.IgnoreCase)
 
@@ -377,15 +386,15 @@ Public Class BasicGeopos
     End Function
 
 
-    Private Const _OSMlink As String = "https://www.openstreetmap.org/#map=%zoom/%lat/%long"
+    ' Private Const _OSMlink As String = "https://www.openstreetmap.org/#map=%zoom/%lat/%long"
 
     ''' <summary>
     ''' returns link to OpenStreetMap from current geoposition
     ''' </summary>
     ''' <param name="zoom">zoom level to be used</param>
     Public Function ToOSMLink(Optional zoom As Integer = 16) As String
-        zoom = Math.Min(zoom, 19)
-        Return FormatLink(_OSMlink, zoom)
+        Return FormatLink("openstreetmap", Math.Min(zoom, 19))
+        ' Return FormatLink(_OSMlink, zoom)
     End Function
 
     ''' <summary>
@@ -403,7 +412,8 @@ Public Class BasicGeopos
     ''' <param name="link"></param>
     ''' <returns></returns>
     Public Shared Function FromOSMLink(link As String) As BasicGeopos
-        Return FromLink(_OSMlink, link)
+        Return GetFromLink(link)
+        'Return FromLink(_OSMlink, link)
     End Function
 
 #Region "dictionary of services"
@@ -417,7 +427,9 @@ Public Class BasicGeopos
         {"bing", "https://bing.com/maps/default.aspx?lvl=%zoom&cp=%lat~%lon"},
         {"google", "https://www.google.pl/maps/@%lat,%lon,%zoomz"},
         {"wirtszlaki", "https://mapa.wirtualneszlaki.pl/#%zoom/%lat/%lon"},
-        {"arcgis", "https://www.arcgis.com/home/webmap/viewer.html?center=%lon,%lat&level=%zoom"}
+        {"arcgis", "https://www.arcgis.com/home/webmap/viewer.html?center=%lon,%lat&level=%zoom"},
+        {"geouri", "geo:%lat,%lon"},
+        {"geouriAlt", "geo:%lat,%lon,%alt"}
         }
 
 

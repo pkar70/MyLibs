@@ -18,8 +18,8 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <Authors>pkar</Authors>
     <PackageTags>geoposition, geolocation, helpers</PackageTags>
-    <Version>1.2.7</Version>
-    <PackageReleaseNotes>Fix: StringLatDM, StringLonDM; Add: ToStringDM(), FromExifString()</PackageReleaseNotes>
+    <Version>1.2.8</Version>
+    <PackageReleaseNotes>Add: GeoUri support</PackageReleaseNotes>
     <SymbolPackageFormat>symbols.nupkg</SymbolPackageFormat>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <PackageId>pkar.$(AssemblyName)</PackageId>
