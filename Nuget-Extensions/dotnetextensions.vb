@@ -6,6 +6,27 @@ Partial Public Module DotNetExtensions
 #Region "String"
 
     ''' <summary>
+    ''' Get len of prefix, common in two strings (CommonPrefixLen("PREFIX", "PREFACE") = 4, CommonPrefixLen("PREFIX", "PRE") = 3)
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function CommonPrefixLen(ByVal string0 As String, string1 As String) As Integer
+        Dim iLp As Integer
+        For iLp = Math.Min(string0.Length, string1.Length) - 1 To 0 Step -1
+            If string0(iLp) = string1(iLp) Then Exit For
+        Next
+        Return iLp
+    End Function
+
+    ''' <summary>
+    ''' Get prefix common in two strings (CommonPrefix("PREFIX", "PREFACE") = "PREF", CommonPrefixLen("PREFIX", "PRE") = "PRE")
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function CommonPrefix(ByVal string0 As String, string1 As String) As String
+        Return string0.Substring(0, CommonPrefixLen(string0, string1))
+    End Function
+
+
+    ''' <summary>
     ''' convert string MAC address (hex bytes separated by '-' or ':') to ULong
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
@@ -528,7 +549,31 @@ Partial Public Module DotNetExtensions
         Return temp.ToStringDHMS
     End Function
 
+    ''' <summary>
+    ''' Shortcut for taking max value (Math.Max(x,y))
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Max(ByVal value As Integer, value1 As Integer) As Integer
+        Return Math.Max(value, value1)
+    End Function
 
+    ''' <summary>
+    ''' Shortcut for taking min value (Math.Min(x,y))
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Min(ByVal value As Integer, value1 As Integer) As Integer
+        Return Math.Min(value, value1)
+    End Function
+
+    ''' <summary>
+    ''' checks if testVal is MinValue or MaxValue
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function IsMinOrMax(ByVal testVal As Integer) As Boolean
+        If testVal = Integer.MinValue Then Return True
+        If testVal = Integer.MaxValue Then Return True
+        Return False
+    End Function
 #End Region
 
 #Region "Long"
@@ -645,6 +690,35 @@ Partial Public Module DotNetExtensions
 
 #End Region
 
+#Region "double"
+
+    ''' <summary>
+    ''' checks if testVal is MinValue or MaxValue
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function IsMinOrMax(ByVal testVal As Double) As Boolean
+        If testVal = Double.MinValue Then Return True
+        If testVal = Double.MaxValue Then Return True
+        Return False
+    End Function
+
+    ''' <summary>
+    ''' Shortcut for taking max value (Math.Max(x,y))
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Max(ByVal value As Double, value1 As Double) As Double
+        Return Math.Max(value, value1)
+    End Function
+
+    ''' <summary>
+    ''' Shortcut for taking min value (Math.Min(x,y))
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Min(ByVal value As Double, value1 As Double) As Double
+        Return Math.Min(value, value1)
+    End Function
+#End Region
+
 #Region "Ulong"
     ''' <summary>
     ''' convert ULong to shortest hex bytes string (e.g. "15", "01:2A", etc.), e.g. for Bluetooth MAC
@@ -739,6 +813,34 @@ Partial Public Module DotNetExtensions
     <Runtime.CompilerServices.Extension()>
     Public Function ToExifString(ByVal oDate As Date) As String
         Return oDate.ToString("yyyy.MM.dd HH:mm:ss")
+    End Function
+
+    ''' <summary>
+    ''' returns 'bigger' date of two dates
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Min(ByVal date1 As Date, date2 As Date) As Date
+        If date1 < date2 Then Return date1
+        Return date2
+    End Function
+
+    ''' <summary>
+    ''' returns 'smaller' date of two dates
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Max(ByVal date1 As Date, date2 As Date) As Date
+        If date1 > date2 Then Return date1
+        Return date2
+    End Function
+
+    ''' <summary>
+    ''' checks if date is MinValue or MaxValue
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function IsMinOrMax(ByVal testDate As Date) As Boolean
+        If testDate = Date.MinValue Then Return True
+        If testDate = Date.MaxValue Then Return True
+        Return False
     End Function
 
 #End Region

@@ -1,4 +1,10 @@
-﻿x.2.1
+﻿x.2.2
+* added: double.Max, double.Min, double.IsMinOrMax
+* added: integer.Max, integer.Min, integer.IsMinOrMax
+* added: date.Min, date.Max, date.IsMinOrMax
+* added: string.CommonPrefixLen, string.CommonPrefix
+
+x.2.1
 * added:
 * String.TransliterateCyrilicToLatin, TransliterateGreekToLatin
 * String.ToPOSIXportableFilename(useTransliterate, optional replacement)

@@ -1,0 +1,2 @@
+﻿
+SetSettingsDate - parametr "noSeconds"

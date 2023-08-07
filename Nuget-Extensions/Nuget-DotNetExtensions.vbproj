@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>pkar</RootNamespace>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard1.4</TargetFramework>
     <AssemblyName>DotNetExts</AssemblyName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>pkar</Authors>
@@ -13,9 +13,9 @@
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
     <PackageTags>extensions; string; MAC; path; integer; ISO string; SI prefixes; Julian Day</PackageTags>
-    <Version>2.2.1</Version>
+    <Version>1.2.2</Version>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
-	  <PackageReleaseNotes>string.transliterating, string.NotContains</PackageReleaseNotes>
+	  <PackageReleaseNotes>double/integer/date.Max/.Min/.IsMinOrMax, string.CommonPrefixLen, string.CommonPrefix</PackageReleaseNotes>
     <Company>none</Company>
     <PackageId>pkar.$(AssemblyName)</PackageId>
   </PropertyGroup>
