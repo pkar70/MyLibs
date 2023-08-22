@@ -1,4 +1,10 @@
 ﻿
+v1.3.1
+* fix: StringLatDM/StringLonDM/StringDM
+
+v1.3.0
+* Add: BasicGeoposWithRadius
+
 v1.2.8
 * Add: GeoUri support (in ToLink, ToUri, FromLink), as mapservice geouri and geouriAlt (with altitude)
 

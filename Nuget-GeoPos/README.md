@@ -109,3 +109,11 @@ Known mapservices:
 // since v1.2.8:
 * geouri (geo: without altitude)
 * geouriAlt (geo: with altitude)
+
+
+# BasicGeoposWithRadius
+
+ Same as BasicGeopos, but with Radius. So, IsInsideCircle method is changed, as we already have radius known:
+
+    Function IsInsideCircle(center As BasicGeoposWithRadius) As Boolean
+    Function IsInsideCircle(center As BasicGeopos) As Boolean

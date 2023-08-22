@@ -1,7 +1,6 @@
 ﻿
 
 Imports System.Collections.Specialized
-Imports System.Globalization
 Imports System.Reflection
 Imports System.Text.RegularExpressions
 
@@ -488,7 +487,36 @@ Public Class BasicGeopos
 #End Region
 
 #Region "DMS format"
-    Private Shared Function Double2StringDMS(dVal As Double, sFormat As String, iDigits As Integer) As String
+    Private Shared Function Double2StringDMS(dWspolrzedna As Double, sFormat As String, iDigits As Integer) As String
+
+#If Not PREV_METHOD Then
+
+        Dim dSign As Double = Math.Sign(dWspolrzedna)
+        dWspolrzedna = Math.Abs(dWspolrzedna)
+
+        Dim iDegrees As Integer = Math.Floor(dWspolrzedna)
+        dWspolrzedna -= iDegrees
+
+        Dim sRet As String = sFormat.Replace("%d", iDegrees.ToString(System.Globalization.CultureInfo.InvariantCulture))
+
+        Dim oTSpanM As TimeSpan = TimeSpan.FromMinutes(dWspolrzedna)
+
+        If sFormat.Contains("%s") Then
+            Dim iMins As Integer = oTSpanM.Seconds
+            Dim dSecs As Double = oTSpanM.TotalSeconds - iMins
+
+            sRet = sRet.Replace("%m", iMins.ToString(System.Globalization.CultureInfo.InvariantCulture))
+
+            Dim oTSpanS As TimeSpan = TimeSpan.FromMinutes(dSecs)   ' dSecs < 1
+            sRet = sRet.Replace("%s", Math.Round(oTSpanS.Seconds, Math.Min(5, iDigits)).ToString(System.Globalization.CultureInfo.InvariantCulture))
+        Else
+            sRet = sRet.Replace("%m", Math.Round(oTSpanM.TotalSeconds, Math.Min(5, iDigits)).ToString(System.Globalization.CultureInfo.InvariantCulture))
+        End If
+
+        Return sRet
+
+
+#Else
 
         ' od .Net Core 3.0 jest Round(x,x,ToZero)
         Dim iDegrees As Integer = If(dVal < 0, Math.Ceiling(dVal), Math.Floor(dVal))
@@ -496,9 +524,13 @@ Public Class BasicGeopos
 
         dVal = Math.Abs(dVal)
         dVal -= iDegrees
+        ' i tu był błąd :)
+        ' 0.0089 -> 
+        ' 0.961
 
         If sFormat.Contains("%s") Then
             Dim iMins As Integer = Math.Floor(dVal * 10.0 / 6.0)
+
             sRet = sRet.Replace("%m", iMins.ToString(System.Globalization.CultureInfo.InvariantCulture))
             dVal -= iMins
             sRet = sRet.Replace("%s", Math.Round(dVal, Math.Min(5, iDigits)).ToString(System.Globalization.CultureInfo.InvariantCulture))
@@ -507,6 +539,7 @@ Public Class BasicGeopos
         End If
 
         Return sRet
+#End If
     End Function
 
     ''' <summary>
@@ -763,12 +796,3 @@ Public Class BasicGeopos
 
 End Class
 
-#If False Then
-Public Enum MapService
-    OpenStreetMap
-    Bing
-    Google
-    WirtSzlaki
-    ArcGis
-End Enum
-#end if
