@@ -1,3 +1,5 @@
 ﻿
-v1.0.0
-* initial release
+NIE DZIAŁA - nie można użyć typu pkar.BasicGeopos w WinRT
+
+v1.4.0
+* initial release, version number to match Nuget pkar.BasicGeopos used 

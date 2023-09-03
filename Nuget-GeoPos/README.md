@@ -84,12 +84,19 @@
 
     Function StringLatDM(Optional sFormat As String = "%d°%m′%s″", Optional iDigits As Integer = 5) As String
     Function StringLonDM(Optional sFormat As String = "%d°%m′%s″", Optional iDigits As Integer = 5) As String
-    Functoin ToStringDM(format, Optional iDigits = 5) As String
+    Function ToStringDM(format, Optional iDigits = 5) As String
 
 ### and constructors
     FromDMS(latD As Integer, latM As Double, latS As Double, latSN As String, lonD As Integer, lonM As Double, lonS As Double, lonEW As String) 
     FromDM(latD As Integer, latM As Double, latSW As String, lonD As Integer, lonM As Double, lonEW As String)
     FromDM(latD As Double, latSW As String, lonD As Double, lonEW As String)
+
+## QTH locator converter
+ See also https://en.wikipedia.org/wiki/Maidenhead_grid_locator
+
+    Function ToQTH(Optional depth As UInt16 = 4) As String [since v1.4.0]
+    Shared Function FromQTH(qth As String) As BasicGeopos [since v1.4.0]
+
 
 # Working with BasicGeopos lists
 

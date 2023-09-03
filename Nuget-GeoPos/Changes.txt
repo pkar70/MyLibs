@@ -1,4 +1,8 @@
 ﻿
+v1.4.0
+* Add: FromQTH, ToQTH
+* Added some unit tests
+
 v1.3.1
 * fix: StringLatDM/StringLonDM/StringDM
 

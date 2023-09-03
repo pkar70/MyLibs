@@ -565,7 +565,7 @@ Public Class BasicGeopos
     ''' <summary>
     ''' return string with DMS format using iDigits decimal digits
     ''' </summary>
-    ''' <param name="sFormat">format of value, use %ad %am %as as placeholders for lAtitude data, and %od %om %os as placeholders for lOngitude data</param>
+    ''' <param name="sFormat">format of value, use %ad %am %as as placeholders for lAtitude data, and %od %om %os as placeholders for lOngitude data. Values would be rounded (e.g. 50.9 would render as 51)</param>
     ''' <param name="iDigits">decimal digits (max 5)</param>
     ''' <returns></returns>
     Public Function StringDM(sFormat As String, Optional iDigits As Integer = 5)
@@ -623,6 +623,146 @@ Public Class BasicGeopos
 
         Return FromDM(latDegree, latMin, latSN, lonDegree, lonMin, lonEW)
     End Function
+#End Region
+
+#Region "Maidenhead Locator System / QTH Locator / IARU Locator"
+
+    ' https://en.wikipedia.org/wiki/Maidenhead_grid_locator
+    ''' <summary>
+    ''' Get as QTH locator 
+    ''' </summary>
+    ''' <param name="depth">number of character pairs (e.q., to get JO90xb use 3), >6 is treated as 6</param>
+    Public Function ToQTH(Optional depth As UInt16 = 4) As String
+        Dim qth As String = ""
+
+        Dim latit As Double = Latitude + 90
+        Dim longit As Double = Longitude + 180
+
+        ' Field, A-R, 18 values, 20×10 degrees
+        qth &= ChrW(&H41 + Math.Floor(longit / 20.0))
+        qth &= ChrW(&H41 + Math.Floor(latit / 10.0))
+
+        If depth < 2 Then Return qth
+
+        longit = Math.IEEERemainder(longit, 20)
+        If longit < 0 Then longit += 20
+        latit = Math.IEEERemainder(latit, 10)
+        If latit < 0 Then latit += 10
+
+        ' Square, 0-9, 10 values,  2×1 degrees			
+        qth &= ChrW(&H30 + Math.Floor(longit / 2))
+        qth &= ChrW(&H30 + Math.Floor(latit / 1))
+
+        If depth < 3 Then Return qth
+
+        longit = Math.IEEERemainder(longit, 2)
+        If longit < 0 Then longit += 2
+        latit = Math.IEEERemainder(latit, 1)
+        If latit < 0 Then latit += 1
+
+        ' Subsquare, a-x, 24 values, 5×2.5 minutes
+        qth &= ChrW(&H61 + Math.Floor(longit * 12))
+        qth &= ChrW(&H61 + Math.Floor(latit * 24))
+
+        If depth < 4 Then Return qth
+
+        longit = Math.IEEERemainder(longit, 1.0 / 12.0)
+        If (longit < 0) Then longit += 1.0 / 12.0
+        latit = Math.IEEERemainder(latit, 1.0 / 24.0)
+        If (latit < 0) Then latit += 1.0 / 24.0
+
+        ' Extended square, 0-9, 10 values, 30×15 seconds
+        qth &= ChrW(&H30 + Math.Floor(longit * 12 * 10))
+        qth &= ChrW(&H30 + Math.Floor(latit * 24 * 10))
+
+        If depth < 5 Then Return qth
+
+        longit = Math.IEEERemainder(longit, 1.0 / 12.0 / 10.0)
+        If (longit < 0) Then longit += 1.0 / 12.0 / 10.0
+        latit = Math.IEEERemainder(latit, 1.0 / 24.0 / 10.0)
+        If (latit < 0) Then latit += 1.0 / 24.0 / 10.0
+
+        ' Super extended square, A-X, 24 values, 1.25×0.625 seconds
+        qth &= ChrW(&H61 + Math.Floor(longit * 12 * 10 * 24))
+        qth &= ChrW(&H61 + Math.Floor(latit * 24 * 10 * 24))
+
+        If depth < 6 Then Return qth
+
+        longit = Math.IEEERemainder(longit, 1.0 / 12.0 / 10.0 / 24.0)
+        If (longit < 0) Then longit += 1.0 / 12.0 / 10.0 / 24.0
+        latit = Math.IEEERemainder(latit, 1.0 / 24.0 / 10.0 / 24.0)
+        If (latit < 0) Then latit += 1.0 / 24.0 / 10.0 / 24.0
+
+        ' Super extended subsquare, 0-9, 10 values, 0.125×0.0625 seconds
+        qth &= ChrW(&H61 + Math.Floor(longit * 12 * 10 * 24 * 10))
+        qth &= ChrW(&H61 + Math.Floor(latit * 24 * 10 * 24 * 10))
+
+
+        Return qth
+
+    End Function
+
+    ''' <summary>
+    '''  creates BasicGeopos from QTH locator
+    ''' </summary>
+    ''' <param name="qth">QTH locator, between 2 and 5 character pairs</param>
+    ''' <returns></returns>
+    Public Shared Function FromQTH(qth As String) As BasicGeopos
+
+        qth = qth.Trim().ToUpper
+        If Not Regex.IsMatch(qth, "^[A-R]{2}[0-9]{2}") Then Return Empty()
+
+        Dim ret As pkar.BasicGeopos = Empty()
+        ret.Longitude = (AscW(qth(0)) - &H41) * 20 - 180 + (AscW(qth(2)) - &H30) * 2
+        ret.Latitude = (AscW(qth(1)) - &H41) * 10 - 90 + (AscW(qth(3)) - &H30)
+
+        If Regex.IsMatch(qth, "^[A-R]{2}[0-9]{2}$") Then
+            ret.Longitude += 1
+            ret.Latitude += 0.5
+            Return ret
+        End If
+
+        If Not Regex.IsMatch(qth, "^[A-R]{2}[0-9]{2}[A-X]{2}") Then Return Empty()
+        ret.Longitude += (AscW(qth(4)) - &H41) / 12
+        ret.Latitude += (AscW(qth(5)) - &H41) / 24
+
+        If Regex.IsMatch(qth, "^[A-R]{2}[0-9]{2}[A-X]{2}$") Then
+            ret.Longitude += 0.5 / 12
+            ret.Latitude += 0.5 / 24
+            Return ret
+        End If
+
+        If Not Regex.IsMatch(qth, "^[A-R]{2}[0-9]{2}[A-X]{2}[0-9]{2}") Then Return Empty()
+
+        ret.Longitude += (AscW(qth(6)) - &H30) / 120
+        ret.Latitude += (AscW(qth(7)) - &H30) / 240
+
+        If Regex.IsMatch(qth, "^[A-R]{2}[0-9]{2}[A-X]{2}[0-9]{2}$") Then
+            ret.Longitude += 0.5 / 120
+            ret.Latitude += 0.5 / 240
+            Return ret
+        End If
+
+        If Not Regex.IsMatch(qth, "^[A-R]{2}[0-9]{2}[A-X]{2}[0-9]{2}[A-X]{2}") Then Return Empty()
+        ret.Longitude += (AscW(qth(8)) - &H41 + 0.5) / 120 / 24
+        ret.Latitude += (AscW(qth(9)) - &H41 + 0.5) / 240 / 24
+
+        If Regex.IsMatch(qth, "^[A-R]{2}[0-9]{2}[A-X]{2}[0-9]{2}[A-X]{2}$") Then
+            ret.Longitude += 0.5 / 120 / 24
+            ret.Latitude += 0.5 / 240 / 24
+        End If
+
+        If Not Regex.IsMatch(qth, "^[A-R]{2}[0-9]{2}[A-X]{2}[0-9]{2}[A-X]{2}[0-9]{2}") Then Return Empty()
+        ret.Longitude += (AscW(qth(10)) - &H30) / 120 / 24 / 10
+        ret.Latitude += (AscW(qth(11)) - &H30) / 240 / 24 / 10
+
+        ' środkujemy ten poziom
+        ret.Longitude += 0.5 / 120 / 24 / 10
+        ret.Latitude += 0.5 / 240 / 24 / 10
+
+        Return ret
+    End Function
+
 #End Region
 
 #Region "from/to any object"

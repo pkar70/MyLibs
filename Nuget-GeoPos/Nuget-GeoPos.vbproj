@@ -18,8 +18,8 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <Authors>pkar</Authors>
     <PackageTags>geoposition, geolocation, helpers</PackageTags>
-    <Version>1.3.1</Version>
-    <PackageReleaseNotes>Fix DMS to string methods</PackageReleaseNotes>
+    <Version>1.4.0</Version>
+    <PackageReleaseNotes>Added QTH locator converters</PackageReleaseNotes>
     <SymbolPackageFormat>symbols.nupkg</SymbolPackageFormat>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <PackageId>pkar.$(AssemblyName)</PackageId>
