@@ -90,6 +90,309 @@ Partial Public Module DotNetExtensions
         Return baseString.IndexOf(value, StringComparison.Ordinal)
     End Function
 
+
+
+#Region "CS"
+
+    ' binary comparisons
+
+    ''' <summary>
+    ''' Simple wrapper for string.contains
+    ''' </summary>
+    ''' <returns>TRUE if value is empty or is inside baseString</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ContainsCS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Contains(value)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.startswith with StringComparison.Ordinal
+    ''' </summary>
+    ''' <returns>TRUE if string starts with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function StartsWithCS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.StartsWith(value, StringComparison.Ordinal)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.EndsWith with StringComparison.Ordinal
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EndsWithCS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.EndsWith(value, StringComparison.Ordinal)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.Equals with StringComparison.Ordinal
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EqualsCS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Equals(value, StringComparison.Ordinal)
+    End Function
+
+#End Region
+
+
+#If NETSTANDARD2_0_OR_GREATER Then
+
+    ' .Net 2.0, InvariantCultureIgnoreCase
+
+#Region "CI"
+
+    ''' <summary>
+    ''' Simple wrapper for string.contains, with ToLowerInvariant
+    ''' </summary>
+    ''' <returns>TRUE if value is empty or is inside baseString</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ContainsCI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.ToLowerInvariant.Contains(value.ToLowerInvariant)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.startswith with StringComparison.InvariantCultureIgnoreCase
+    ''' </summary>
+    ''' <returns>TRUE if string starts with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function StartsWithCI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.StartsWith(value, StringComparison.InvariantCultureIgnoreCase)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.EndsWith with StringComparison.InvariantCultureIgnoreCase
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EndsWithCI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.EndsWith(value, StringComparison.InvariantCultureIgnoreCase)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.Equals with StringComparison.InvariantCultureIgnoreCase
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EqualsCI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Equals(value, StringComparison.InvariantCultureIgnoreCase)
+    End Function
+
+#End Region
+
+#Region "CSAS"
+
+    ' binary comparisons
+
+    ''' <summary>
+    ''' wrapper for string.contains, but after Normalization
+    ''' </summary>
+    ''' <returns>TRUE if value is empty or is inside baseString</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ContainsCSAS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Normalize(Text.NormalizationForm.FormKD).Contains(value.Normalize(Text.NormalizationForm.FormKD))
+    End Function
+
+    ''' <summary>
+    ''' wrapper for string.startswith with StringComparison.Ordinal, but after Normalization
+    ''' </summary>
+    ''' <returns>TRUE if string starts with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function StartsWithCSAS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Normalize(Text.NormalizationForm.FormKD).StartsWith(value.Normalize(Text.NormalizationForm.FormKD), StringComparison.Ordinal)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.EndsWith with StringComparison.Ordinal, but after Normalization
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EndsWithCSAS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Normalize(Text.NormalizationForm.FormKD).EndsWith(value.Normalize(Text.NormalizationForm.FormKD), StringComparison.Ordinal)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.Equals with StringComparison.Ordinal, but after Normalization
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EqualsCSAS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Normalize(Text.NormalizationForm.FormKD).Equals(value.Normalize(Text.NormalizationForm.FormKD), StringComparison.Ordinal)
+    End Function
+
+#End Region
+
+#Region "CIAS"
+
+    ' binary comparisons
+
+    ''' <summary>
+    ''' wrapper for string.contains, but after ToLowerInvariant and Normalization
+    ''' </summary>
+    ''' <returns>TRUE if value is empty or is inside baseString</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ContainsCIAS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.ToLowerInvariant.Normalize(Text.NormalizationForm.FormKD).Contains(value.ToLowerInvariant.Normalize(Text.NormalizationForm.FormKD))
+    End Function
+
+    ''' <summary>
+    ''' wrapper for string.startswith with StringComparison.OrdinalIgnoreCase, but after Normalization
+    ''' </summary>
+    ''' <returns>TRUE if string starts with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function StartsWithCIAS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Normalize(Text.NormalizationForm.FormKD).StartsWith(value.Normalize(Text.NormalizationForm.FormKD), StringComparison.OrdinalIgnoreCase)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.EndsWith with StringComparison.OrdinalIgnoreCase, but after Normalization
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EndsWithCIAS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Normalize(Text.NormalizationForm.FormKD).EndsWith(value.Normalize(Text.NormalizationForm.FormKD), StringComparison.OrdinalIgnoreCase)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.Equals with StringComparison.OrdinalIgnoreCase, but after Normalization
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EqualsCIAS(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Normalize(Text.NormalizationForm.FormKD).Equals(value.Normalize(Text.NormalizationForm.FormKD), StringComparison.OrdinalIgnoreCase)
+    End Function
+
+#End Region
+
+#Region "CIAI"
+
+    ' binary comparisons
+
+    ''' <summary>
+    ''' wrapper for string.contains, but after ToLowerInvariant and DropAccents
+    ''' </summary>
+    ''' <returns>TRUE if value is empty or is inside baseString</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ContainsCIAI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.ToLowerInvariant.DropAccents.Contains(value.ToLowerInvariant.DropAccents)
+    End Function
+
+    ''' <summary>
+    ''' wrapper for string.startswith with StringComparison.InvariantCultureIgnoreCase
+    ''' </summary>
+    ''' <returns>TRUE if string starts with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function StartsWithCIAI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.StartsWith(value, StringComparison.InvariantCultureIgnoreCase)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.EndsWith with StringComparison.InvariantCultureIgnoreCase
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EndsWithCIAI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.EndsWith(value, StringComparison.InvariantCultureIgnoreCase)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.Equals with StringComparison.InvariantCultureIgnoreCase
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EqualsCIAI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Equals(value, StringComparison.InvariantCultureIgnoreCase)
+    End Function
+
+#End Region
+
+#Region "CSAI"
+
+    ' binary comparisons
+
+    ''' <summary>
+    ''' wrapper for string.contains, but after DropAccents
+    ''' </summary>
+    ''' <returns>TRUE if value is empty or is inside baseString</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ContainsCSAI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.DropAccents.Contains(value.DropAccents)
+    End Function
+
+    ''' <summary>
+    ''' wrapper for string.startswith with StringComparison.InvariantCulture
+    ''' </summary>
+    ''' <returns>TRUE if string starts with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function StartsWithCSAI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.StartsWith(value, StringComparison.InvariantCulture)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.EndsWith with StringComparison.InvariantCulture
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EndsWithCSAI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.EndsWith(value, StringComparison.InvariantCulture)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.Equals with StringComparison.InvariantCulture
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EqualsCSAI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Equals(value, StringComparison.InvariantCulture)
+    End Function
+
+#End Region
+
+
+#Else
+
+ 'w .Net 1.4 nie ma InvariantCultureIgnoreCase, więc używamy CurrentCulture
+
+#Region "CI"
+
+    ''' <summary>
+    ''' Simple wrapper for string.contains, with ToLowerInvariant
+    ''' </summary>
+    ''' <returns>TRUE if value is empty or is inside baseString</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ContainsCI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.ToLowerInvariant.Contains(value.ToLowerInvariant)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.startswith with StringComparison.CurrentCultureIgnoreCase
+    ''' </summary>
+    ''' <returns>TRUE if string starts with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function StartsWithCI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.StartsWith(value, StringComparison.CurrentCultureIgnoreCase)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.EndsWith with StringComparison.CurrentCultureIgnoreCase
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EndsWithCI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.EndsWith(value, StringComparison.CurrentCultureIgnoreCase)
+    End Function
+
+    ''' <summary>
+    ''' Simple wrapper for string.Equals with StringComparison.CurrentCultureIgnoreCase
+    ''' </summary>
+    ''' <returns>TRUE if string ends with value</returns>
+    <Runtime.CompilerServices.Extension()>
+    Public Function EqualsCI(ByVal baseString As String, value As String) As Boolean
+        Return baseString.Equals(value, StringComparison.CurrentCultureIgnoreCase)
+    End Function
+
+#End Region
+
+#End If
     ''' <summary>
     ''' trim beginning of string (same as Substring(IndexOf(startString), no trimminig if startString is not found)
     ''' </summary>
@@ -198,8 +501,6 @@ Partial Public Module DotNetExtensions
     ''' <summary>
     ''' change Polish letters to their latin base letters (drop accents)
     ''' </summary>
-    ''' <param name="basestring"></param>
-    ''' <returns></returns>
     <Runtime.CompilerServices.Extension()>
     Public Function Depolit(ByVal basestring As String) As String
         Dim sRet As String = basestring
@@ -516,6 +817,21 @@ Partial Public Module DotNetExtensions
         Return sRet
     End Function
 
+    ''' <summary>
+    ''' return TRUE if string is already LowerInvariant
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function IsLowerInvariant(ByVal basestring As String) As Boolean
+        Return (basestring = basestring.ToLowerInvariant)
+    End Function
+
+    ''' <summary>
+    ''' return TRUE if string is already UpperInvariant
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function IsUpperInvariant(ByVal basestring As String) As Boolean
+        Return (basestring = basestring.ToUpperInvariant)
+    End Function
 
 #End Region
 
@@ -816,7 +1132,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' returns 'bigger' date of two dates
+    ''' returns 'smaller' date of two dates
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Min(ByVal date1 As Date, date2 As Date) As Date
@@ -825,7 +1141,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' returns 'smaller' date of two dates
+    ''' returns 'bigger' date of two dates
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Max(ByVal date1 As Date, date2 As Date) As Date

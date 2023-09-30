@@ -33,6 +33,48 @@ If some extension is added in v1.x.y, then it would be present also in v2.x.y (n
     String.CommonPrefix(string1 As String) As String    // since x.2.2
     String.CommonPrefixLen(string1 As String) As Integer // since x.2.2
 
+    String.IsLowerInvariant As Boolean  // since x.2.3
+    String.IsUpperInvariant As Boolean  // since x.2.3
+
+    // same as SQL: case sensitive, i.e. standard methods (as same without CS suffix)
+    String.ContainsCS     // since x.2.3
+    String.StartsWithCS   // since x.2.3
+    String.EndsWithCS     // since x.2.3
+    String.EqualsCS       // since x.2.3
+
+    // case insensitive methods; uses CurrentCultureIgnoreCase in 1.x.x, and InvariantCultureIgnoreCase in 2.x.x
+    String.ContainsCI     // since x.2.3
+    String.StartsWithCI   // since x.2.3
+    String.EndsWithCI     // since x.2.3
+    String.EqualsCI       // since x.2.3
+
+    // same as SQL: case sensitive, accent sensitive; uses Normalization KFD form
+    String.ContainsCSAS     // since 2.2.3
+    String.StartsWithCSAS   // since 2.2.3
+    String.EndsWithCSAS     // since 2.2.3
+    String.EqualsCSAS       // since 2.2.3
+
+    // case insensitive methods; uses OrdinalIgnoreCase on Normalization KFD form 
+    String.ContainsCIAS     // since 2.2.3
+    String.StartsWithCIAS   // since 2.2.3
+    String.EndsWithCIAS     // since 2.2.3
+    String.EqualsCIAS       // since 2.2.3
+
+    // case insensitive, accent insensitive methods; uses InvariantCulture
+    String.ContainsCSAI     // since 2.2.3
+    String.StartsWithCSAI   // since 2.2.3
+    String.EndsWithCSAI     // since 2.2.3
+    String.EqualsCSAI       // since 2.2.3
+
+    // case insensitive, accent insensitive methods; uses InvariantCultureIgnoreCase
+    String.ContainsCIAI     // since 2.2.3
+    String.StartsWithCIAI   // since 2.2.3
+    String.EndsWithCIAI     // since 2.2.3
+    String.EqualsCIAI       // since 2.2.3
+
+
+
+
 # for Integer
 
     Integer.ToStringWithSpaces() As String
