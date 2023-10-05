@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="VSIXclibWinui3vb.11" Version="1.1" Language="en-US" Publisher="Piotr Karocki" />
+        <DisplayName>Class Library (WinUI in Desktop) in VB</DisplayName>
+        <Description xml:space="preserve">A project for creating a managed class library (.dll) for Desktop apps based on Windows UI Library (WinUI3) in VB</Description>
+        <MoreInfo>https://github.com/pkar70/MyLibs/tree/master/VsTempCLibWinUI3inVB</MoreInfo>
+        <License>LICENCE.txt</License>
+        <Icon>__TemplateIcon.png</Icon>
+        <Tags>visualbasic xaml desktop windows library platformreunion winui</Tags>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+    </Dependencies>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[17.0,18.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="File" Path="ProjectTemplates" d:TargetPath="ProjectTemplates\Class Library (WinUI in Desktop).zip" />
+    </Assets>
+</PackageManifest>

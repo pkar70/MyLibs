@@ -1,0 +1,30 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>Class Library (WinUI in Desktop)</Name>
+    <Description>A project for creating a managed class library (.dll) for Desktop apps based on Windows UI Library (WinUI3) in VB</Description>
+    <ProjectType>VisualBasic</ProjectType>
+    <ProjectSubType>
+    </ProjectSubType>
+
+	<LanguageTag>visualbasic</LanguageTag>
+	<LanguageTag>xaml</LanguageTag>
+        <PlatformTag>windows</PlatformTag>
+        <PlatformTag>projectreunion</PlatformTag>
+        <ProjectTypeTag>winui</ProjectTypeTag>
+        <ProjectTypeTag>desktop</ProjectTypeTag>
+
+    <SortOrder>1000</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>Class Library (WinUI in Desktop)</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <CreateInPlace>true</CreateInPlace>
+    <Icon>__TemplateIcon.png</Icon>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="ClassLibWinUI3VB.vbproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" TargetFileName="Class1.vb">Class1.vb</ProjectItem>
+    </Project>
+  </TemplateContent>
+</VSTemplate>
