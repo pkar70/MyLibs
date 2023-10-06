@@ -23,6 +23,7 @@ Using string with Ini file content, not filename as parameter solves problem wit
 
         TextBlock.[Get|Set]SettingsString()
         TextBox.[Get|Set]SettingsString()
+        PasswordBox.[Get|Set]SettingsString() [since 1.1.0]
         TextBox.[Get|Set]SettingsInt()  // this Int can be scaled (int is saved, but UI get double)
         ToggleButton.[Get|Set]SettingsBool
         Slider.[Get|Set]SettingsInt()

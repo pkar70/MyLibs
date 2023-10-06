@@ -16,6 +16,9 @@
   <RepositoryType>https://github.com/pkar70/MyLibs/pkar.WPF.Configs</RepositoryType>
   <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
   <IncludeSymbols>True</IncludeSymbols>
+  <Version>1.1.0</Version>
+  <PackageProjectUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.WPF.Configs</PackageProjectUrl>
+  <PackageReleaseNotes>Added PasswordBox.Get/SetSettingsString</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -207,6 +207,67 @@ Public Module Extensions
 
 #End Region
 
+#Region "PasswordBox"
+    ''' <summary>
+    ''' Read setting and place it in UI, use empty string as default. Setting name (key) is same as UI element name.
+    ''' </summary>
+    <Extension()>
+    Public Sub GetSettingsString(ByVal oItem As PasswordBox)
+        oItem.GetSettingsString("", "")
+    End Sub
+
+    ''' <summary>
+    ''' Read setting sName and place it in UI, use empty string as default
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    <Extension()>
+    Public Sub GetSettingsString(ByVal oItem As PasswordBox, sName As String)
+        oItem.GetSettingsString(sName, "")
+    End Sub
+
+    ''' <summary>
+    ''' Read setting sName and place it in UI, use given default
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    ''' <param name="sDefault">default value</param>
+    <Extension()>
+    Public Sub GetSettingsString(ByVal oItem As PasswordBox, sName As String, sDefault As String)
+        If sName = "" Then sName = oItem.Name
+        Dim sTxt As String = VBlib.GetSettingsString(sName, sDefault)
+        oItem.Password = sTxt
+    End Sub
+
+    ''' <summary>
+    ''' Save UI content in sName local setting. Setting name (key) is same as UI element name.
+    ''' </summary>
+    <Extension()>
+    Public Sub SetSettingsString(ByVal oItem As PasswordBox)
+        oItem.SetSettingsString("", False)
+    End Sub
+
+
+    ''' <summary>
+    ''' Save UI content in sName local setting
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    <Extension()>
+    Public Sub SetSettingsString(ByVal oItem As PasswordBox, sName As String)
+        oItem.SetSettingsString(sName, False)
+    End Sub
+
+    ''' <summary>
+    ''' Save UI content in sName setting, locally or roaming
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    ''' <param name="useRoam">True if value should be placed also in roaming settings</param>
+    <Extension()>
+    Public Sub SetSettingsString(ByVal oItem As PasswordBox, sName As String, useRoam As Boolean)
+        If sName = "" Then sName = oItem.Name
+        VBlib.SetSettingsString(sName, oItem.Password, useRoam)
+    End Sub
+
+#End Region
+
 #Region "ToggleButton"
 
     ''' <summary>
