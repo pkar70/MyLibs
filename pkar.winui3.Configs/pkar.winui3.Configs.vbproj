@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>pkar.winui3.Configs</RootNamespace>
+    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Helpers for retrieving/storing config data from UI</Title>
+    <Authors>pkar</Authors>
+    <Company>none</Company>
+    <Description>This Nuget adds UI extensions helpers to transfer data between UI elements and .Net configuration. It is similar to my other Nuget: pkar.Uwp.Config and pkar.Wpf.Config</Description>
+    <Copyright>Piotr Karocki</Copyright>
+    <PackageProjectUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.winui3.Configs</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.winui3.Configs</RepositoryUrl>
+    <Version>1.1.0</Version>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <IncludeSymbols>True</IncludeSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+      <PackageReference Include="Microsoft.ProjectReunion" Version="0.8.12" />
+      <PackageReference Include="Microsoft.ProjectReunion.Foundation" Version="0.8.12" />
+      <PackageReference Include="Microsoft.ProjectReunion.WinUI" Version="0.8.12" />
+      <PackageReference Include="pkar.NetConfigs" Version="2.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
+</Project>
