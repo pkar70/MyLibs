@@ -1,0 +1,12 @@
+﻿
+basestruct: list na observablelist
+
+to co mozna z BaseList. przeniesc jako extension List. - tak zrobic
+czy jest observablelist? wtedy podmienic
+collection: nie ma item(index), nie ma sort
+
+dodac BaseList.INotifyCollectionChanged ?
+
+overridable BaseList.FindPredicate(param) as bool
+i BaseList.Find(param) ktore uzywa predicate
+
