@@ -1,4 +1,6 @@
 ﻿
+Imports System.ServiceModel.Channels
+
 Partial Public Module extensions
 
 #Region "UI related"
@@ -133,7 +135,7 @@ Partial Public Module extensions
     ''' </summary>
     <Extension()>
     Public Sub GoBack(ByVal oPage As Page)
-        oPage.Frame.GoBack()
+        If oPage.Frame.CanGoBack Then oPage.Frame.GoBack()
     End Sub
 
     ''' <summary>
@@ -461,6 +463,143 @@ Partial Public Module extensions
 
 #End Region
 
+#Region "dialog boxes"
+    Private Function IsInteractive() As Boolean
+        If Window.Current?.Content Is Nothing Then Return False
+        Return True
+    End Function
+
+    <Extension()>
+    Private Async Function MsgBoxAsyncTask(ByVal oPage As Page, message As String) As Task
+        If Not IsInteractive() Then Return
+
+        Dim oMsg As New Windows.UI.Popups.MessageDialog(message)
+        Await oMsg.ShowAsync()
+    End Function
+
+    ''' <summary>
+    ''' Show message on screen, can be awaited
+    ''' </summary>
+    ''' <param name="message">message to be shown</param>
+    <Extension()>
+    Public Function MsgBoxAsync(ByVal oPage As Page, message As String) As IAsyncAction
+        Return oPage.MsgBoxAsyncTask(message).AsAsyncAction
+    End Function
+
+
+    ''' <summary>
+    ''' Show message on screen
+    ''' </summary>
+    ''' <param name="message">message to be shown</param>
+    <Extension()>
+    Public Sub MsgBox(ByVal oPage As Page, message As String)
+        oPage.MsgBoxAsyncTask(message)
+    End Sub
+
+    ''' <summary>
+    ''' Show message on screen, and waits for Yes/No buttons
+    ''' </summary>
+    ''' <param name="message">message to be shown</param>
+    ''' <returns>TRUE if YES button was pressed</returns>
+    <Extension()>
+    Public Function DialogBoxYNAsync(ByVal oPage As Page, message As String) As IAsyncOperation(Of Boolean)
+        Return oPage.DialogBoxYNAsyncTask(message, "Yes", "No").AsAsyncOperation
+    End Function
+
+
+    ''' <summary>
+    ''' Show message on screen, and waits for Yes/No buttons
+    ''' </summary>
+    ''' <param name="message">message to be shown</param>
+    ''' <param name="buttonYes">text to be shown instead of "Yes"</param>
+    ''' <param name="buttonNo">text to be shown instead of "No"</param>
+    ''' <returns>TRUE if YES button was pressed</returns>
+    <Extension()>
+    Public Function DialogBoxYNAsync(ByVal oPage As FrameworkElement, message As String, buttonYes As String, buttonNo As String) As IAsyncOperation(Of Boolean)
+        Return oPage.DialogBoxYNAsyncTask(message, buttonYes, buttonNo).AsAsyncOperation
+    End Function
+
+    <Extension()>
+    Private Async Function DialogBoxYNAsyncTask(ByVal oPage As FrameworkElement, sMsg As String, sYes As String, sNo As String) As Task(Of Boolean)
+        If Not IsInteractive() Then Return False
+
+        Dim oMsg As New Windows.UI.Popups.MessageDialog(sMsg)
+        Dim oYes As New Windows.UI.Popups.UICommand(sYes)
+        Dim oNo As New Windows.UI.Popups.UICommand(sNo)
+        oMsg.Commands.Add(oYes)
+        oMsg.Commands.Add(oNo)
+        oMsg.DefaultCommandIndex = 1    ' default: No
+        oMsg.CancelCommandIndex = 1
+        Dim oCmd As Windows.UI.Popups.IUICommand = Await oMsg.ShowAsync
+        If oCmd Is Nothing Then Return False
+        If oCmd.Label = sYes Then Return True
+        Return False
+    End Function
+
+
+    ''' <summary>
+    ''' Show message on screen, waits for Continue/Cancel buttons and return text entered by user
+    ''' </summary>
+    ''' <param name="message">message to be shown</param>
+    ''' <returns>text entered by user, or empty if Cancel was pressed</returns>
+    <Extension()>
+    Public Function InputBoxAsync(ByVal oPage As FrameworkElement, message As String) As IAsyncOperation(Of String)
+        Return oPage.InputBoxAsync(message, "")
+    End Function
+
+
+    ''' <summary>
+    ''' Show message on screen, waits for Continue/Cancel buttons and return text entered by user
+    ''' </summary>
+    ''' <param name="message">message to be shown</param>
+    ''' <param name="defaultText">default value</param>
+    ''' <returns>text entered by user, or empty if Cancel was pressed</returns>
+    <Extension()>
+    Public Function InputBoxAsync(ByVal oPage As FrameworkElement, message As String, defaultText As String) As IAsyncOperation(Of String)
+        Return oPage.InputBoxAsyncTask(message, defaultText, "Continue", "Cancel").AsAsyncOperation
+    End Function
+
+    ''' <summary>
+    ''' Show message on screen, waits for Continue/Cancel buttons and return text entered by user
+    ''' </summary>
+    ''' <param name="message">message to be shown</param>
+    ''' <param name="defaultText">default value</param>
+    ''' <param name="buttonContinue">text to be shown instead of "Continue"</param>
+    ''' <param name="buttonCancel">text to be shown instead of "Cancel"</param>
+    ''' <returns>text entered by user, or empty if Cancel was pressed</returns>
+    <Extension()>
+    Public Function InputBoxAsync(ByVal oPage As FrameworkElement, message As String, defaultText As String, buttonContinue As String, buttonCancel As String) As IAsyncOperation(Of String)
+        Return oPage.InputBoxAsyncTask(message, defaultText, buttonContinue, buttonCancel).AsAsyncOperation
+    End Function
+
+
+    <Extension()>
+    Private Async Function InputBoxAsyncTask(ByVal oPage As FrameworkElement, sMsg As String, sDefault As String, sYes As String, sNo As String) As Task(Of String)
+        If Not IsInteractive() Then Return ""
+
+
+        Dim oInputTextBox = New TextBox With {
+            .AcceptsReturn = False,
+            .Text = sDefault,
+            .IsSpellCheckEnabled = False
+        }
+
+        Dim oDlg As New ContentDialog With {
+            .Content = oInputTextBox,
+            .PrimaryButtonText = sYes,
+            .SecondaryButtonText = sNo,
+            .Title = sMsg
+        }
+
+        Dim oCmd = Await oDlg.ShowAsync
+        If oCmd <> ContentDialogResult.Primary Then Return ""
+
+        Return oInputTextBox.Text
+
+    End Function
+
+
+#End Region
 
 #End Region
 
