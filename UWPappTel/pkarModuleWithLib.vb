@@ -19,17 +19,21 @@
 
 ' 2022.05.02: NetIsIPavail param bMsg jest teraz optional (default: bez pytania)
 
+' 2024.01.13  + FrameworkElement.SetUiPropertiesFromLang, FrameworkElementSetFromResourcesTree, TextBlock.SetLangText
+
 Imports System
 Imports System.Collections.Generic
 Imports System.Runtime.CompilerServices
-Imports VBlib.Extensions
 Imports pkar
+Imports pkar.Uwp.Ext
+Imports pkar.Uwp.Triggers
 
 Imports MsExtConfig = Microsoft.Extensions.Configuration
 Imports MsExtPrim = Microsoft.Extensions.Primitives
 
 Imports WinAppData = Windows.Storage.ApplicationData
 Imports Microsoft.Extensions.Configuration
+Imports System.Diagnostics
 
 Partial Public Class App
     Inherits Application
@@ -195,13 +199,13 @@ Public Module pkar
     ''' dla nowszych:  InitLib(Environment.GetCommandLineArgs)
     ''' </summary>
     Public Sub InitLib(aCmdLineArgs As List(Of String), Optional bUseOwnFolderIfNotSD As Boolean = True)
-        InitSettings(aCmdLineArgs)
+        Uwp.Configs.InitSettings(VBlib.IniLikeDefaults.sIniContent, False, aCmdLineArgs)
         VBlib.LibInitToast(AddressOf FromLibMakeToast)
         VBlib.LibInitDialogBox(AddressOf FromLibDialogBoxAsync, AddressOf FromLibDialogBoxYNAsync, AddressOf FromLibDialogBoxInputAllDirectAsync)
 
         VBlib.LibInitClip(AddressOf FromLibClipPut, AddressOf FromLibClipPutHtml)
 #Disable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
-        InitDatalogFolder(bUseOwnFolderIfNotSD)
+        ' InitDatalogFolder(bUseOwnFolderIfNotSD)
 #Enable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
     End Sub
 
@@ -232,11 +236,16 @@ Public Module pkar
 
 #Region "ClipBoard"
     Private Sub FromLibClipPut(sTxt As String)
-        Dim oClipCont As New DataTransfer.DataPackage With {
-            .RequestedOperation = DataTransfer.DataPackageOperation.Copy
-        }
-        oClipCont.SetText(sTxt)
-        DataTransfer.Clipboard.SetContent(oClipCont)
+        Try
+
+            Dim oClipCont As New DataTransfer.DataPackage With {
+                .RequestedOperation = DataTransfer.DataPackageOperation.Copy
+            }
+            oClipCont.SetText(sTxt)
+            DataTransfer.Clipboard.SetContent(oClipCont)
+        Catch ex As Exception
+            ' czasem daje "Not enough memory resources are available to process this command. (Exception from HRESULT: 0x80070008)"
+        End Try
     End Sub
 
     Private Sub FromLibClipPutHtml(sHtml As String)
@@ -262,6 +271,8 @@ Public Module pkar
 
 
     ' -- Get/Set Settings ---------------------------------------------
+#If False Then
+
 
 #Region "Get/Set settings"
     ''' <summary>
@@ -289,151 +300,8 @@ Public Module pkar
                             Windows.Storage.ApplicationData.Current.RoamingFolder.Path, aCmdLineArgs)
     End Sub
 
-#If False Then
-
-#Region "String"
-
-    Private Sub FromLibSetSettings(sName As String, oVal As Object, bRoam As Boolean)
-        If oVal.GetType Is GetType(Integer) Then
-            FromLibSetSettingsInt(sName, CType(oVal, Integer), bRoam)
-            Return
-        End If
-        If oVal.GetType Is GetType(Long) Then
-            FromLibSetSettingsLong(sName, CType(oVal, Long), bRoam)
-            Return
-        End If
-        If oVal.GetType Is GetType(Boolean) Then
-            FromLibSetSettingsBool(sName, CType(oVal, Boolean), bRoam)
-            Return
-        End If
-        FromLibSetSettingsString(sName, CType(oVal, String), bRoam)
-    End Sub
-
-
-    Public Function FromLibGetSettingsString(sName As String, sDefault As String) As String
-        Dim sTmp As String
-
-        sTmp = sDefault
-
-        With Windows.Storage.ApplicationData.Current
-            If .RoamingSettings.Values.ContainsKey(sName) Then
-                sTmp = .RoamingSettings.Values(sName).ToString
-            End If
-            If .LocalSettings.Values.ContainsKey(sName) Then
-                sTmp = .LocalSettings.Values(sName).ToString
-            End If
-        End With
-
-        Return sTmp
-
-    End Function
-
-    Private Function FromLibSetSettingsString(sName As String, sValue As String, Optional bRoam As Boolean = False) As Boolean
-        Try
-            If bRoam Then Windows.Storage.ApplicationData.Current.RoamingSettings.Values(sName) = sValue
-            Windows.Storage.ApplicationData.Current.LocalSettings.Values(sName) = sValue
-            Return True
-        Catch ex As Exception
-            ' jesli przepełniony bufor (za długa zmienna) - nie zapisuj dalszych błędów
-            Return False
-        End Try
-    End Function
-
-
 #End Region
-#Region "Int"
-    Public Function FromLibGetSettingsInt(sName As String, iDefault As Integer) As Integer
-        Dim sTmp As Integer
-
-        sTmp = iDefault
-
-        With Windows.Storage.ApplicationData.Current
-            If .RoamingSettings.Values.ContainsKey(sName) Then
-                sTmp = CInt(.RoamingSettings.Values(sName).ToString)
-            End If
-            If .LocalSettings.Values.ContainsKey(sName) Then
-                sTmp = CInt(.LocalSettings.Values(sName).ToString)
-            End If
-        End With
-
-        Return sTmp
-
-    End Function
-
-    Private Sub FromLibSetSettingsInt(sName As String, sValue As Integer, Optional bRoam As Boolean = False)
-        With Windows.Storage.ApplicationData.Current
-            If bRoam Then .RoamingSettings.Values(sName) = sValue.ToString
-            .LocalSettings.Values(sName) = sValue.ToString
-        End With
-    End Sub
-#End Region
-#Region "Long"
-    Public Function GetSettingsLongNIEMA(sName As String, Optional iDefault As Long = 0) As Long
-        Dim sTmp As Long
-
-        sTmp = iDefault
-
-        With Windows.Storage.ApplicationData.Current
-            If .RoamingSettings.Values.ContainsKey(sName) Then
-                sTmp = CLng(.RoamingSettings.Values(sName).ToString)
-            End If
-            If .LocalSettings.Values.ContainsKey(sName) Then
-                sTmp = CLng(.LocalSettings.Values(sName).ToString)
-            End If
-        End With
-
-        Return sTmp
-
-    End Function
-
-    Private Sub FromLibSetSettingsLong(sName As String, sValue As Long, Optional bRoam As Boolean = False)
-        With Windows.Storage.ApplicationData.Current
-            If bRoam Then .RoamingSettings.Values(sName) = sValue.ToString
-            .LocalSettings.Values(sName) = sValue.ToString
-        End With
-    End Sub
-#End Region
-#Region "Bool"
-    Private Function FromLibGetSettingsBool(sName As String, iDefault As Boolean) As Boolean
-        Dim sTmp As Boolean
-
-        sTmp = iDefault
-        With Windows.Storage.ApplicationData.Current
-            If .RoamingSettings.Values.ContainsKey(sName) Then
-                sTmp = CBool(.RoamingSettings.Values(sName).ToString)
-            End If
-            If .LocalSettings.Values.ContainsKey(sName) Then
-                sTmp = CBool(.LocalSettings.Values(sName).ToString)
-            End If
-        End With
-
-        Return sTmp
-
-    End Function
-
-
-    Public Sub FromLibSetSettingsBool(sName As String, sValue As Boolean, Optional bRoam As Boolean = False)
-        With Windows.Storage.ApplicationData.Current
-            If bRoam Then .RoamingSettings.Values(sName) = sValue.ToString
-            .LocalSettings.Values(sName) = sValue.ToString
-        End With
-    End Sub
-
-
-#End Region
-#Region "Date"
-    '    Public Sub SetSettingsDate(sName As String)
-    '        Dim sValue As String = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-    '        SetSettingsString(sName, sValue)
-    '    End Sub
-
-
-#End Region
-
 #End If
-
-#End Region
-
 
     ' -- Testy sieciowe ---------------------------------------------
 
@@ -541,16 +409,6 @@ Public Module pkar
 
         Dim oRadios As IReadOnlyList(Of Windows.Devices.Radios.Radio) = Await Windows.Devices.Radios.Radio.GetRadiosAsync()
 
-#If DEBUG Then
-        VBlib.DumpCurrMethod(", count=" & oRadios.Count)
-        For Each oRadio As Windows.Devices.Radios.Radio In oRadios
-            VBlib.DumpMessage("NEXT RADIO")
-            VBlib.DumpMessage("name=" & oRadio.Name)
-            VBlib.DumpMessage("kind=" & oRadio.Kind)
-            VBlib.DumpMessage("state=" & oRadio.State)
-        Next
-#End If
-
         Dim bHasBT As Boolean = False
 
         For Each oRadio As Windows.Devices.Radios.Radio In oRadios
@@ -583,40 +441,6 @@ Public Module pkar
 
     End Function
 
-#If BT_HERE Then
-    ''' <summary>
-    ''' Zwraca true/false czy State (po call) jest taki jak bOn; wymaga devCap=radios
-    ''' </summary>
-    Public Async Function NetTrySwitchBTOnAsync(bOn As Boolean) As Task(Of Boolean)
-        Dim iCurrState As Integer = Await NetIsBTavailableAsync(False)
-        If iCurrState = -1 Then Return False
-
-        ' jeśli nie trzeba przełączać... 
-        If bOn AndAlso iCurrState = 1 Then Return True
-        If Not bOn AndAlso iCurrState = 0 Then Return True
-
-        ' czy mamy prawo przełączyć? (devCap=radios)
-        Dim result222 As Windows.Devices.Radios.RadioAccessStatus = Await Windows.Devices.Radios.Radio.RequestAccessAsync()
-        If result222 <> Windows.Devices.Radios.RadioAccessStatus.Allowed Then Return False
-
-
-        Dim radios As IReadOnlyList(Of Windows.Devices.Radios.Radio) = Await Windows.Devices.Radios.Radio.GetRadiosAsync()
-
-        For Each oRadio In radios
-            If oRadio.Kind = Windows.Devices.Radios.RadioKind.Bluetooth Then
-                Dim oStat As Windows.Devices.Radios.RadioAccessStatus
-                If bOn Then
-                    oStat = Await oRadio.SetStateAsync(Windows.Devices.Radios.RadioState.On)
-                Else
-                    oStat = Await oRadio.SetStateAsync(Windows.Devices.Radios.RadioState.Off)
-                End If
-                If oStat <> Windows.Devices.Radios.RadioAccessStatus.Allowed Then Return False
-            End If
-        Next
-
-        Return True
-    End Function
-#End If
 #End Region
 
 #End Region
@@ -803,6 +627,9 @@ Public Module pkar
 
 #Region "triggers"
 #Region "zwykłe"
+
+#If TRIGGERSHERENOTNUGET Then
+
     Public Function IsTriggersRegistered(sNameMask As String) As Boolean
         sNameMask = sNameMask.Replace(" ", "").Replace("'", "")
 
@@ -997,6 +824,22 @@ Public Module pkar
         Return Nothing
     End Function
 
+        Private Function DumpTriggers() As String
+        Dim sRet As String = "Dumping Triggers" & vbCrLf & vbCrLf
+        Try
+            For Each oTask In Windows.ApplicationModel.Background.BackgroundTaskRegistration.AllTasks
+                sRet &= oTask.Value.Name & vbCrLf ' //GetType niestety nie daje rzeczywistego typu
+            Next
+        Catch
+        End Try
+
+
+        Return sRet
+    End Function
+
+
+#End If
+
 #End Region
 #Region "RemoteSystem"
 
@@ -1064,53 +907,6 @@ Public Module pkar
     End Function
 
 
-    '    Private Function DumpSettings() As String
-    '       Dim sRoam As String = ""
-    '        Try
-    '            For Each oVal In Windows.Storage.ApplicationData.Current.RoamingSettings.Values
-    '                sRoam = sRoam & oVal.Key & vbTab & oVal.Value.ToString() & vbCrLf
-    '            Next
-    '        Catch
-    '        End Try
-    '
-    '        Dim sLocal As String = ""
-    '        Try
-    '            For Each oVal In Windows.Storage.ApplicationData.Current.LocalSettings.Values
-    '                sLocal = sLocal & oVal.Key & vbTab & oVal.Value.ToString() & vbCrLf
-    '            Next
-    '        Catch
-    '        End Try
-    '
-    '        Dim sRet As String = "Dumping Settings" & vbCrLf
-    '        If sRoam <> "" Then
-    '            sRet = sRet & vbCrLf & "Roaming:" & vbCrLf & sRoam
-    '        Else
-    '            sRet = sRet & "(no roaming settings)" & vbCrLf
-    '       End If
-    '
-    '        If sLocal <> "" Then
-    '            sRet = sRet & vbCrLf & "Local:" & vbCrLf & sLocal
-    '        Else
-    '            sRet = sRet & "(no local settings)" & vbCrLf
-    '        End If
-    '
-    '        Return sRet
-    '    End Function
-
-
-    Private Function DumpTriggers() As String
-        Dim sRet As String = "Dumping Triggers" & vbCrLf & vbCrLf
-        Try
-            For Each oTask In Windows.ApplicationModel.Background.BackgroundTaskRegistration.AllTasks
-                sRet &= oTask.Value.Name & vbCrLf ' //GetType niestety nie daje rzeczywistego typu
-            Next
-        Catch
-        End Try
-
-
-        Return sRet
-    End Function
-
     Private Function DumpToasts() As String
 
         Dim sResult As String = ""
@@ -1135,7 +931,7 @@ Public Module pkar
 #End Region
 
 #Region "DataLog folder support"
-
+#If False Then
 
     Private Async Function GetSDcardFolderAsync() As Task(Of Windows.Storage.StorageFolder)
         ' uwaga: musi być w Manifest RemoteStorage oraz fileext!
@@ -1203,97 +999,10 @@ Public Module pkar
         If oFold Is Nothing Then Return
         VBlib.LibInitDataLog(oFold.Path)
     End Function
+#End If
 
 #End Region
 
-#If BT_DUMP_HERE Then
-#Region "Bluetooth debugs"
-
-    Public Async Function DebugBTGetServChar(uMAC As ULong,
-                                      sService As String, sCharacteristic As String) As Task(Of Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic)
-        Dim oDev As Windows.Devices.Bluetooth.BluetoothLEDevice
-        oDev = Await Windows.Devices.Bluetooth.BluetoothLEDevice.FromBluetoothAddressAsync(uMAC)
-        If oDev Is Nothing Then
-            VBlib.DebugOut("DebugBTGetServChar called, cannot get device for uMAC = " & uMAC.ToHexBytesString)
-            Return Nothing
-        End If
-
-        Return Await DebugBTGetServChar(oDev, sService, sCharacteristic)
-    End Function
-
-    Public Async Function DebugBTGetServChar(oDevice As Windows.Devices.Bluetooth.BluetoothLEDevice,
-                                      sService As String, sCharacteristic As String) As Task(Of Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic)
-
-        If oDevice Is Nothing Then
-            VBlib.DebugOut("DebugBTGetServChar called with oDevice = null")
-            Return Nothing
-        End If
-
-        Dim oSrv = Await oDevice.GetGattServicesAsync
-        If oSrv.Status <> Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success Then
-            VBlib.DebugOut("DebugBTGetServChar:GetGattServicesAsync.Status = " & oSrv.Status.ToString)
-            Return Nothing
-        End If
-
-        Dim oSvc As Windows.Devices.Bluetooth.GenericAttributeProfile.GattDeviceService = Nothing
-        For Each oSv In oSrv.Services
-            If oSv.Uuid.ToString = sService.ToLower Then
-                oSvc = oSv
-            End If
-        Next
-        If oSvc Is Nothing Then
-            VBlib.DebugOut("DebugBTGetServChar: cannot find service " & sService)
-            Return Nothing
-        End If
-
-        Dim oChars = Await oSvc.GetCharacteristicsAsync
-        If oChars Is Nothing Then
-            VBlib.DebugOut("DebugBTGetServChar:GetCharacteristicsAsync = null")
-            Return Nothing
-        End If
-
-        If oChars.Status <> Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success Then
-            Debug.WriteLine("DebugBTGetServChar:GetCharacteristicsAsync.Status = " & oChars.Status.ToString)
-            Return Nothing
-        End If
-
-        For Each oChr In oChars.Characteristics
-            If oChr.Uuid.ToString = sCharacteristic.ToLower Then Return oChr
-        Next
-
-        Return Nothing
-    End Function
-
-#End Region
-
-#End If
-
-#If BASIC_GEO Then
-    Public Function GetDomekGeopos(Optional iDecimalDigits As UInt16 = 0) As Windows.Devices.Geolocation.BasicGeoposition
-        Select Case iDecimalDigits
-            Case 1
-                Return NewBasicGeoposition(50.0, 19.9)
-            Case 2
-                Return NewBasicGeoposition(50.01, 19.97)
-            Case 3
-                Return NewBasicGeoposition(50.019, 19.978)
-            Case 4
-                Return NewBasicGeoposition(50.0198, 19.9787)
-            Case 5
-                Return NewBasicGeoposition(50.01985, 19.97872)
-            Case Else
-                Return NewBasicGeoposition(50, 20)
-        End Select
-
-    End Function
-
-    Public Function NewBasicGeoposition(dLat As Double, dLon As Double) As Windows.Devices.Geolocation.BasicGeoposition
-        Return New Windows.Devices.Geolocation.BasicGeoposition With {
-            .Latitude = dLat,
-            .Longitude = dLon
-        }
-    End Function
-#End If
 
     Public Async Function IsFullVersion() As Task(Of Boolean)
 #If DEBUG Then
@@ -1314,6 +1023,10 @@ Public Module pkar
 
 
 End Module
+
+
+
+#If False Then
 
 Module Extensions
 
@@ -1377,17 +1090,6 @@ Module Extensions
 
         Await oFile.WriteAllTextAsync(sTxt)
     End Function
-
-#If False Then
-
-    <Extension()>
-    Public Async Function SerializeToJSONAsync(ByVal oFold As Windows.Storage.StorageFolder, sFileName As String, mItems As Object) As Task
-
-        Dim sTxt As String = Newtonsoft.Json.JsonConvert.SerializeObject(mItems, Newtonsoft.Json.Formatting.Indented)
-        Await oFold.WriteAllTextToFileAsync(sFileName, sTxt, Windows.Storage.CreationCollisionOption.ReplaceExisting)
-
-    End Function
-#End If
 
     <Extension()>
     <Obsolete("Raczej się pozbądź, przejdź na .Net")>
@@ -1470,10 +1172,11 @@ Module Extensions
             Return "" ' jesli strona jest pusta, jest Exception
         End Try
     End Function
-
-#Region "GPS odleglosci"
+#Region "GPS"
+#If False Then
 
     <Extension()>
+    <Obsolete("spróbuj Nugeta")>
     Public Function ToMyGeopos(ByVal oPos As Windows.Devices.Geolocation.BasicGeoposition) As BasicGeopos
         Return New BasicGeopos(oPos.Latitude, oPos.Longitude)
     End Function
@@ -1485,6 +1188,7 @@ Module Extensions
 
 
     <Extension()>
+    <Obsolete("spróbuj Nugeta")>
     Public Function ToWinGeopos(ByVal oPos As BasicGeopos) As Windows.Devices.Geolocation.BasicGeoposition
         Dim oPoint As New Windows.Devices.Geolocation.BasicGeoposition With
             {
@@ -1496,86 +1200,30 @@ Module Extensions
     End Function
 
     <Extension()>
+    <Obsolete("spróbuj Nugeta")>
     Public Function DistanceTo(ByVal oGeocoord0 As Windows.Devices.Geolocation.Geocoordinate, oGeocoord1 As Windows.Devices.Geolocation.Geocoordinate) As Double
         Return oGeocoord0.Point.Position.ToMyGeopos().DistanceTo(oGeocoord1.Point.Position.ToMyGeopos())
     End Function
 
     <Extension()>
+    <Obsolete("spróbuj Nugeta")>
     Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.Geoposition, oGeopos1 As Windows.Devices.Geolocation.Geoposition) As Double
         Return oGeopos0.Coordinate.DistanceTo(oGeopos1.Coordinate)
     End Function
 
-    '<Extension()>
-    'Public Function DistanceTo(ByVal oGeocoord0 As Windows.Devices.Geolocation.Geocoordinate, oGeocoord1 As Windows.Devices.Geolocation.Geocoordinate) As Integer
-    '    Return oGeocoord0.Point.Position.DistanceTo(oGeocoord1.Point.Position)
-    'End Function
-
-    '<Extension()>
-    'Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.Geoposition, oGeopos1 As Windows.Devices.Geolocation.Geoposition) As Integer
-    '    Return oGeopos0.Coordinate.DistanceTo(oGeopos1.Coordinate)
-
-    'End Function
 
     <Extension()>
+    <Obsolete("spróbuj Nugeta")>
     Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.BasicGeoposition, oGeopos1 As Windows.Devices.Geolocation.BasicGeoposition) As Integer
         Return oGeopos0.ToMyGeopos.DistanceTo(oGeopos1.ToMyGeopos)
     End Function
-
-    '<Extension()>
-    'Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.BasicGeoposition, oGeopos1 As Windows.Devices.Geolocation.BasicGeoposition) As Integer
-    '    ' https://stackoverflow.com/questions/28569246/how-to-get-distance-between-two-locations-in-windows-phone-8-1
-
-    '    Try
-    '        Dim iRadix As Integer = 6371000
-    '        Dim tLat As Double = (oGeopos1.Latitude - oGeopos0.Latitude) * Math.PI / 180
-    '        Dim tLon As Double = (oGeopos1.Longitude - oGeopos0.Longitude) * Math.PI / 180
-    '        Dim a As Double = Math.Sin(tLat / 2) * Math.Sin(tLat / 2) +
-    '        Math.Cos(Math.PI / 180 * oGeopos0.Latitude) * Math.Cos(Math.PI / 180 * oGeopos1.Latitude) *
-    '        Math.Sin(tLon / 2) * Math.Sin(tLon / 2)
-    '        Dim c As Double = 2 * Math.Asin(Math.Min(1, Math.Sqrt(a)))
-    '        Dim d As Double = iRadix * c
-
-    '        Return d
-
-    '    Catch ex As Exception
-    '        Return 0    ' nie powinno sie nigdy zdarzyc, ale na wszelki wypadek...
-    '    End Try
-
-    'End Function
-
-    '<Extension()>
-    'Public Function DistanceTo(ByVal oGeopos0 As Windows.Devices.Geolocation.BasicGeoposition, dLat As Double, dLong As Double) As Integer
-    '    Return oGeopos0.DistanceTo(NewBasicGeoposition(dLat, dLong))
-    'End Function
-
-    '''' <summary>
-    '''' Czy punkt leży w miarę w Polsce (mniej niż 500 km od środka geometrycznego Polski)
-    '''' </summary>
-    '<Extension()>
-    'Public Function IsInsidePoland(ByVal oPos As Windows.Devices.Geolocation.BasicGeoposition) As Boolean
-    '    ' https://pl.wikipedia.org/wiki/Geometryczny_%C5%9Brodek_Polski
-
-    '    Dim dOdl As Double = oPos.DistanceTo(NewBasicGeoposition(52.2159333, 19.1344222))
-    '    If dOdl / 1000 > 500 Then Return False
-    '    Return True    ' ale to nie jest pewne, tylko: "możliwe"
-    'End Function
+#End If
 
 #End Region
 
 
-#If BT_DUMP_HERE Then
-    <Extension()>
-    Public Function ToDebugString(ByVal oBuf As Windows.Storage.Streams.IBuffer, iMaxLen As Integer) As String
-        Dim sRet As String = oBuf.Length & ": "
-        Dim oArr As Byte() = oBuf.ToArray
 
-        For i As Integer = 0 To Math.Min(oBuf.Length - 1, iMaxLen)
-            sRet = sRet & oArr.ElementAt(i).ToString("X2") & " "
-        Next
-
-        Return sRet & vbCrLf
-    End Function
-#End If
+#If False Then
 
 
 #Region "Settingsy jako Extension"
@@ -1649,7 +1297,7 @@ Module Extensions
     <Extension()>
     Public Sub SetSettingsInt(ByVal oItem As TextBox, Optional sName As String = "", Optional bRoam As Boolean = False, Optional dScale As Double = 1)
         If sName = "" Then sName = oItem.Name
-        Dim dTmp As Integer
+        Dim dTmp As Double
         If Not Double.TryParse(oItem.Text, dTmp) Then Return
         dTmp *= dScale
         VBlib.SetSettingsInt(sName, dTmp, bRoam)
@@ -1715,6 +1363,8 @@ Module Extensions
 
 
 #End Region
+
+#End If
     <Extension()>
     Public Sub ShowAppVers(ByVal oItem As TextBlock)
         Dim sTxt As String = pkar.GetAppVers()
@@ -1774,6 +1424,24 @@ Module Extensions
     Public Sub Navigate(ByVal oPage As Page, sourcePageType As Type, Optional parameter As Object = Nothing)
         oPage.Frame.Navigate(sourcePageType, parameter)
     End Sub
+
+    ''' <summary>
+    ''' Visiblity po BOOLowsku
+    ''' </summary>
+    <Extension()>
+    Public Sub Show(ByVal oFE As frameworkelement, Optional show As Boolean = True)
+        If show Then
+            oFE.Visibility = visibility.visible
+        Else
+            oFE.Visibility = visibility.collapsed
+        End If
+    End Sub
+
+    <Extension()>
+    Public Sub Hide(ByVal oFE As frameworkelement)
+        oFE.Show(False)
+    End Sub
+
 #End Region
 
     ' --- progring ------------------------
@@ -1825,6 +1493,31 @@ Module Extensions
                 oGrid.Children.Add(_mProgRing)
             End If
         End If
+
+        ' tekst jest zawsze, bo i dla Ring i dla Bar jest przydatny
+        If oPage.FindName("uiPkAutoProgText") Is Nothing Then
+
+            Dim color As Windows.UI.Color = oPage.Resources("SystemAccentColor")
+
+            Dim _mProgText As New TextBlock With {
+                .Name = "uiPkAutoProgText",
+                .VerticalAlignment = VerticalAlignment.Center,
+                .HorizontalAlignment = HorizontalAlignment.Center,
+                .Visibility = Visibility.Collapsed,
+                .Foreground = New Windows.UI.Xaml.Media.SolidColorBrush(color)
+            }
+            Canvas.SetZIndex(_mProgText, 10000)
+            If iRows > 1 Then
+                Grid.SetRow(_mProgText, 0)
+                Grid.SetRowSpan(_mProgText, iRows)
+            End If
+            If iCols > 1 Then
+                Grid.SetColumn(_mProgText, 0)
+                Grid.SetColumnSpan(_mProgText, iCols)
+            End If
+            oGrid.Children.Add(_mProgText)
+        End If
+
 
         If oPage.FindName("uiPkAutoProgBar") Is Nothing Then
             If bBar Then
@@ -1882,8 +1575,11 @@ Module Extensions
         Debug.WriteLine("ProgRingShow(" & bVisible & ", " & bForce & "...), current ShowCnt=" & _mProgRingShowCnt)
 
 
+
         Try
             Dim _mProgRing As ProgressRing = TryCast(oPage.FindName("uiPkAutoProgRing"), ProgressRing)
+            Dim _mProgText As TextBlock = TryCast(oPage.FindName("uiPkAutoProgText"), TextBlock)
+
             If _mProgRingShowCnt > 0 Then
                 VBlib.DebugOut("ProgRingShow - mam pokazac")
                 If _mProgRing IsNot Nothing Then
@@ -1896,7 +1592,9 @@ Module Extensions
                     _mProgRing.Visibility = Visibility.Visible
                     _mProgRing.IsActive = True
                 End If
+
                 If _mProgBar IsNot Nothing Then _mProgBar.Visibility = Visibility.Visible
+                If _mProgText IsNot Nothing Then _mProgText.Visibility = Visibility.Visible
             Else
                 VBlib.DebugOut("ProgRingShow - mam ukryc")
                 If _mProgRing IsNot Nothing Then
@@ -1904,10 +1602,24 @@ Module Extensions
                     _mProgRing.IsActive = False
                 End If
                 If _mProgBar IsNot Nothing Then _mProgBar.Visibility = Visibility.Collapsed
+                If _mProgText IsNot Nothing Then _mProgText.Visibility = Visibility.Collapsed
             End If
 
         Catch ex As Exception
         End Try
+    End Sub
+
+    <Extension()>
+    Public Sub ProgRingText(ByVal oPage As Page, message As String)
+        Dim _mProgText As TextBlock = TryCast(oPage.FindName("uiPkAutoProgText"), TextBlock)
+        If _mProgText Is Nothing Then
+            ' skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
+            Debug.WriteLine("ProgRingText called, ale nie ma uiPkAutoProgText")
+            Throw New ArgumentException("ProgRingText called, ale nie ma uiPkAutoProgText")
+        End If
+
+        _mProgText.Text = message
+
     End Sub
 
     <Extension()>
@@ -1960,212 +1672,10 @@ Module Extensions
 
 #End Region
 
-#If BT_DUMP_HERE Then
-
-#Region "Bluetooth debug strings"
-
-    <Extension()>
-    Public Function ToDebugString(ByVal oAdv As Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisement) As String
-
-        If oAdv Is Nothing Then
-            Return "ERROR: Advertisement is Nothing, unmoglich!"
-        End If
-
-        Dim sRet As String = ""
-
-        If oAdv.DataSections IsNot Nothing Then
-            sRet = sRet & "Adverisement, number of data sections: " & oAdv.DataSections.Count & vbCrLf
-            For Each oItem As Windows.Devices.Bluetooth.Advertisement.BluetoothLEAdvertisementDataSection In oAdv.DataSections
-                sRet = sRet & " DataSection: " & oItem.Data.ToDebugString(32)
-            Next
-        End If
-
-        If oAdv.Flags IsNot Nothing Then sRet = sRet & "Adv.Flags: " & CInt(oAdv.Flags) & vbCrLf
-
-        sRet = sRet & "Adv local name: " & oAdv.LocalName & vbCrLf
-
-        If oAdv.ManufacturerData IsNot Nothing Then
-            For Each oItem As Windows.Devices.Bluetooth.Advertisement.BluetoothLEManufacturerData In oAdv.ManufacturerData
-                sRet = sRet & " ManufacturerData.Company: " & oItem.CompanyId & vbCrLf
-                sRet = sRet & " ManufacturerData.Data: " & oItem.Data.ToDebugString(32) & vbCrLf
-            Next
-        End If
-
-        If oAdv.ServiceUuids IsNot Nothing Then
-            For Each oItem As Guid In oAdv.ServiceUuids
-                sRet = sRet & " service " & oItem.ToString & vbCrLf
-            Next
-        End If
-
-        Return sRet
-    End Function
-
-    <Extension()>
-    Public Async Function ToDebugStringAsync(ByVal oDescriptor As Windows.Devices.Bluetooth.GenericAttributeProfile.GattDescriptor) As Task(Of String)
-        Dim sRet As String
-
-        sRet = "      descriptor: " & oDescriptor.Uuid.ToString & vbTab & oDescriptor.Uuid.AsGattReservedDescriptorName & vbCrLf
-        Dim oRdVal = Await oDescriptor.ReadValueAsync
-        If oRdVal.Status = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success Then
-            Dim oVal = oRdVal.Value
-            sRet = sRet & oVal.ToArray.ToDebugString(8) & vbCrLf
-        Else
-            sRet = sRet & "      ReadValueAsync status = " & oRdVal.Status.ToString & vbCrLf
-        End If
-        Return sRet
-    End Function
-
-
-    <Extension()>
-    Public Function ToDebugString(ByVal oProp As Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristicProperties) As String
-
-        Dim sRet As String = "      CharacteristicProperties: "
-
-        If oProp.HasFlag(Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristicProperties.Read) Then
-            sRet &= "[read] "
-        End If
-
-        If oProp.HasFlag(Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristicProperties.AuthenticatedSignedWrites) Then
-            sRet &= "[AuthenticatedSignedWrites] "
-        End If
-        If oProp.HasFlag(Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristicProperties.Broadcast) Then
-            sRet &= "[broadcast] "
-        End If
-        If oProp.HasFlag(Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristicProperties.Indicate) Then
-            sRet &= "[indicate] "
-            ' bCanRead = False
-        End If
-        If oProp.HasFlag(Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristicProperties.None) Then
-            sRet &= "[NONE] "
-        End If
-        If oProp.HasFlag(Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristicProperties.Notify) Then
-            sRet &= "[notify] "
-            ' bCanRead = False
-        End If
-        If oProp.HasFlag(Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristicProperties.ReliableWrites) Then
-            sRet &= "[reliableWrite] "
-        End If
-        If oProp.HasFlag(Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristicProperties.Write) Then
-            sRet &= "[write] "
-        End If
-        If oProp.HasFlag(Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristicProperties.WritableAuxiliaries) Then
-            sRet &= "[WritableAuxiliaries] "
-        End If
-        If oProp.HasFlag(Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristicProperties.WriteWithoutResponse) Then
-            sRet &= "[writeNoResponse] "
-        End If
-
-        Return sRet
-    End Function
-
-    <Extension()>
-    Public Async Function ToDebugStringAsync(ByVal oChar As Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic) As Task(Of String)
-
-        Dim sRet As String = "      CharacteristicProperties: " & oChar.CharacteristicProperties.ToDebugString & vbCrLf
-        Dim bCanRead As Boolean = False
-        If sRet.Contains("[read]") Then bCanRead = True
-        ' ewentualnie wygaszenie gdy:
-        'sProp &= "[indicate] "
-        ' bCanRead = False
-        '   sProp &= "[notify] "
-        ' bCanRead = False
-
-
-        Dim oDescriptors = Await oChar.GetDescriptorsAsync
-        If oDescriptors Is Nothing Then Return sRet
-
-        If oDescriptors.Status <> Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success Then
-            sRet = sRet & "      GetDescriptorsAsync.Status = " & oDescriptors.Status.ToString & vbCrLf
-            Return sRet
-        End If
-
-
-        For Each oDescr In oDescriptors.Descriptors
-            sRet = sRet & Await oDescr.ToDebugStringAsync & vbCrLf
-        Next
-
-        If bCanRead Then
-            Dim oRd = Await oChar.ReadValueAsync()
-            If oRd.Status <> Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success Then
-                sRet = sRet & "ReadValueAsync.Status=" & oRd.Status & vbCrLf
-            Else
-                sRet = sRet & "      characteristic data (read):" & vbCrLf
-                sRet = sRet & oRd.Value.ToArray.ToDebugString(8) & vbCrLf
-            End If
-
-        End If
-
-        Return sRet
-    End Function
-
-    <Extension()>
-    Public Async Function ToDebusStringAsync(ByVal oServ As Windows.Devices.Bluetooth.GenericAttributeProfile.GattDeviceService) As Task(Of String)
-
-        If oServ Is Nothing Then Return ""
-
-        Dim oChars = Await oServ.GetCharacteristicsAsync
-        If oChars Is Nothing Then Return ""
-        If oChars.Status <> Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success Then
-            Return "    GetCharacteristicsAsync.Status = " & oChars.Status.ToString
-        End If
-
-        Dim sRet As String = ""
-        For Each oChr In oChars.Characteristics
-            sRet = sRet & vbCrLf & "    characteristic: " & oChr.Uuid.ToString & oChr.Uuid.AsGattReservedCharacteristicName & vbCrLf
-            sRet = sRet & Await oChr.ToDebugStringAsync & vbCrLf
-        Next
-
-        Return sRet
-    End Function
-
-    <Extension()>
-    Public Async Function ToDebusStringAsync(ByVal oDevice As Windows.Devices.Bluetooth.BluetoothLEDevice) As Task(Of String)
-
-        'If oDevice.BluetoothAddress = mLastBTdeviceDumped Then
-        '    DebugOut("DebugBTdevice, but MAC same as previous - skipping")
-        '    Return
-        'End If
-        'mLastBTdeviceDumped = oDevice.BluetoothAddress
-
-        Dim sRet As String = ""
-
-        sRet = sRet & "DebugBTdevice, data dump:" & vbCrLf
-        sRet = sRet & "Device name: " & oDevice.Name & vbCrLf
-        sRet = sRet & "MAC address: " & oDevice.BluetoothAddress.ToHexBytesString & vbCrLf
-        sRet = sRet & "Connection status: " & oDevice.ConnectionStatus.ToString & vbCrLf
-
-        Dim oDAI = oDevice.DeviceAccessInformation
-        sRet = sRet & vbCrLf & "DeviceAccessInformation:" & vbCrLf
-        sRet = sRet & "  CurrentStatus: " & oDAI.CurrentStatus.ToString & vbCrLf
-
-        Dim oDApperr = oDevice.Appearance
-        sRet = sRet & vbCrLf & "Appearance:" & vbCrLf
-        sRet = sRet & "  Category: " & oDApperr.Category & vbCrLf
-        sRet = sRet & "  Subcategory: " & oDApperr.SubCategory & vbCrLf
-
-        sRet = sRet & "Services: " & oDApperr.SubCategory & vbCrLf
-
-        Dim oSrv = Await oDevice.GetGattServicesAsync
-        If oSrv.Status <> Windows.Devices.Bluetooth.GenericAttributeProfile.GattCommunicationStatus.Success Then
-            sRet = sRet & "  GetGattServicesAsync.Status = " & oSrv.Status.ToString & vbCrLf
-            Return sRet
-        End If
-
-        For Each oSv In oSrv.Services
-            sRet = sRet & vbCrLf & "  service: " & oSv.Uuid.ToString & vbTab & vbTab & oSv.Uuid.AsGattReservedServiceName & vbCrLf
-            sRet = sRet & Await oSv.ToDebusStringAsync & vbCrLf
-        Next
-
-        Return sRet
-
-    End Function
-
-
-#End Region
-
-#End If
 
 End Module
+
+#End If
 
 
 #Region ".Net configuration - UWP settings"
@@ -2311,6 +1821,44 @@ End Module
 
 
 #End Region
+
+Partial Public Module Extensions
+
+    ''' <summary>
+    ''' ustaw wszystkie Properties według resources, jeśli są zdefiniowane dla tego elementu
+    ''' </summary>
+    <Extension>
+    Public Sub SetFromResources(uiElement As FrameworkElement)
+        Vblib.SetUiPropertiesFromLang(uiElement)
+    End Sub
+
+    ''' <summary>
+    ''' ustaw wszystkie Properties według resources, jeśli są zdefiniowane dla tego elementu bądź jego dzieci
+    ''' </summary>
+    <Extension>
+    Public Sub SetFromResourcesTree(uiElement As FrameworkElement)
+
+        uiElement.SetFromResources
+
+        Dim iMax As Integer = VisualTreeHelper.GetChildrenCount(uiElement)
+        For iLp = 0 To iMax - 1
+            Dim depObj = VisualTreeHelper.GetChild(uiElement, iLp)
+            Dim frmwrkEl As FrameworkElement = TryCast(depObj, FrameworkElement)
+            frmwrkEl?.SetFromResourcesTree
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' ustaw .Text używając podanego stringu z resources
+    ''' </summary>
+    <Extension>
+    Public Sub SetLangText(uiElement As TextBlock, stringId As String)
+        uiElement.Text = Vblib.GetLangString(stringId)
+    End Sub
+
+End Module
+
 
 #Region "Konwertery Bindings XAML"
 ' nie mogą być w VBlib, bo Implements Microsoft.UI.Xaml.Data.IValueConverter

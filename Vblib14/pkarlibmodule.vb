@@ -411,15 +411,48 @@ Partial Public Module pkarlibmodule14
 
 #Region "Globalization"
     Private moResMan As Resources.ResourceManager ' = Nothing
+    Private moResManForced As String
+
+    ''' <summary>
+    ''' Wymuszenie języka (na razie "pl*" versus cokolwiek innego trafiające na en)
+    ''' </summary>
+    ''' <param name="forceLang"></param>
+    Public Sub LangForce(Optional forceLang As String = "")
+        moResManForced = forceLang
+        moResMan = Nothing
+    End Sub
+
+    ''' <summary>
+    ''' uprawnia się że moResMan jest ustawiony i można z niego korzystać
+    ''' </summary>
+    Private Sub LangEnsureInit()
+        If moResMan IsNot Nothing Then Return
+
+        Dim cultureName As String
+        If Not String.IsNullOrWhiteSpace(moResManForced) Then
+            cultureName = moResManForced
+        Else
+            cultureName = Globalization.CultureInfo.CurrentCulture.Name
+        End If
+
+        If cultureName.StartsWithCI("PL") Then
+            moResMan = My.Resources.Resource_PL.ResourceManager
+        Else
+            moResMan = My.Resources.Resource_EN.ResourceManager
+        End If
+    End Sub
+
+
+    ''' <summary>
+    ''' zwraca tekst o identyfikatorze sResId dla aktualnego języka, lub default
+    ''' </summary>
+    ''' <param name="sResID">identyfikator żądanego tekstu</param>
+    ''' <param name="sDefault">default, może być NULL</param>
+    ''' <returns>tekst z resources gdy istnieje, a gdy nie to default o ile jest; gdy default = "" to sResId, lub NULL gdy nie ma stringu a default is null </returns>
     Public Function GetLangString(sResID As String, Optional sDefault As String = "") As String
         If sResID = "" Then Return ""
-        If moResMan Is Nothing Then
-            If Globalization.CultureInfo.CurrentCulture.Name.ToUpperInvariant.StartsWithOrdinal("PL") Then
-                moResMan = My.Resources.Resource_PL.ResourceManager
-            Else
-                moResMan = My.Resources.Resource_EN.ResourceManager
-            End If
-        End If
+        LangEnsureInit()
+
         Dim sRet As String
 #Disable Warning CA1304 ' Specify CultureInfo
         Try
@@ -427,14 +460,41 @@ Partial Public Module pkarlibmodule14
         Catch ex As Exception
             ' jakby co
             ' bez dodania dla VBLib defLang - zdarza się zawsze w RELEASE (i dla PL i dla EN)
-            sRet = ""
+            sRet = Nothing
         End Try
 
 #Enable Warning CA1304 ' Specify CultureInfo
-        If sRet <> "" Then Return sRet
+        If Not String.IsNullOrEmpty(sRet) Then Return sRet
+        If sDefault Is Nothing Then Return Nothing
         If sDefault <> "" Then Return sDefault
         Return sResID
     End Function
+
+
+    Public Sub SetUiPropertiesFromLang(anyObject As Object)
+        If anyObject Is Nothing Then Return
+        LangEnsureInit()
+
+        ' search for NAME
+        Dim name As String = ""
+        For Each oProp As PropertyInfo In anyObject.GetType.GetRuntimeProperties
+            Debug.WriteLine("Property " & oProp.Name)
+            If oProp.Name = "Name" Then
+                name = oProp.GetValue(anyObject)
+                Exit For
+            End If
+        Next
+
+        If name = "" Then Return
+
+        For Each oPropFrom As PropertyInfo In anyObject.GetType.GetRuntimeProperties
+            Dim newValue As String = GetLangString(name & "." & oPropFrom.Name, Nothing)
+            If newValue Is Nothing Then Continue For
+
+            oPropFrom.SetValue(anyObject, newValue)
+        Next
+
+    End Sub
 
 #End Region
 
@@ -725,12 +785,13 @@ Partial Public Module pkarlibmodule14
 
 #End Region
 
-
+#If PKAR_USEDATALOG Then
     Public msDataLog As pkar.Datalog.Datalog
     Public Sub LibInitDataLog(sPath As String)
         If Not IO.Directory.Exists(sPath) Then IO.Directory.CreateDirectory(sPath)
         msDataLog = New pkar.Datalog.Datalog(sPath, "")
     End Sub
+#End If
 
 
 

@@ -1,4 +1,7 @@
 ﻿
+2024.01.13
+* ADD: LangForce(string), Object.SetUiPropertiesFromLang
+
 2023.02.26
 * przejście na Nugety moje
 
