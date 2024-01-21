@@ -470,7 +470,7 @@ Partial Public Module extensions
     End Function
 
     <Extension()>
-    Private Async Function MsgBoxAsyncTask(ByVal oPage As Page, message As String) As Task
+    Private Async Function MsgBoxAsyncTask(ByVal oPage As FrameworkElement, message As String) As Task
         If Not IsInteractive() Then Return
 
         Dim oMsg As New Windows.UI.Popups.MessageDialog(message)
@@ -482,7 +482,7 @@ Partial Public Module extensions
     ''' </summary>
     ''' <param name="message">message to be shown</param>
     <Extension()>
-    Public Function MsgBoxAsync(ByVal oPage As Page, message As String) As IAsyncAction
+    Public Function MsgBoxAsync(ByVal oPage As FrameworkElement, message As String) As IAsyncAction
         Return oPage.MsgBoxAsyncTask(message).AsAsyncAction
     End Function
 
@@ -492,7 +492,7 @@ Partial Public Module extensions
     ''' </summary>
     ''' <param name="message">message to be shown</param>
     <Extension()>
-    Public Sub MsgBox(ByVal oPage As Page, message As String)
+    Public Sub MsgBox(ByVal oPage As FrameworkElement, message As String)
         oPage.MsgBoxAsyncTask(message)
     End Sub
 
@@ -502,7 +502,7 @@ Partial Public Module extensions
     ''' <param name="message">message to be shown</param>
     ''' <returns>TRUE if YES button was pressed</returns>
     <Extension()>
-    Public Function DialogBoxYNAsync(ByVal oPage As Page, message As String) As IAsyncOperation(Of Boolean)
+    Public Function DialogBoxYNAsync(ByVal oPage As FrameworkElement, message As String) As IAsyncOperation(Of Boolean)
         Return oPage.DialogBoxYNAsyncTask(message, "Yes", "No").AsAsyncOperation
     End Function
 
@@ -796,6 +796,26 @@ Partial Public Module extensions
     End Function
 
 
+#End Region
+
+#Region "clipboard"
+
+    ''' <summary>
+    ''' send String to clipboard
+    ''' </summary>
+    <Extension()>
+    Public Sub SendToClipboard(ByVal text As String)
+        Try
+
+            Dim oClipCont As New DataTransfer.DataPackage With {
+                .RequestedOperation = DataTransfer.DataPackageOperation.Copy
+            }
+            oClipCont.SetText(text)
+            DataTransfer.Clipboard.SetContent(oClipCont)
+        Catch ex As Exception
+            ' czasem daje "Not enough memory resources are available to process this command. (Exception from HRESULT: 0x80070008)"
+        End Try
+    End Sub
 #End Region
 
 #End Region

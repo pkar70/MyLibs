@@ -75,3 +75,7 @@ This Nuget contains extensions of UWP classes.
     StorageFolder.ReadAllTextFromFileAsync(sFileName As String) As String
 
     StorageFolder.FileExistsAsync(sFileName As String) As Boolean
+
+## others
+
+    String.SendToClipboard  ' since 1.1.3

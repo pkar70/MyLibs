@@ -2,13 +2,13 @@
 <package >
   <metadata>
     <id>pkar.UWP.Extensions</id>
-    <version>1.1.1</version>
+    <version>1.1.3</version>
     <authors>pkar</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">GPL-3.0-or-later</license>
     <projectUrl>https://github.com/pkar70/MyLibs/pkar.Uwp.Extensions/</projectUrl>
     <description>Several extensions of UWP classes</description>
-    <releaseNotes>Moved InputBox, MsgBox from Page to FrameworkElement</releaseNotes>
+    <releaseNotes>added: String.SendToClipboard</releaseNotes>
     <copyright>Piotr Karocki</copyright>
     <tags>Extension Configuration ApplicationData</tags>
 	<readme>docs\README.md</readme>
