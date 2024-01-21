@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>pkar.winui3.Triggers</RootNamespace>
+    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>pkar</Authors>
+    <Company>none</Company>
+    <Copyright>Piotr Karocki</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Description>some helpers for background Triggers</Description>
+    <Title>some helpers for background Triggers</Title>
+    <PackageReleaseNotes>initial release</PackageReleaseNotes>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <IncludeSymbols>True</IncludeSymbols>
+    <Version>1.0.2</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231008000" />
+    <PackageReference Include="pkar.DotNetExts" Version="2.2.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+</Project>
