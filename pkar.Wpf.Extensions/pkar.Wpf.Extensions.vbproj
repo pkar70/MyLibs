@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <RootNamespace>pkar.Wpf.Extensions</RootNamespace>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>pkar.Wpf.Extensions</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <Version>1.1.3</Version>
+    <Title>Several extensions of WPF UI classes</Title>
+    <Authors>pkar</Authors>
+    <Company>none</Company>
+    <Copyright>Piotr Karocki</Copyright>
+    <PackageProjectUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.WPF.Extensions</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.WPF.Extensions</RepositoryUrl>
+    <PackageReleaseNotes>initial release</PackageReleaseNotes>
+    <Description>This Nuget adds UI extensions for WPF, similar to my other Nuget: pkar.Uwp.Extensions</Description>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <IncludeSymbols>True</IncludeSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Changes.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Changes.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
