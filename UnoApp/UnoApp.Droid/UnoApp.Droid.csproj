@@ -98,7 +98,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Vblib14\Vblib.vbproj">
       <Project>{50a21bbf-b091-4a5d-a414-4fa3205a6f1b}</Project>
-      <Name>Vblib14</Name>
+      <Name>Vblib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\UnoApp.Shared\UnoApp.Shared.projitems" Label="Shared" />

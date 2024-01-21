@@ -8,6 +8,7 @@ Imports Microsoft.Extensions.Configuration
 Imports pkar.DotNetExtensions
 Imports pkar
 
+
 'Imports Newtonsoft.Json
 'Imports Newtonsoft.Json.Linq
 ' Imports pkar.NetConfigs.Extensions
@@ -422,20 +423,24 @@ Partial Public Module pkarlibmodule14
         moResMan = Nothing
     End Sub
 
+    Public Function LangGetCurrent() As String
+        If Not String.IsNullOrWhiteSpace(moResManForced) Then Return moResManForced
+
+        Return Globalization.CultureInfo.CurrentCulture.Name
+    End Function
+
+    Public Function LangIsCurrent(Optional lang As String = "pl") As Boolean
+        Return LangGetCurrent.StartsWithCI(lang)
+    End Function
+
+
     ''' <summary>
     ''' uprawnia się że moResMan jest ustawiony i można z niego korzystać
     ''' </summary>
     Private Sub LangEnsureInit()
         If moResMan IsNot Nothing Then Return
 
-        Dim cultureName As String
-        If Not String.IsNullOrWhiteSpace(moResManForced) Then
-            cultureName = moResManForced
-        Else
-            cultureName = Globalization.CultureInfo.CurrentCulture.Name
-        End If
-
-        If cultureName.StartsWithCI("PL") Then
+        If LangGetCurrent.StartsWithCI("PL") Then
             moResMan = My.Resources.Resource_PL.ResourceManager
         Else
             moResMan = My.Resources.Resource_EN.ResourceManager

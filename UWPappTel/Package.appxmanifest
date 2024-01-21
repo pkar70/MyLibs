@@ -45,7 +45,7 @@
 
       <Extensions>
         <uap:Extension Category="windows.appService">
-          <uap:AppService Name="com.microsoft.pkar.$targetnametoken$"/>
+          <uap:AppService Name="com.microsoft.pkar.UWPappTel"/>
         </uap:Extension>
         <uap5:Extension
 		  Category="windows.appExecutionAlias"

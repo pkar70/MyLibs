@@ -1,0 +1,51 @@
+﻿
+2023.02.26
+* przejście na Nugety moje
+
+2022.09.08
+* MojaStruct jako podstawa do class z property, z DumpAsText oraz DumpAsJSON
+
+2022.09.07
+* ToStringISOsufix
+
+2022.09.06
+* integer.ToStringDHMS
+
+2022.09.02
+* MojaLista :GetFileDate, :CheckIfTooOld
+
+2022.08.18
+* VBlib.MyBasicGeoposition.GetKrakowGeopos()
+* HttpPageReset(optional redirect as bool) - KrakTram wymaga False (do trasy tramwaju)
+
+2022.08.11
+* operacje typu GPS, na własnym typie (skoro nie ma w .NetStd): MyBasicGeoposition
+* SubstringBetween - wycięcie tego co chcemy
+
+2022.08.10
+* string.DePascal (wedle sampla ze szkoleń Sollers)
+* większość porównań z IsNullOrEmpty na IsNullOrWhiteSpace
+* czasem w Split: , options:=StringSplitOptions.RemoveEmptyEntries
+* MojaLista.Find(predykat) oraz .Remove(predykat)
+
+2022.08.01
+* Public Class MojaLista(Of TYP) - jak podstawa do wczytywania 
+
+2022.07.17
+* HttpPageAsync z String na wejściu
+
+2022.06.07
+* DumpCurrMethod - poprawki, by dobrą funkcję podawało, i nie aż tak głęboko w stack
+* DumpMessage - poprawki (uwzglednianie glebokosci tak samo jak w DumpCurrMethod, bo wspolna sub-method)
+
+2022.05.17
+* SetSettingsDate, GetSettingsDate
+
+2022.04.29
+* Extension: String.ToValidPath
+
+2022.02.23
+* poprawka GetSettingsLong
+* dodanie SetSettingsCurrentDate
+* zmiana w CommandLineROConfigurationProvider _aArgs ze String() na List(Of String)
+* w EnvironmentVariablesROConfigurationProvider _AlwaysCopy="|COMPUTERNAME|USERNAME|" (poza tymi z prefiksem i tymi z pkar)

@@ -63,7 +63,7 @@ Public Class JsonRwConfigurationProvider
             Return IO.Path.Combine(sPath, JSON_FILENAME)
         End If
 
-        ' WPF = C:\Users\xxx\AppData\Local
+        ' WPF = WinUI3 = MAUI = C:\Users\xxx\AppData\Local
         sPath = IO.Path.Combine(sPath, sAppName)
         IO.Directory.CreateDirectory(sPath)
         Return IO.Path.Combine(sPath, JSON_FILENAME)

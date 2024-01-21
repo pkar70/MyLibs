@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>pkar.UWP.Config</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <authors>pkar</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">GPL-3.0-or-later</license>
@@ -15,6 +15,7 @@
 
     <dependencies>
       <group targetFramework="UAP10.0">
+<dependency id="pkar.NetConfigs" version="1.0.3"/>
       </group>
     </dependencies>
 

@@ -62,6 +62,10 @@
 	  <AndroidResource Include="Resources\Images\dotnet_bot.svg" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\pkar.Wpf.Extensions\pkar.Wpf.Extensions.vbproj" />
+	</ItemGroup>
+
 	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<OutputType>WinExe</OutputType>
 		<RuntimeIdentifier>win10-x64</RuntimeIdentifier>

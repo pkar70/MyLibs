@@ -1,4 +1,7 @@
 ﻿
+2023.02.26
+* przejscie na Nuget UWP.Bluetooth
+
 2022.08.18
 * ToWinGeopoint
 

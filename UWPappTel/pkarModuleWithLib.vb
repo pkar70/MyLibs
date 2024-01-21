@@ -1857,6 +1857,16 @@ Partial Public Module Extensions
         uiElement.Text = Vblib.GetLangString(stringId)
     End Sub
 
+    ''' <summary>
+    ''' ustaw .Content używając podanego stringu z resources
+    ''' </summary>
+    <Extension>
+    Public Sub SetLangText(uiElement As Button, stringId As String)
+        uiElement.Content = Vblib.GetLangString(stringId)
+    End Sub
+
+
+
 End Module
 
 

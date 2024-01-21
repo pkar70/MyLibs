@@ -6,9 +6,16 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Loaded="Page_Loaded">
 
     <Grid>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
 
+            <TextBox Name="uiSetLocal" Width="50" Header="via LOCAL"/>
+            <Button Content="Set" Click="uiSetLocal_Click"/>
+            <TextBox Name="uiSetVblib" Width="50" Header="via VBlib"/>
+            <Button Content="Set" Click="uiSetVblib_Click"/>
+
+        </StackPanel>
     </Grid>
 </Page>

@@ -15,6 +15,12 @@
             CounterLabel.Text = $"Current count: {count}";
 
             SemanticScreenReader.Announce(CounterLabel.Text);
+
+            var cos = new La;
+
+
+            var str = pkar.Wpf.Extensions
+
         }
     }
 }

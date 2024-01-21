@@ -890,6 +890,25 @@ Partial Public Module DotNetExtensions
         If testVal = Integer.MaxValue Then Return True
         Return False
     End Function
+
+    ' since x.2.5
+
+    ''' <summary>
+    ''' shortcut for Math.Abs - returns the absolute value of an integer
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Abs(ByVal value As Integer) As Integer
+        Return Math.Abs(value)
+    End Function
+
+    ''' <summary>
+    ''' shortcut for Math.Sign - returns an integer that indicates the sign of a number (-1,0,1)
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Sign(ByVal value As Integer) As Integer
+        Return Math.Sign(value)
+    End Function
+
 #End Region
 
 #Region "Long"
@@ -1003,6 +1022,23 @@ Partial Public Module DotNetExtensions
 
     End Function
 
+    ' since x.2.5
+
+    ''' <summary>
+    ''' shortcut for Math.Abs - returns the absolute value
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Abs(ByVal value As Long) As Long
+        Return Math.Abs(value)
+    End Function
+
+    ''' <summary>
+    ''' shortcut for Math.Sign - returns an integer that indicates the sign of a number (-1,0,1)
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Sign(ByVal value As Long) As Integer
+        Return Math.Sign(value)
+    End Function
 
 #End Region
 
@@ -1033,6 +1069,55 @@ Partial Public Module DotNetExtensions
     Public Function Min(ByVal value As Double, value1 As Double) As Double
         Return Math.Min(value, value1)
     End Function
+
+    ''' <summary>
+    ''' shortcut for Math.Abs - returns the absolute value
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Abs(ByVal value As Double) As Double
+        Return Math.Abs(value)
+    End Function
+
+    ''' <summary>
+    ''' shortcut for Math.Sign - returns an integer that indicates the sign of a number (-1,0,1)
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Sign(ByVal value As Double) As Integer
+        Return Math.Sign(value)
+    End Function
+
+    ''' <summary>
+    ''' shortcut for Math.Round - Rounds a double-precision floating-point value to the nearest integral value, and rounds midpoint values to the nearest even number.
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Round(ByVal value As Double) As Integer
+        Return Math.Round(value)
+    End Function
+
+    ''' <summary>
+    ''' shortcut for Math.Round - Rounds a double-precision floating-point value to a specified number of fractional digits, and rounds midpoint values to the nearest even number.
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Round(ByVal value As Double, digits As Integer) As Double
+        Return Math.Round(value, digits)
+    End Function
+
+    ''' <summary>
+    ''' shortcut for Math.Floor - Returns the largest integral value less than or equal to the specified number
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Floor(ByVal value As Double) As Double
+        Return Math.Floor(value)
+    End Function
+
+    ''' <summary>
+    ''' shortcut for Math.Ceiling - Returns the smallest integral value greater than or equal to the specified number
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function Ceiling(ByVal value As Double) As Double
+        Return Math.Ceiling(value)
+    End Function
+
 #End Region
 
 #Region "Ulong"
@@ -1092,7 +1177,7 @@ Partial Public Module DotNetExtensions
     ''' Convert seconds number to "XXd HH:MM:SS", integer.max = ~150 days
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
-    Public Function ToStringDHMS(ByVal czas As TimeSpan) As Integer
+    Public Function ToStringDHMS(ByVal czas As TimeSpan) As String
         Dim temp As Integer = Math.Round(czas.TotalSeconds)
         Return temp.ToStringDHMS
     End Function

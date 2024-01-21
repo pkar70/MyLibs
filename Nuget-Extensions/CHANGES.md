@@ -1,5 +1,10 @@
 ﻿
+# version x.2.5
+* (int|long).(Abs|Sign)
+* Double.(Abs|Sign|Floor|Round|Ceiling)
 
+# version x.2.4
+* corrected TimeSpan.ToStringDHMS
 
 # version x.2.3
 * corrected tooltips/intellisense for date.Min and date.Max

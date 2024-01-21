@@ -13,12 +13,13 @@
   <Copyright>Piotr Karocki</Copyright>
   <Description>This Nuget adds UI extensions helpers to transfer data between UI elements and .Net configuration. It is similar to my other Nuget: pkar.Uwp.Config</Description>
   <PackageReadmeFile>README.md</PackageReadmeFile>
-  <RepositoryType>https://github.com/pkar70/MyLibs/pkar.WPF.Configs</RepositoryType>
+  <RepositoryType></RepositoryType>
   <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
   <IncludeSymbols>True</IncludeSymbols>
   <Version>1.1.0</Version>
-  <PackageProjectUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.WPF.Configs</PackageProjectUrl>
-  <PackageReleaseNotes>Added PasswordBox.Get/SetSettingsString</PackageReleaseNotes>
+  <PackageProjectUrl>https://github.com/pkar70/MyLibs/pkar.WPF.Configs</PackageProjectUrl>
+  <PackageReleaseNotes>initial release</PackageReleaseNotes>
+  <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.WPF.Configs</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

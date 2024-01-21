@@ -85,6 +85,9 @@ If some extension is added in v1.x.y, then it would be present also in v2.x.y (n
     Integer.Min(int1 As Integer) As Integer    // since x.2.2, same as Math.Min(int0, int1)
     Integer.IsMinOrMax As Boolean    // since x.2.2
 
+    Integer.Abs // since x.2.5, same as Math.Abs
+    Integer.Sign // since x.2.5, same as Math.Sign
+
 # for Long
 
     Long.FileLen2string() As String
@@ -92,6 +95,8 @@ If some extension is added in v1.x.y, then it would be present also in v2.x.y (n
     Long.ToSIstring() As String
     Long.ToStringDHMS() As String
     Long.ToSIstringWithPrefix(unitSymbol As String, Optional fullPrefix As Boolean = False, Optional binary As Boolean = False) As String
+    Long.Abs // since x.2.5, same as Math.Abs
+    Long.Sign // since x.2.5, same as Math.Sign
 
 # for Ulong
 
@@ -102,12 +107,19 @@ If some extension is added in v1.x.y, then it would be present also in v2.x.y (n
     Double.Max(double1 As Double) As Double    // since x.2.2, same as Math.Max(dbl0, dbl1)
     Double.Min(double1 As Double) As Double    // since x.2.2, same as Math.Min(dbl0, dbl1)
     Double.IsMinOrMax As Boolean    // since x.2.2
+    Double.Abs // since x.2.5, same as Math.Abs
+    Double.Sign // since x.2.5, same as Math.Sign
+    Double.Floor // since x.2.5, same as Math.Floor
+    Double.Ceiling // since x.2.5, same as Math.Ceiling
+    Double.Round // since x.2.5, same as Math.Round
+    Double.Round(digits) // since x.2.5, same as Math.Round(digits)
+
 
 # for dates
 
     Date.ToJulianDay() As Integer
     Date.ToModifiedJulianDay() As Double
-    TimeSpan.ToStringDHMS() As Integer
+    TimeSpan.ToStringDHMS() As String
     Date.TwoLetterWeekDayPL(Optional bezOgonkow As Boolean = False) As String // ['bezOgonkow' since x.1.3]
     Date.ToExifString() As String
 

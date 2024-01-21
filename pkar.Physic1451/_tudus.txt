@@ -1,2 +1,4 @@
 
 jedna klasa więcej - wartość z jednostkami
+
+BTU https://en.wikipedia.org/wiki/Btu
