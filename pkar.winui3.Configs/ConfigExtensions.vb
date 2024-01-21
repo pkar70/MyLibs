@@ -274,6 +274,67 @@ Public Module Extensions
 
 #End Region
 
+#Region "ToggleSwitch"
+
+    ''' <summary>
+    ''' Read setting and place it in UI, use FALSE as default. Setting name (key) is same as UI element name.
+    ''' </summary>
+    <Extension()>
+    Public Sub GetSettingsBool(ByVal oItem As ToggleSwitch)
+        oItem.GetSettingsBool("", False)
+    End Sub
+
+    ''' <summary>
+    ''' Read setting sName and place it in UI, use FALSE as default
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    <Extension()>
+    Public Sub GetSettingsBool(ByVal oItem As ToggleSwitch, sName As String)
+        oItem.GetSettingsBool(sName, False)
+    End Sub
+
+    ''' <summary>
+    ''' Read setting sName and place it in UI, use given default
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    ''' <param name="bDefault">default value</param>
+    <Extension()>
+    Public Sub GetSettingsBool(ByVal oItem As ToggleSwitch, sName As String, bDefault As Boolean)
+        If sName = "" Then sName = oItem.Name
+        Dim bBool As Boolean = VBlib.GetSettingsBool(sName, bDefault)
+        oItem.IsOn = bBool
+    End Sub
+
+    ''' <summary>
+    ''' Save UI content in sName local setting. Setting name (key) is same as UI element name.
+    ''' </summary>
+    <Extension()>
+    Public Sub SetSettingsBool(ByVal oItem As ToggleSwitch)
+        oItem.SetSettingsBool("", False)
+    End Sub
+
+    ''' <summary>
+    ''' Save UI content in sName local setting
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    <Extension()>
+    Public Sub SetSettingsBool(ByVal oItem As ToggleSwitch, sName As String)
+        oItem.SetSettingsBool(sName, False)
+    End Sub
+
+    ''' <summary>
+    ''' Save UI content in sName setting, locally or roaming
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    ''' <param name="useRoam">True if value should be placed also in roaming settings</param>
+    <Extension()>
+    Public Sub SetSettingsBool(ByVal oItem As ToggleSwitch, sName As String, useRoam As Boolean)
+        If sName = "" Then sName = oItem.Name
+        VBlib.SetSettingsBool(sName, oItem.IsOn, useRoam)
+    End Sub
+
+#End Region
+
 #Region "ToggleButton"
 
     ''' <summary>
@@ -332,6 +393,67 @@ Public Module Extensions
         If sName = "" Then sName = oItem.Name
         VBlib.SetSettingsBool(sName, oItem.IsChecked, useRoam)
     End Sub
+#End Region
+
+#Region "AppBarToggleButton"
+
+    ''' <summary>
+    ''' Read setting and place it in UI, use FALSE as default. Setting name (key) is same as UI element name.
+    ''' </summary>
+    <Extension()>
+    Public Sub GetSettingsBool(ByVal oItem As AppBarToggleButton)
+        oItem.GetSettingsBool("", False)
+    End Sub
+
+    ''' <summary>
+    ''' Read setting sName and place it in UI, use FALSE as default
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    <Extension()>
+    Public Sub GetSettingsBool(ByVal oItem As AppBarToggleButton, sName As String)
+        oItem.GetSettingsBool(sName, False)
+    End Sub
+
+    ''' <summary>
+    ''' Read setting sName and place it in UI, use given default
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    ''' <param name="bDefault">default value</param>
+    <Extension()>
+    Public Sub GetSettingsBool(ByVal oItem As AppBarToggleButton, sName As String, bDefault As Boolean)
+        If sName = "" Then sName = oItem.Name
+        Dim bBool As Boolean = VBlib.GetSettingsBool(sName, bDefault)
+        oItem.IsChecked = bBool
+    End Sub
+
+    ''' <summary>
+    ''' Save UI content in sName local setting. Setting name (key) is same as UI element name.
+    ''' </summary>
+    <Extension()>
+    Public Sub SetSettingsBool(ByVal oItem As AppBarToggleButton)
+        oItem.GetSettingsBool("", False)
+    End Sub
+
+    ''' <summary>
+    ''' Save UI content in sName local setting
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    <Extension()>
+    Public Sub SetSettingsBool(ByVal oItem As AppBarToggleButton, sName As String)
+        oItem.GetSettingsBool(sName, False)
+    End Sub
+
+    ''' <summary>
+    ''' Save UI content in sName setting, locally or roaming
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    ''' <param name="useRoam">True if value should be placed also in roaming settings</param>
+    <Extension()>
+    Public Sub SetSettingsBool(ByVal oItem As AppBarToggleButton, sName As String, useRoam As Boolean)
+        If sName = "" Then sName = oItem.Name
+        VBlib.SetSettingsBool(sName, oItem.IsChecked, useRoam)
+    End Sub
+
 #End Region
 
 
