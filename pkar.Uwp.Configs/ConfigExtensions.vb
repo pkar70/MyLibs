@@ -1,4 +1,31 @@
-﻿Imports VBlib = pkar.NetConfigs
+﻿
+Imports VBlib = pkar.NetConfigs
+
+#If PK_WPF Then
+Imports System.Runtime.CompilerServices
+Imports System.Windows.Controls
+Imports System.Windows.Controls.Primitives
+' rename, tak by działały extension z UWP dla WPF
+Imports CalendarDatePicker = System.Windows.Controls.Calendar
+#End If
+
+#If PK_WINUI Then
+Imports System.Runtime.CompilerServices
+Imports Microsoft.UI.Xaml.Controls
+Imports Microsoft.UI.Xaml.Controls.Primitives
+#End If
+
+#If NETFX_CORE Then
+Imports Windows.Foundation.Metadata
+#Else
+' to jest pusta definicja, żeby mógł być <DefaultOverload> podany - nie można go #IF zrobić, bo to nie działa
+<AttributeUsage(AttributeTargets.Method)>
+Public Class DefaultOverloadAttribute
+    Inherits Attribute
+End Class
+#End If
+
+
 
 Public Module Extensions
 
@@ -69,8 +96,8 @@ Public Module Extensions
     ''' <summary>
     ''' Read setting and place it in UI, use empty string as default. Setting name (key) is same as UI element name.
     ''' </summary>
+    <DefaultOverload>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
     Public Sub GetSettingsString(ByVal oItem As TextBox)
         oItem.GetSettingsString("", "")
     End Sub
@@ -80,7 +107,7 @@ Public Module Extensions
     ''' </summary>
     ''' <param name="sName">setting name (key)</param>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
+    <DefaultOverload>
     Public Sub GetSettingsString(ByVal oItem As TextBox, sName As String)
         oItem.GetSettingsString(sName, "")
     End Sub
@@ -91,7 +118,7 @@ Public Module Extensions
     ''' <param name="sName">setting name (key)</param>
     ''' <param name="sDefault">default value</param>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
+    <DefaultOverload>
     Public Sub GetSettingsString(ByVal oItem As TextBox, sName As String, sDefault As String)
         If sName = "" Then sName = oItem.Name
         Dim sTxt As String = VBlib.GetSettingsString(sName, sDefault)
@@ -102,7 +129,7 @@ Public Module Extensions
     ''' Save UI content in sName local setting. Setting name (key) is same as UI element name.
     ''' </summary>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
+    <DefaultOverload>
     Public Sub SetSettingsString(ByVal oItem As TextBox)
         oItem.SetSettingsString("", False)
     End Sub
@@ -113,7 +140,7 @@ Public Module Extensions
     ''' </summary>
     ''' <param name="sName">setting name (key)</param>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
+    <DefaultOverload>
     Public Sub SetSettingsString(ByVal oItem As TextBox, sName As String)
         oItem.SetSettingsString(sName, False)
     End Sub
@@ -124,7 +151,7 @@ Public Module Extensions
     ''' <param name="sName">setting name (key)</param>
     ''' <param name="useRoam">True if value should be placed also in roaming settings</param>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
+    <DefaultOverload>
     Public Sub SetSettingsString(ByVal oItem As TextBox, sName As String, useRoam As Boolean)
         If sName = "" Then sName = oItem.Name
         VBlib.SetSettingsString(sName, oItem.Text, useRoam)
@@ -211,14 +238,14 @@ Public Module Extensions
 
 #End Region
 
-
+#If Not PK_WPF Then
 #Region "ToggleSwitch"
 
     ''' <summary>
     ''' Read setting and place it in UI, use FALSE as default. Setting name (key) is same as UI element name.
     ''' </summary>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
+    <DefaultOverload>
     Public Sub GetSettingsBool(ByVal oItem As ToggleSwitch)
         oItem.GetSettingsBool("", False)
     End Sub
@@ -228,7 +255,7 @@ Public Module Extensions
     ''' </summary>
     ''' <param name="sName">setting name (key)</param>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
+    <DefaultOverload>
     Public Sub GetSettingsBool(ByVal oItem As ToggleSwitch, sName As String)
         oItem.GetSettingsBool(sName, False)
     End Sub
@@ -239,7 +266,7 @@ Public Module Extensions
     ''' <param name="sName">setting name (key)</param>
     ''' <param name="bDefault">default value</param>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
+    <DefaultOverload>
     Public Sub GetSettingsBool(ByVal oItem As ToggleSwitch, sName As String, bDefault As Boolean)
         If sName = "" Then sName = oItem.Name
         Dim bBool As Boolean = VBlib.GetSettingsBool(sName, bDefault)
@@ -250,7 +277,7 @@ Public Module Extensions
     ''' Save UI content in sName local setting. Setting name (key) is same as UI element name.
     ''' </summary>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
+    <DefaultOverload>
     Public Sub SetSettingsBool(ByVal oItem As ToggleSwitch)
         oItem.SetSettingsBool("", False)
     End Sub
@@ -260,7 +287,7 @@ Public Module Extensions
     ''' </summary>
     ''' <param name="sName">setting name (key)</param>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
+    <DefaultOverload>
     Public Sub SetSettingsBool(ByVal oItem As ToggleSwitch, sName As String)
         oItem.SetSettingsBool(sName, False)
     End Sub
@@ -271,13 +298,14 @@ Public Module Extensions
     ''' <param name="sName">setting name (key)</param>
     ''' <param name="useRoam">True if value should be placed also in roaming settings</param>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
+    <DefaultOverload>
     Public Sub SetSettingsBool(ByVal oItem As ToggleSwitch, sName As String, useRoam As Boolean)
         If sName = "" Then sName = oItem.Name
         VBlib.SetSettingsBool(sName, oItem.IsOn, useRoam)
     End Sub
 
 #End Region
+#End If
 
 #Region "ToggleButton"
 
@@ -339,6 +367,74 @@ Public Module Extensions
     End Sub
 #End Region
 
+#If Not NETFX_CORE Then
+
+    ' PK_WPF Or PK_WINUI Or PK_UNO
+
+#Region "PasswordBox"
+    ''' <summary>
+    ''' Read setting and place it in UI, use empty string as default. Setting name (key) is same as UI element name.
+    ''' </summary>
+    <Extension()>
+    Public Sub GetSettingsString(ByVal oItem As PasswordBox)
+        oItem.GetSettingsString("", "")
+    End Sub
+
+    ''' <summary>
+    ''' Read setting sName and place it in UI, use empty string as default
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    <Extension()>
+    Public Sub GetSettingsString(ByVal oItem As PasswordBox, sName As String)
+        oItem.GetSettingsString(sName, "")
+    End Sub
+
+    ''' <summary>
+    ''' Read setting sName and place it in UI, use given default
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    ''' <param name="sDefault">default value</param>
+    <Extension()>
+    Public Sub GetSettingsString(ByVal oItem As PasswordBox, sName As String, sDefault As String)
+        If sName = "" Then sName = oItem.Name
+        Dim sTxt As String = VBlib.GetSettingsString(sName, sDefault)
+        oItem.Password = sTxt
+    End Sub
+
+    ''' <summary>
+    ''' Save UI content in sName local setting. Setting name (key) is same as UI element name.
+    ''' </summary>
+    <Extension()>
+    Public Sub SetSettingsString(ByVal oItem As PasswordBox)
+        oItem.SetSettingsString("", False)
+    End Sub
+
+
+    ''' <summary>
+    ''' Save UI content in sName local setting
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    <Extension()>
+    Public Sub SetSettingsString(ByVal oItem As PasswordBox, sName As String)
+        oItem.SetSettingsString(sName, False)
+    End Sub
+
+    ''' <summary>
+    ''' Save UI content in sName setting, locally or roaming
+    ''' </summary>
+    ''' <param name="sName">setting name (key)</param>
+    ''' <param name="useRoam">True if value should be placed also in roaming settings</param>
+    <Extension()>
+    Public Sub SetSettingsString(ByVal oItem As PasswordBox, sName As String, useRoam As Boolean)
+        If sName = "" Then sName = oItem.Name
+        VBlib.SetSettingsString(sName, oItem.Password, useRoam)
+    End Sub
+
+#End Region
+
+#End If
+
+#If Not PK_WPF Then
 #Region "AppBarToggleButton"
 
     ''' <summary>
@@ -399,6 +495,7 @@ Public Module Extensions
     End Sub
 
 #End Region
+#End If
 
 #Region "Slider"
 
@@ -406,8 +503,8 @@ Public Module Extensions
     ''' Save UI content in sName local setting. Setting name (key) is same as UI element name.
     ''' </summary>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
-    Public Sub SetSettingsInt(ByVal oItem As Windows.UI.Xaml.Controls.Slider)
+    <DefaultOverload>
+    Public Sub SetSettingsInt(ByVal oItem As Slider)
         oItem.SetSettingsInt("", False)
     End Sub
 
@@ -416,8 +513,8 @@ Public Module Extensions
     ''' </summary>
     ''' <param name="sName">setting name (key)</param>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
-    Public Sub SetSettingsInt(ByVal oItem As Windows.UI.Xaml.Controls.Slider, sName As String)
+    <DefaultOverload>
+    Public Sub SetSettingsInt(ByVal oItem As Slider, sName As String)
         oItem.SetSettingsInt(sName, False)
     End Sub
 
@@ -427,8 +524,8 @@ Public Module Extensions
     ''' <param name="sName">setting name (key)</param>
     ''' <param name="useRoam">True if value should be placed also in roaming settings</param>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
-    Public Sub SetSettingsInt(ByVal oItem As Windows.UI.Xaml.Controls.Slider, sName As String, useRoam As Boolean)
+    <DefaultOverload>
+    Public Sub SetSettingsInt(ByVal oItem As Slider, sName As String, useRoam As Boolean)
         If sName = "" Then sName = oItem.Name
         VBlib.SetSettingsInt(sName, oItem.Value, useRoam)
     End Sub
@@ -437,8 +534,8 @@ Public Module Extensions
     ''' Read setting and place it in UI, use 0 as default. Setting name (key) is same as UI element name.
     ''' </summary>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
-    Public Sub GetSettingsInt(ByVal oItem As Windows.UI.Xaml.Controls.Slider)
+    <DefaultOverload>
+    Public Sub GetSettingsInt(ByVal oItem As Slider)
         oItem.GetSettingsInt("")
     End Sub
 
@@ -447,8 +544,8 @@ Public Module Extensions
     ''' </summary>
     ''' <param name="sName">setting name (key)</param>
     <Extension()>
-    <Windows.Foundation.Metadata.DefaultOverload>
-    Public Sub GetSettingsInt(ByVal oItem As Windows.UI.Xaml.Controls.Slider, sName As String)
+    <DefaultOverload>
+    Public Sub GetSettingsInt(ByVal oItem As Slider, sName As String)
         If sName = "" Then sName = oItem.Name
         oItem.Value = VBlib.GetSettingsInt(sName)
     End Sub
@@ -535,8 +632,18 @@ Public Module Extensions
     ''' <param name="useRoam">True if value should be placed also in roaming settings</param>
     <Extension()>
     Public Sub SetSettingsDate(ByVal oItem As CalendarDatePicker, sName As String, useRoam As Boolean)
+#If PK_WPF Then
+        If oItem.SelectedDate Is Nothing Then Return
+#Else
+        If oItem.Date Is Nothing Then Return
+#End If
         If sName = "" Then sName = oItem.Name
+
+#If PK_WPF Then
+        VBlib.SetSettingsDate(sName, oItem.SelectedDate.Value, useRoam)
+#Else
         VBlib.SetSettingsDate(sName, oItem.Date.Value, useRoam)
+#End If
     End Sub
 
     ''' <summary>
@@ -555,7 +662,12 @@ Public Module Extensions
     Public Sub GetSettingsDate(ByVal oItem As CalendarDatePicker, sName As String)
         If sName = "" Then sName = oItem.Name
         Dim dDTOff As DateTimeOffset = VBlib.GetSettingsDate(sName)
+#If PK_WPF Then
+        oItem.SelectedDate = New Date(dDTOff.Ticks)
+#Else
         oItem.Date = dDTOff
+#End If
+
     End Sub
 
 #End Region

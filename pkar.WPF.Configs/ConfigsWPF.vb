@@ -1,6 +1,9 @@
 ﻿
-
+#If PK_WPF Then
 Public Module WpfConfig
+#ElseIf PK_WINUI Then
+    Public Module WinUI3Config
+#End If
 
     ''' <summary>
     ''' initialization of library - as a wrapper to pkar.NetConfigs. Used sources: (1) INI source; (2) Environment variables, prefixed with appname; (3) JSON source, roaming and local; (4) command line arguments
@@ -10,6 +13,7 @@ Public Module WpfConfig
     Public Sub InitSettings(sIniContent As String, bIniUseDebug As Boolean)
 
         ' use cmdline, envVars, JSON local+roam (no temp)
+        ' uses .Net Std 2.0 call
         pkar.NetConfigs.InitSettings(sIniContent, bIniUseDebug, True, Nothing, False, True, True)
 
     End Sub

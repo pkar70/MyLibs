@@ -2,13 +2,13 @@
 <package >
   <metadata>
     <id>pkar.UWP.Config</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <authors>pkar</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">GPL-3.0-or-later</license>
     <projectUrl>https://github.com/pkar70/MyLibs/Nuget-Uwp-BTdump/</projectUrl>
     <description>UI extension for Nuget pkar.NetConfigs, with UWP ApplicationData to .Net configuration translator</description>
-    <releaseNotes>Initial release.</releaseNotes>
+    <releaseNotes>Changed namespace from pkar.Uwp to pkar.UI</releaseNotes>
     <copyright>Piotr Karocki</copyright>
     <tags>Extension Configuration ApplicationData</tags>
 	<readme>docs\README.md</readme>
@@ -24,20 +24,20 @@
 
     <files>
         <!-- WinMd and IntelliSense files -->
-      <file src="bin\Release\pkar.Uwp.Configs.winmd" target="lib\uap10.0"/>
-      <file src="bin\Release\pkar.Uwp.Configs.xml" target="lib\uap10.0"/>
+      <file src="bin\Release\pkar.UI.Configs.winmd" target="lib\uap10.0"/>
+      <file src="bin\Release\pkar.UI.Configs.xml" target="lib\uap10.0"/>
 
  <file src="README.md" target="docs\" />
 
  <!-- WINMDs and resources -->
-      <file src="bin\ARM\Release\pkar.Uwp.Configs.winmd" target="runtimes\win10-arm"/>
-      <file src="bin\ARM\Release\pkar.Uwp.Configs.pri" target="runtimes\win10-arm"/>
+      <file src="bin\ARM\Release\pkar.UI.Configs.winmd" target="runtimes\win10-arm"/>
+      <file src="bin\ARM\Release\pkar.UI.Configs.pri" target="runtimes\win10-arm"/>
 
-      <file src="bin\x64\Release\pkar.Uwp.Configs.winmd" target="runtimes\win10-x64"/>
-      <file src="bin\x64\Release\pkar.Uwp.Configs.pri" target="runtimes\win10-x64"/>
+      <file src="bin\x64\Release\pkar.UI.Configs.winmd" target="runtimes\win10-x64"/>
+      <file src="bin\x64\Release\pkar.UI.Configs.pri" target="runtimes\win10-x64"/>
 
-      <file src="bin\x86\Release\pkar.Uwp.Configs.winmd" target="runtimes\win10-x86"/>
-      <file src="bin\x86\Release\pkar.Uwp.Configs.pri" target="runtimes\win10-x86"/>
+      <file src="bin\x86\Release\pkar.UI.Configs.winmd" target="runtimes\win10-x86"/>
+      <file src="bin\x86\Release\pkar.UI.Configs.pri" target="runtimes\win10-x86"/>
 
     </files>
 

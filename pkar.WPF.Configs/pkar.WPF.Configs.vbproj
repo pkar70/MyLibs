@@ -3,7 +3,7 @@
   <PropertyGroup>
     <RootNamespace>pkar.WPF.Configs</RootNamespace>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>pkar.WPF.Configs</RootNamespace>
+    <RootNamespace>pkar.UI.Configs</RootNamespace>
     <UseWPF>true</UseWPF>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -16,10 +16,18 @@
   <RepositoryType></RepositoryType>
   <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
   <IncludeSymbols>True</IncludeSymbols>
-  <Version>1.1.0</Version>
+  <Version>1.1.2</Version>
   <PackageProjectUrl>https://github.com/pkar70/MyLibs/pkar.WPF.Configs</PackageProjectUrl>
   <PackageReleaseNotes>initial release</PackageReleaseNotes>
   <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.WPF.Configs</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>PK_WPF</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>PK_WPF</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

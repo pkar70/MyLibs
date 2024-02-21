@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{70365DA2-083B-4727-8670-43489E2586B1}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
-    <RootNamespace>pkar.Uwp.Configs</RootNamespace>
+    <RootNamespace>pkar.UI.Configs</RootNamespace>
     <AssemblyName>pkar.Uwp.Configs</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>

@@ -1,5 +1,4 @@
 ﻿
-
 Imports Microsoft.Extensions.Configuration
 Imports MsExtConfig = Microsoft.Extensions.Configuration
 Imports MsExtPrim = Microsoft.Extensions.Primitives
@@ -26,6 +25,7 @@ Public Module UwpConfig
                            Windows.Storage.ApplicationData.Current.LocalFolder.Path,
                             Windows.Storage.ApplicationData.Current.RoamingFolder.Path, False, cmdLineArgs)
     End Sub
+
 
 #Region "config from WinAppData.Current.*Settings"
 
@@ -159,5 +159,6 @@ Public Module UwpConfig
     'End Function
 
 #End Region
+
 End Module
 
