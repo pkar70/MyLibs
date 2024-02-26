@@ -26,6 +26,31 @@ This Nuget contains extensions of UWP classes.
     Page.ShowAppVers(withDebug As Boolean)  ' creates TextBox in row=1 with app version
 
 
+## dialogboxes - all uses pkar.Localize, so strings can be localized
+
+    FrameworkElement.MsgBox(message As String)
+    FrameworkElement.MsgBoxAsync(message As String) As Task
+    FrameworkElement.DialogBoxYNAsync(message As String, Optional sYes As String = "Yes", Optional sNo As String = "No") As Task(Of Boolean))
+    FrameworkElement.InputBox(message As String, Optional sDefault As String = "", Optional sYes As String = "Continue", Optional sNo As String = "Cancel") As Task(Of String)
+
+## localizations (using pkar.Localize)
+    
+### using object name
+
+    DependencyObject.LocalizePropertiesUsingObjectName(recursive)
+    XAML: <TextBox Name="uiTBox" ...>
+    res:  uiTBox.Text="some localized text"
+    .Net: uiTBox.LocalizePropertiesUsingObjectName
+    .Net: yourPage.LocalizePropertiesUsingObjectName(True)    ' calls LocalizePropertiesUsingObjectName in whole visual tree
+
+### using text values
+
+    DependencyObject.LocalizePrefixedProperties(recursive)
+    XAML: <TextBox Text="res:pagetitle" ...>
+    res:  pagetitle="some localized text"
+    .Net: uiTBox.LocalizePrefixedProperties()
+    .Net: yourPage.LocalizePrefixedProperties(True)    ' calls LocalizePropertiesUsingObjectName in whole visual tree
+
 
 ### MAUI style calls
 

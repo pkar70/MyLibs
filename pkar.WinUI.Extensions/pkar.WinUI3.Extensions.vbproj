@@ -6,7 +6,7 @@
     <UseWinUI>true</UseWinUI>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 
-    <RootNamespace>pkar.WinUI3.Extensions</RootNamespace>
+    <RootNamespace>pkar.UI.Extensions</RootNamespace>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Several extensions of WinUI3 classes</Title>
     <Authors>pkar</Authors>
@@ -19,11 +19,12 @@
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>1.1.5</Version>
-    <PackageReleaseNotes>initial release</PackageReleaseNotes>
+    <Version>2.0.2</Version>
+    <PackageReleaseNotes>Now all texts in Dialogs can be Localized (see pkar.Localize nuget)</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231008000" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />
+    <PackageReference Include="pkar.Localize" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>

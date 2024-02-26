@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{6A8C1CEA-3B04-4E28-9CE1-07B7CA2F18D5}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
-    <RootNamespace>pkar.Uwp.Ext</RootNamespace>
+    <RootNamespace>pkar.UI.Extensions</RootNamespace>
     <AssemblyName>pkar-Uwp-Extensions</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
@@ -177,6 +177,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.14</Version>
+    </PackageReference>
+    <PackageReference Include="pkar.Localize">
+      <Version>1.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,8 @@
 ﻿
+v.1.1.5
+* added: Storage[Folder|File].LaunchFile[Async], .FutureAccessListAddOrReplace
+* changed namespace from pkar.Uwp.Ext to pkar.UI.Extensions, to make switching UI between UWP/MAUI/WinUI3/WPF easier
+
 v.1.1.3
 * added: String.SendToClipboard
 

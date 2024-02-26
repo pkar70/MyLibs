@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package >
   <metadata>
-    <id>pkar.UWP.Extensions</id>
-    <version>1.1.3</version>
+    <id>pkar.Uwp.Extensions</id>
+    <version>2.0.2</version>
     <authors>pkar</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">GPL-3.0-or-later</license>
-    <projectUrl>https://github.com/pkar70/MyLibs/pkar.Uwp.Extensions/</projectUrl>
+    <projectUrl>https://github.com/pkar70/MyLibs/pkar.UI.Extensionsensions/</projectUrl>
     <description>Several extensions of UWP classes</description>
-    <releaseNotes>added: String.SendToClipboard</releaseNotes>
+    <releaseNotes>Now all texts in Dialogs can be Localized (see pkar.Localize nuget)</releaseNotes>
     <copyright>Piotr Karocki</copyright>
     <tags>Extension Configuration ApplicationData</tags>
 	<readme>docs\README.md</readme>
@@ -23,20 +23,20 @@
 
     <files>
         <!-- WinMd and IntelliSense files -->
-      <file src="bin\Release\pkar.Uwp.Ext.winmd" target="lib\uap10.0"/>
-      <file src="bin\Release\pkar.Uwp.Ext.xml" target="lib\uap10.0"/>
+      <file src="bin\Release\pkar.UI.Extensions.winmd" target="lib\uap10.0"/>
+      <file src="bin\Release\pkar.UI.Extensions.xml" target="lib\uap10.0"/>
 
  <file src="README.md" target="docs\" />
 
  <!-- WINMDs and resources -->
-      <file src="bin\ARM\Release\pkar.Uwp.Ext.winmd" target="runtimes\win10-arm"/>
-      <file src="bin\ARM\Release\pkar.Uwp.Ext.pri" target="runtimes\win10-arm"/>
+      <file src="bin\ARM\Release\pkar.UI.Extensions.winmd" target="runtimes\win10-arm"/>
+      <file src="bin\ARM\Release\pkar.UI.Extensions.pri" target="runtimes\win10-arm"/>
 
-      <file src="bin\x64\Release\pkar.Uwp.Ext.winmd" target="runtimes\win10-x64"/>
-      <file src="bin\x64\Release\pkar.Uwp.Ext.pri" target="runtimes\win10-x64"/>
+      <file src="bin\x64\Release\pkar.UI.Extensions.winmd" target="runtimes\win10-x64"/>
+      <file src="bin\x64\Release\pkar.UI.Extensions.pri" target="runtimes\win10-x64"/>
 
-      <file src="bin\x86\Release\pkar.Uwp.Ext.winmd" target="runtimes\win10-x86"/>
-      <file src="bin\x86\Release\pkar.Uwp.Ext.pri" target="runtimes\win10-x86"/>
+      <file src="bin\x86\Release\pkar.UI.Extensions.winmd" target="runtimes\win10-x86"/>
+      <file src="bin\x86\Release\pkar.UI.Extensions.pri" target="runtimes\win10-x86"/>
 
     </files>
 

@@ -7,6 +7,7 @@ This Nuget contains extensions of UWP classes.
     Function GetAppVers() As String     ' x.y.z (major, minor, build)
     Function GetBuildTimestamp(bWithTime As Boolean) As String ' date in "yyyy.MM.dd HH:mm" format
 
+
 # Extensions
 
  Many extensions for UWP classes.
@@ -14,6 +15,14 @@ This Nuget contains extensions of UWP classes.
 ## UI related
 
     StorageFolder.OpenExplorer()
+
+    StorageFolder.LaunchFileAsync(filename) ' since 1.1.5
+    StorageFolder.LaunchFile(filename)      ' since 1.1.5
+    StorageFolder.FutureAccessListAddOrReplace(token) ' since 1.1.5
+    StorageFile.LaunchAsync()               ' since 1.1.5
+    StorageFile.Launch()                    ' since 1.1.5
+    StorageFile.FutureAccessListAddOrReplace(token)  ' since 1.1.5
+
     Uri.OpenBrowser()
     Uri.OpenBrowser(bForceEdge As Boolean)
     WebView.GetDocumentHtmlAsync() As String
@@ -26,6 +35,20 @@ This Nuget contains extensions of UWP classes.
     FrameworkElement.MsgBoxAsync(message As String) As Task
     FrameworkElement.DialogBoxYNAsync(message As String, Optional sYes As String = "Yes", Optional sNo As String = "No") As Task(Of Boolean))
     FrameworkElement.InputBox(message As String, Optional sDefault As String = "", Optional sYes As String = "Continue", Optional sNo As String = "Cancel") As Task(Of String)
+
+## localizations (using pkar.Localize)
+
+    XAML: <TextBox Name="uiTBox" ...>
+    res:  uiTBox.Text="some localized text"
+    .Net: uiTBox.LocalizePropertiesUsingObjectName
+    .Net: yourPage.LocalizePropertiesUsingObjectName(True)    ' calls LocalizePropertiesUsingObjectName in whole visual tree
+
+### using text values
+
+    XAML: <TextBox Text="res:pagetitle" ...>
+    res:  pagetitle="some localized text"
+    .Net: uiTBox.LocalizePrefixedProperties()
+    .Net: yourPage.LocalizePrefixedProperties(True)    ' calls LocalizePropertiesUsingObjectName in whole visual tree
 
 
 ### MAUI style calls

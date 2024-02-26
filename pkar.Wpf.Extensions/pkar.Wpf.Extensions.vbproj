@@ -3,9 +3,9 @@
   <PropertyGroup>
     <RootNamespace>pkar.Wpf.Extensions</RootNamespace>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>pkar.Wpf.Extensions</RootNamespace>
+    <RootNamespace>pkar.UI.Extensions</RootNamespace>
     <UseWPF>true</UseWPF>
-    <Version>1.1.3</Version>
+    <Version>2.0.8</Version>
     <Title>Several extensions of WPF UI classes</Title>
     <Authors>pkar</Authors>
     <Company>none</Company>
@@ -13,10 +13,19 @@
     <PackageProjectUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.WPF.Extensions</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.WPF.Extensions</RepositoryUrl>
-    <PackageReleaseNotes>initial release</PackageReleaseNotes>
+    <PackageReleaseNotes>Now all texts in Dialogs can be Localized (see pkar.Localize nuget)</PackageReleaseNotes>
     <Description>This Nuget adds UI extensions for WPF, similar to my other Nuget: pkar.Uwp.Extensions</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>PK_WPF</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>PK_WPF</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +34,11 @@
 
   <ItemGroup>
     <Content Include="Changes.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="pkar.DotNetExts" Version="2.2.5" />
+    <PackageReference Include="pkar.Localize" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>
