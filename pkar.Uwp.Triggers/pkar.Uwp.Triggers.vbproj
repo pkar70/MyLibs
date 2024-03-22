@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{A077DB13-4FB9-4235-A7B6-66B565685EBF}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
-    <RootNamespace>pkar.Uwp.Triggers</RootNamespace>
+    <RootNamespace>pkar.UI.Triggers</RootNamespace>
     <AssemblyName>Nuget-Uwp-BTdump</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>

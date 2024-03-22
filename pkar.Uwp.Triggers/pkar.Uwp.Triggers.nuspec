@@ -2,13 +2,13 @@
 <package >
   <metadata>
     <id>pkar.UWP.Triggers</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <authors>pkar</authors>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">GPL-3.0-or-later</license>
     <projectUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.Uwp.Triggers</projectUrl>
     <description>some helpers for background Triggers</description>
-    <releaseNotes>Initial release.</releaseNotes>
+    <releaseNotes>changed namespace</releaseNotes>
     <copyright>Piotr Karocki</copyright>
     <tags>Extension Triggers</tags>
 	<readme>docs\README.md</readme>
@@ -24,20 +24,20 @@
 
     <files>
         <!-- WinMd and IntelliSense files -->
-      <file src="bin\Release\pkar.Uwp.Triggers.winmd" target="lib\uap10.0"/>
-      <file src="bin\Release\pkar.Uwp.Triggers.xml" target="lib\uap10.0"/>
+      <file src="bin\Release\pkar.UI.Triggers.winmd" target="lib\uap10.0"/>
+      <file src="bin\Release\pkar.UI.Triggers.xml" target="lib\uap10.0"/>
 
  <file src="README.md" target="docs\" />
 
  <!-- WINMDs and resources -->
-      <file src="bin\ARM\Release\pkar.Uwp.Triggers.winmd" target="runtimes\win10-arm"/>
-      <file src="bin\ARM\Release\pkar.Uwp.Triggers.pri" target="runtimes\win10-arm"/>
+      <file src="bin\ARM\Release\pkar.UI.Triggers.winmd" target="runtimes\win10-arm"/>
+      <file src="bin\ARM\Release\pkar.UI.Triggers.pri" target="runtimes\win10-arm"/>
 
-      <file src="bin\x64\Release\pkar.Uwp.Triggers.winmd" target="runtimes\win10-x64"/>
-      <file src="bin\x64\Release\pkar.Uwp.Triggers.pri" target="runtimes\win10-x64"/>
+      <file src="bin\x64\Release\pkar.UI.Triggers.winmd" target="runtimes\win10-x64"/>
+      <file src="bin\x64\Release\pkar.UI.Triggers.pri" target="runtimes\win10-x64"/>
 
-      <file src="bin\x86\Release\pkar.Uwp.Triggers.winmd" target="runtimes\win10-x86"/>
-      <file src="bin\x86\Release\pkar.Uwp.Triggers.pri" target="runtimes\win10-x86"/>
+      <file src="bin\x86\Release\pkar.UI.Triggers.winmd" target="runtimes\win10-x86"/>
+      <file src="bin\x86\Release\pkar.UI.Triggers.pri" target="runtimes\win10-x86"/>
 
     </files>
 

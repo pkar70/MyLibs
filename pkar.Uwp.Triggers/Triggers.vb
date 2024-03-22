@@ -1,6 +1,10 @@
 ﻿
 Imports pkar.DotNetExtensions
 
+#If Not NETFX_CORE Then
+Imports Windows.ApplicationModel
+#End If
+
 Public Module Triggers
 
 #Region "simple checks"
@@ -31,12 +35,15 @@ Public Module Triggers
     ''' <summary>
     ''' Check if app can register triggers (via BackgroundAccessStatus)
     ''' </summary>
+#If NETFX_CORE Then
     Public Function CanRegisterTriggersAsync() As IAsyncOperation(Of Boolean)
         Return CanRegisterTriggersAsyncTask.AsAsyncOperation
     End Function
 
     Private Async Function CanRegisterTriggersAsyncTask() As Task(Of Boolean)
-
+#Else
+    Public Async Function CanRegisterTriggersAsync() As Task(Of Boolean)
+#End If
         Dim oBAS As Background.BackgroundAccessStatus
         oBAS = Await Background.BackgroundExecutionManager.RequestAccessAsync()
 
