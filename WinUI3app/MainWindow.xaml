@@ -1,0 +1,98 @@
+﻿<Window
+    x:Class="WinUI3app.MainWindow"
+    x:Name="FrmMain"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:WinUI3app"
+    mc:Ignorable="d">
+
+    <Grid x:Name="LayoutRoot" AllowDrop="True" Padding="4" 
+          Background="{ThemeResource SystemRevealAltMediumColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="TblTitleText" Margin="4"
+                   Text="{Binding ElementName=FrmMain,Path=Title,Mode=OneWay}" />
+        <TextBlock x:Name="ConvertStatus" Margin="4" Grid.Row="1"
+                   Text="Ready. Drag and drop mp4 files to add to conversion list." />
+        <StackPanel Orientation="Horizontal" Margin="4,0" Grid.Row="1" HorizontalAlignment="Right">
+            <TextBlock Margin="4,0" VerticalAlignment="Center">Encoding:</TextBlock>
+            <ComboBox x:Name="CmbCurFormat" SelectedIndex="0" VerticalAlignment="Center">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock ToolTipService.ToolTip="{Binding Path=Description,Mode=OneTime}" Text="{Binding Path=Name,Mode=OneTime}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock Margin="4,0" VerticalAlignment="Center">Max parallel:</TextBlock>
+            <ComboBox x:Name="CmbMaxConverterThread" Margin="4,0" SelectedIndex="0" VerticalAlignment="Center">
+                <ComboBoxItem>1 video</ComboBoxItem>
+                <ComboBoxItem>2 videos</ComboBoxItem>
+                <ComboBoxItem>3 videos</ComboBoxItem>
+                <ComboBoxItem>4 videos</ComboBoxItem>
+            </ComboBox>
+            <Button Margin="4,0" Grid.Row="1" HorizontalAlignment="Right" Padding="6">
+                <Button.Content>
+                    <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}" Glyph="&#xE10C;" />
+                </Button.Content>
+                <Button.Flyout>
+                    <MenuFlyout Placement="BottomEdgeAlignedRight">
+                        <MenuFlyoutItem x:Name="BtnInvertSelection" Text="Invert Selection"/>
+                        <MenuFlyoutItem x:Name="BtnSelectAll" Text="Select All"/>
+                        <MenuFlyoutItem x:Name="BtnDelSelected" Text="Remove Selected from List"/>
+                        <MenuFlyoutItem x:Name="BtnPreferPCores" Text="Prefer P-Cores (Normal priority)" Visibility="Collapsed"/>
+                        <MenuFlyoutItem x:Name="BtnPreferECores" Text="Prefer E-Cores (Lower priority)"/>
+                        <MenuFlyoutItem x:Name="BtnCleanConverted" Text="Recycle Converted Videos..."/>
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+            <Button x:Name="BtnConvertStop" Style="{ThemeResource AccentButtonStyle}"
+                    Margin="4" Content="Convert" VerticalAlignment="Center">
+                <Button.Resources>
+                    <TeachingTip x:Name="ConvertTip"
+                                 Title="Convert video" PreferredPlacement="BottomLeft"
+                                 Subtitle="If you've added ffmpeg to %PATH%, click this button to convert videos."/>
+                </Button.Resources>
+            </Button>
+        </StackPanel>
+        <ListView x:Name="ConvertingFiles" Grid.Row="2" AllowDrop="True" CanReorderItems="True"
+                  Margin="4" SelectionMode="Extended" CornerRadius="{ThemeResource ControlCornerRadius}"
+                  Background="{ThemeResource SystemRevealAltHighColor}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="32"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <FontIcon FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                  Glyph="{Binding Path=Icon, Mode=OneWay}" Grid.RowSpan="2"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Path=FormatName, Mode=OneTime}" 
+                                   VerticalAlignment="Center" FontWeight="Bold"
+                                   FontSize="{ThemeResource SubtitleTextBlockFontSize}" 
+                                   Grid.RowSpan="2"/>
+                        <TextBlock Grid.Column="2" Margin="8,0,0,0" Text="{Binding Path=Path, Mode=OneTime}"/>
+                        <TextBlock Grid.Column="2" Margin="8,0,0,0" Grid.Row="1">
+                            → <Run Text="{Binding Path=Output, Mode=OneTime}"/>
+                        </TextBlock>
+                        <ProgressBar Grid.Row="2" Height="4" HorizontalAlignment="Stretch" Margin="4"
+                                     Maximum="{Binding Path=ProgressMax, Mode=OneWay}" Grid.Column="2"
+                                     Value="{Binding Path=ProgressValue, Mode=OneWay}"
+                                     Visibility="{Binding Path=ProgressVisibility, Mode=OneWay}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Window>

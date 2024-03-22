@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>WinUI3app</RootNamespace>
+    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+    <Platforms>x86;x64</Platforms>
+    <RuntimeIdentifiers>win10-x86;win10-x64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <!-- Workaround for https://github.com/dotnet/sdk/issues/17890 -->
+  <PropertyGroup>
+    <NoWarn>CA1416, $(NoWarn)</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221209.1" />
+  </ItemGroup>
+  
+  <!-- Import the common workaround file -->
+  <Import Project="WinUI3.VisualBasic.targets" />
+  
+</Project>

@@ -21,49 +21,31 @@
 
 ' 2024.01.13  + FrameworkElement.SetUiPropertiesFromLang, FrameworkElementSetFromResourcesTree, TextBlock.SetLangText
 
+Imports pkar
+Imports pkar.UI.Extensions
+Imports pkar.UI.Triggers
 
-' Włącz "PK_USE_TRIGGERS" gdy ma być obsługa Triggerów
-' PK_USE_TOASTS dla toastów
-
-
-#If NETFX_CORE Then
 Imports MsExtConfig = Microsoft.Extensions.Configuration
 Imports MsExtPrim = Microsoft.Extensions.Primitives
 
 Imports WinAppData = Windows.Storage.ApplicationData
-#End If
-
-#If Not NETFX_CORE And Not PK_WPF Then
-Imports Microsoft.UI.Xaml
-Imports Microsoft.UI.Xaml.Data ' dla IValueConverter
-Imports Windows.Foundation.Collections  ' dla IPropertySet
-Imports Windows.ApplicationModel    ' dla DataTransfer
-#End If
 
 #If Not NETFX_CORE Then
+Imports Microsoft.UI.Xaml
+Imports Microsoft.UI.Xaml.Data ' dla IValueConverter
 Imports System.IO   ' dla Stream oraz OpenStreamForWrite
 Imports System.Runtime.CompilerServices
-Imports System.Reflection
-#End If
-
-Imports pkar
-Imports pkar.UI.Extensions
-Imports pkar.DotNetExtensions
-
-#If PK_USE_TOASTS Then
-Imports pkar.UI.Toasts
+Imports Windows.Foundation.Collections  ' dla IPropertySet
+Imports Windows.ApplicationModel    ' dla DataTransfer
 #End If
 
 
 
 Partial Public Class App
     Inherits Application
-#If NETFX_CORE Then
 
 #Region "Back button"
-
 #If NETFX_CORE Then
-
     ' PKAR added wedle https://stackoverflow.com/questions/39262926/uwp-hardware-back-press-work-correctly-in-mobile-but-error-with-pc
     Private Sub OnNavigatedAddBackButton(sender As Object, e As NavigationEventArgs)
         Try
@@ -150,7 +132,6 @@ Partial Public Class App
 
     End Sub
 #End If
-
 #End Region
 
 #Region "RemoteSystem/Background"
@@ -268,59 +249,14 @@ Partial Public Class App
 
 #End Region
 
-#Else
-#Region "Commandline"
-    Private msLocalCmdsHelp As String = ""
-
-    Sub app_Startup(sender As Object, e As StartupEventArgs)
-        If e.Args.Length > 0 Then
-            Dim sCmdLine As String = ""
-            For Each oneCmd In e.Args
-                If sCmdLine <> "" Then sCmdLine &= " "
-                sCmdLine &= oneCmd
-            Next
-
-            ObsluzCommandLine(sCmdLine).Wait()
-
-        End If
-    End Sub
-
-#Disable Warning BC42356 ' This async method lacks 'Await' operators and so will run synchronously
-    Public Async Function CmdLineOrRemSys(sCommand As String) As Task(Of String)
-#Enable Warning BC42356 ' This async method lacks 'Await' operators and so will run synchronously
-        Dim sResult As String = AppServiceStdCmd(sCommand, msLocalCmdsHelp)
-        If String.IsNullOrEmpty(sResult) Then
-            ' *TODO* sResult = Await AppServiceLocalCommand(sCommand)
-        End If
-
-        Return sResult
-    End Function
-
-
-    Public Async Function ObsluzCommandLine(sCommand As String) As Task
-
-        Dim sResult = Await CmdLineOrRemSys(sCommand)
-        If String.IsNullOrEmpty(sResult) Then
-            sResult = "(empty - probably unrecognized command)"
-        End If
-
-        Console.WriteLine(sResult)
-    End Function
-#End If
-
-#End Region
-
-#If NETFX_CORE Then
     Public Shared Sub OpenRateIt()
         Dim sUri As New Uri("ms-windows-store://review/?PFN=" & Package.Current.Id.FamilyName)
         sUri.OpenBrowser
     End Sub
-#End If
 
 End Class
 
 Public Module pkar
-
 
 #Region "import settings"
 
@@ -364,7 +300,7 @@ Public Module pkar
         IO.File.Copy(srcFile, dstFile)
     End Sub
 
-    Public Function GetAppName() As String
+    Private Function GetAppName() As String
         Dim sAssemblyFullName = Reflection.Assembly.GetEntryAssembly().FullName
         Dim oAss As New Reflection.AssemblyName(sAssemblyFullName)
         Return oAss.Name
@@ -375,7 +311,6 @@ Public Module pkar
 #End Region
 
 
-
     ''' <summary>
     ''' dla starszych: InitLib(Nothing)
     ''' dla nowszych:  InitLib(Environment.GetCommandLineArgs)
@@ -384,28 +319,16 @@ Public Module pkar
 #If NETFX_CORE Then
         UI.Configs.InitSettings(VBlib.IniLikeDefaults.sIniContent, False, aCmdLineArgs)
 #Else
-
-#If DEBUG Then
-        UI.Configs.InitSettings(VBlib.IniLikeDefaults.sIniContent, True)
-#Else
-        ui.configs.InitSettings(Vblib.IniLikeDefaults.sIniContent, False)
+        UI.Configs.InitSettings(VBlib.IniLikeDefaults.sIniContent, False)
 #End If
 
-#End If
-
-#If PK_USE_TOASTS Then
         VBlib.LibInitToast(AddressOf FromLibMakeToast)
-#End If
-
         VBlib.LibInitDialogBox(AddressOf FromLibDialogBoxAsync, AddressOf FromLibDialogBoxYNAsync, AddressOf FromLibDialogBoxInputAllDirectAsync)
 
         VBlib.LibInitClip(AddressOf FromLibClipPut, AddressOf FromLibClipPutHtml)
 #Disable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
         ' InitDatalogFolder(bUseOwnFolderIfNotSD)
 #Enable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
-#Disable Warning BC40000 ' Type or member is obsolete
-        VBlib.LangEnsureInit()  ' od tej pory na pewno zadziała lokalizacja
-#Enable Warning BC40000 ' Type or member is obsolete
     End Sub
 
 #Region "CrashMessage"
@@ -426,11 +349,7 @@ Public Module pkar
     ''' </summary>
     Public Sub CrashMessageExit(sTxt As String, exMsg As String)
         VBlib.CrashMessageAdd(sTxt, exMsg)
-#If PK_WPF Then
-        System.Windows.Application.Current.Shutdown()
-#Else
-        Application.Current.Exit()
-#End If
+        TryCast(Application.Current, App)?.Exit()
     End Sub
 
 #End Region
@@ -439,40 +358,37 @@ Public Module pkar
 
 #Region "ClipBoard"
     Private Sub FromLibClipPut(sTxt As String)
-        sTxt.SendToClipboard
+        Try
+
+            Dim oClipCont As New DataTransfer.DataPackage With {
+                .RequestedOperation = DataTransfer.DataPackageOperation.Copy
+            }
+            oClipCont.SetText(sTxt)
+            DataTransfer.Clipboard.SetContent(oClipCont)
+        Catch ex As Exception
+            ' czasem daje "Not enough memory resources are available to process this command. (Exception from HRESULT: 0x80070008)"
+        End Try
     End Sub
 
     Private Sub FromLibClipPutHtml(sHtml As String)
-#If PK_WPF Then
-        Clipboard.SetText(sHtml, TextDataFormat.Html)
-#Else
         Dim oClipCont As New DataTransfer.DataPackage With {
             .RequestedOperation = DataTransfer.DataPackageOperation.Copy
         }
         oClipCont.SetHtmlFormat(sHtml)
         DataTransfer.Clipboard.SetContent(oClipCont)
-#End If
     End Sub
 
-#Disable Warning BC42356 ' This async method lacks 'Await' operators and so will run synchronously
     ''' <summary>
     ''' w razie Catch() zwraca ""
     ''' </summary>
     Public Async Function ClipGetAsync() As Task(Of String)
-#Enable Warning BC42356 ' This async method lacks 'Await' operators and so will run synchronously
-
-#If PK_WPF Then
-        Return Clipboard.GetText()
-#Else
         Dim oClipCont As DataTransfer.DataPackageView = DataTransfer.Clipboard.GetContent
         Try
             Return Await oClipCont.GetTextAsync()
         Catch ex As Exception
             Return ""
         End Try
-#End If
     End Function
-
 #End Region
 
 
@@ -481,21 +397,12 @@ Public Module pkar
 #Region "testy sieciowe"
 
     Public Function IsFamilyMobile() As Boolean
-#If WINDOWS8_0_OR_GREATER Or NETFX_CORE Then
         Return (Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily = "Windows.Mobile")
-#Else
-        return False
-#End If
     End Function
 
     Public Function IsFamilyDesktop() As Boolean
-#If WINDOWS8_0_OR_GREATER Or NETFX_CORE Then
         Return (Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily = "Windows.Desktop")
-#Else
-        return True
-#End If
     End Function
-
 
 
     ' <Obsolete("Jest w .Net Standard 2.0 (lib)")>
@@ -509,43 +416,14 @@ Public Module pkar
         Return False
     End Function
 
+    ' <Obsolete("Jest w .Net Standard 2.0 (lib), ale on jest nie do telefonu :)")>
     Public Function NetIsCellInet() As Boolean
-
-#If WINDOWS8_0_OR_GREATER Or NETFX_CORE Then
         Return Windows.Networking.Connectivity.NetworkInformation.GetInternetConnectionProfile().IsWwanConnectionProfile
-#Else
-        ' można tak sprawdzić wszystkie, i jeśli jes 
-        For Each oNIC As Net.NetworkInformation.NetworkInterface In Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()
-
-            ' jeśli nie jest to link aktywny, to ignorujemy go
-            If oNIC.OperationalStatus <> Net.NetworkInformation.OperationalStatus.Up Then Continue For
-
-            ' nie jest to pełna logika, bo mogą być dodatkowe typy kiedyś...
-            Select Case oNIC.NetworkInterfaceType
-                Case Net.NetworkInformation.NetworkInterfaceType.Wman
-                    Return True
-                Case Net.NetworkInformation.NetworkInterfaceType.Wwanpp
-                    Return True
-                Case Net.NetworkInformation.NetworkInterfaceType.Wwanpp2
-                    Return True
-                Case Net.NetworkInformation.NetworkInterfaceType.GenericModem
-                    Return True
-                Case Net.NetworkInformation.NetworkInterfaceType.HighPerformanceSerialBus
-                    Return True
-                Case Net.NetworkInformation.NetworkInterfaceType.Ppp
-                    Return True
-                Case Net.NetworkInformation.NetworkInterfaceType.Slip
-                    Return True
-            End Select
-        Next
-
-        Return False
-#End If
     End Function
 
 
+    ' <Obsolete("Jest w .Net Standard 2.0 (lib)")>
     Public Function GetHostName() As String
-#If NETFX_CORE Then
         Dim hostNames As IReadOnlyList(Of Windows.Networking.HostName) =
                 Windows.Networking.Connectivity.NetworkInformation.GetHostNames()
         For Each oItem As Windows.Networking.HostName In hostNames
@@ -554,17 +432,14 @@ Public Module pkar
             End If
         Next
         Return ""
-#Else
-        Return System.Environment.MachineName
-#End If
     End Function
 
+    ' <Obsolete("Jest w .Net Standard 2.0 (lib)")>
     ''' <summary>
     ''' Ale to chyba przestało działać...
     ''' </summary>
-    <Obsolete("Jest w .Net Standard 2.0 (lib)")>
     Public Function IsThisMoje() As Boolean
-        Dim sTmp As String = GetHostName.ToLowerInvariant
+        Dim sTmp As String = GetHostName.ToLower
         If sTmp = "home-pkar" Then Return True
         If sTmp = "lumia_pkar" Then Return True
         If sTmp = "kuchnia_pk" Then Return True
@@ -573,8 +448,6 @@ Public Module pkar
         'If sTmp.EndsWith("_pk") Then Return True
         Return False
     End Function
-
-#If WINDOWS8_0_OR_GREATER Or NETFX_CORE Then
 
     ''' <summary>
     ''' w razie Catch() zwraca false
@@ -605,21 +478,15 @@ Public Module pkar
         End Try
     End Function
 
-#End If
-
     Public Sub OpenBrowser(sLink As String)
         Dim oUri As New Uri(sLink)
         oUri.OpenBrowser
     End Sub
 
 #Region "Bluetooth"
-
-#If WINDOWS8_0_OR_GREATER Or NETFX_CORE Then
-
     ''' <summary>
     ''' Zwraca -1 (no radio), 0 (off), 1 (on), ale gdy bMsg to pokazuje dokładniej błąd (nie włączony, albo nie ma radia Bluetooth) - wedle stringów podanych, które mogą być jednak identyfikatorami w Resources
     ''' </summary>
-    <Obsolete("do poprawienia MsgBox, skoro teraz res:")>
     Public Async Function NetIsBTavailableAsync(bMsg As Boolean,
                                     Optional bRes As Boolean = False,
                                     Optional sBtDisabled As String = "ERROR: Bluetooth is not enabled",
@@ -630,16 +497,6 @@ Public Module pkar
         'If result222 <> Windows.Devices.Radios.RadioAccessStatus.Allowed Then Return -1
 
         Dim oRadios As IReadOnlyList(Of Windows.Devices.Radios.Radio) = Await Windows.Devices.Radios.Radio.GetRadiosAsync()
-
-#If DEBUG Then
-        VBlib.DumpCurrMethod(", licznik=" & oRadios.Count)
-        For Each oRadio As Windows.Devices.Radios.Radio In oRadios
-            VBlib.DumpMessage("NEXT RADIO")
-            VBlib.DumpMessage("name=" & oRadio.Name)
-            VBlib.DumpMessage("kind=" & oRadio.Kind)
-            VBlib.DumpMessage("state=" & oRadio.State)
-        Next
-#End If
 
         Dim bHasBT As Boolean = False
 
@@ -673,43 +530,6 @@ Public Module pkar
 
     End Function
 
-    ''' <summary>
-    ''' Zwraca true/false czy State (po call) jest taki jak bOn; wymaga devCap=radios
-    ''' </summary>
-    Public Async Function NetTrySwitchBTOnAsync(bOn As Boolean) As Task(Of Boolean)
-        Dim iCurrState As Integer = Await NetIsBTavailableAsync(False)
-        If iCurrState = -1 Then Return False
-
-        ' jeśli nie trzeba przełączać... 
-        If bOn AndAlso iCurrState = 1 Then Return True
-        If Not bOn AndAlso iCurrState = 0 Then Return True
-
-        ' czy mamy prawo przełączyć? (devCap=radios)
-        Dim result222 As Windows.Devices.Radios.RadioAccessStatus = Await Windows.Devices.Radios.Radio.RequestAccessAsync()
-        If result222 <> Windows.Devices.Radios.RadioAccessStatus.Allowed Then Return False
-
-
-        Dim radios As IReadOnlyList(Of Windows.Devices.Radios.Radio) = Await Windows.Devices.Radios.Radio.GetRadiosAsync()
-
-        For Each oRadio In radios
-            If oRadio.Kind = Windows.Devices.Radios.RadioKind.Bluetooth Then
-                Dim oStat As Windows.Devices.Radios.RadioAccessStatus
-                If bOn Then
-                    oStat = Await oRadio.SetStateAsync(Windows.Devices.Radios.RadioState.On)
-                Else
-                    oStat = Await oRadio.SetStateAsync(Windows.Devices.Radios.RadioState.Off)
-                End If
-                If oStat <> Windows.Devices.Radios.RadioAccessStatus.Allowed Then Return False
-            End If
-        Next
-
-        Return True
-    End Function
-
-
-#End If
-
-
 #End Region
 
 #End Region
@@ -720,108 +540,132 @@ Public Module pkar
 #Region "DialogBoxy"
 
     Public Async Function FromLibDialogBoxAsync(sMsg As String) As Task
-        Dim oPage As New Page
-#If Not NETFX_CORE And Not PK_WPF Then
-        oPage.XamlRoot = _XamlRoot
-#End If
-        Await oPage.MsgBoxAsync(sMsg)
+        Dim oMsg As New Windows.UI.Popups.MessageDialog(sMsg)
+        Await oMsg.ShowAsync
     End Function
 
     ''' <summary>
     ''' Dla Cancel zwraca ""
     ''' </summary>
     Public Async Function FromLibDialogBoxYNAsync(sMsg As String, Optional sYes As String = "Tak", Optional sNo As String = "Nie") As Task(Of Boolean)
-        Dim oPage As New Page
-#If Not NETFX_CORE And Not PK_WPF Then
-        oPage.XamlRoot = _XamlRoot
-#End If
-        Return Await oPage.DialogBoxYNAsync(sMsg, sYes, sNo)
+        Dim oMsg As New Windows.UI.Popups.MessageDialog(sMsg)
+        Dim oYes As New Windows.UI.Popups.UICommand(sYes)
+        Dim oNo As New Windows.UI.Popups.UICommand(sNo)
+        oMsg.Commands.Add(oYes)
+        oMsg.Commands.Add(oNo)
+        oMsg.DefaultCommandIndex = 1    ' default: No
+        oMsg.CancelCommandIndex = 1
+        Dim oCmd As Windows.UI.Popups.IUICommand = Await oMsg.ShowAsync
+        If oCmd Is Nothing Then Return False
+        If oCmd.Label = sYes Then Return True
+
+        Return False
     End Function
 
     Public Async Function FromLibDialogBoxInputAllDirectAsync(sMsg As String, Optional sDefault As String = "", Optional sYes As String = "Continue", Optional sNo As String = "Cancel") As Task(Of String)
-        Dim oPage As New Page
-#If Not NETFX_CORE And Not PK_WPF Then
-        oPage.XamlRoot = _XamlRoot
-#End If
-        Return Await oPage.InputBoxAsync(sMsg, sDefault, sYes, sNo)
+        Dim oInputTextBox = New Controls.TextBox With {
+            .AcceptsReturn = False,
+            .Text = sDefault,
+            .IsSpellCheckEnabled = False
+        }
+
+        Dim oDlg As New Controls.ContentDialog With {
+            .Content = oInputTextBox,
+            .PrimaryButtonText = sYes,
+            .SecondaryButtonText = sNo,
+            .Title = sMsg
+        }
+
+        Dim oCmd = Await oDlg.ShowAsync
+        If oCmd <> Controls.ContentDialogResult.Primary Then Return ""
+
+        Return oInputTextBox.Text
+
     End Function
+
 
 #End Region
 
 
     ' --- INNE FUNKCJE ------------------------
 #Region "Toasty itp"
-
-#If PK_USE_TOASTS Then
-    Private Sub FromLibMakeToast(sMsg As String, sMsg1 As String)
-        Toasts.MakeToast(sMsg, sMsg1)
-    End Sub
-#End If
-
-#If NETFX_CORE Then
-    <Obsolete("użyj z nuget toasts")>
     Public Sub SetBadgeNo(iInt As Integer)
+        ' https://docs.microsoft.com/en-us/windows/uwp/controls-and-patterns/tiles-and-notifications-badges
+
+        Dim oXmlBadge As Windows.Data.Xml.Dom.XmlDocument
+        oXmlBadge = Windows.UI.Notifications.BadgeUpdateManager.GetTemplateContent(
+                Windows.UI.Notifications.BadgeTemplateType.BadgeNumber)
+
+        Dim oXmlNum As Windows.Data.Xml.Dom.XmlElement
+        oXmlNum = CType(oXmlBadge.SelectSingleNode("/badge"), Windows.Data.Xml.Dom.XmlElement)
+        oXmlNum.SetAttribute("value", iInt.ToString)
+
+        Windows.UI.Notifications.BadgeUpdateManager.CreateBadgeUpdaterForApplication().Update(
+                New Windows.UI.Notifications.BadgeNotification(oXmlBadge))
     End Sub
 
-    <Obsolete("użyj z nuget toasts;Czy na pewno ma być GetSettingsString a nie GetLangString?")>
+    <Obsolete("Czy na pewno ma być GetSettingsString a nie GetLangString?")>
     Public Function ToastAction(sAType As String, sAct As String, sGuid As String, sContent As String) As String
         Dim sTmp As String = sContent
-        If sTmp <> "" Then sTmp = Vblib.GetSettingsString(sTmp, sTmp)
+        If sTmp <> "" Then sTmp = VBlib.GetSettingsString(sTmp, sTmp)
+
+        Dim sTxt As String = "<action " &
+            "activationType=""" & sAType & """ " &
+            "arguments=""" & sAct & sGuid & """ " &
+            "content=""" & sTmp & """/> "
+        Return sTxt
     End Function
 
-    <Obsolete("użyj z nuget toasts")>
     Private Sub FromLibMakeToast(sMsg As String, sMsg1 As String)
+        Dim sXml = "<visual><binding template='ToastGeneric'><text>" & VBlib.XmlSafeStringQt(sMsg)
+        If sMsg1 <> "" Then sXml = sXml & "</text><text>" & VBlib.XmlSafeStringQt(sMsg1)
+        sXml &= "</text></binding></visual>"
+        Dim oXml = New Windows.Data.Xml.Dom.XmlDocument
+        oXml.LoadXml("<toast>" & sXml & "</toast>")
+        Dim oToast = New Windows.UI.Notifications.ToastNotification(oXml)
+        Windows.UI.Notifications.ToastNotificationManager.CreateToastNotifier().Show(oToast)
     End Sub
 
     ''' <summary>
     ''' dwa kolejne teksty, sMsg oraz sMsg1
     ''' </summary>
-    <Obsolete("użyj z nuget toasts")>
     Public Sub MakeToast(sMsg As String, Optional sMsg1 As String = "")
+        FromLibMakeToast(sMsg, sMsg1)
     End Sub
-    <Obsolete("użyj z nuget toasts")>
     Public Sub MakeToast(oDate As DateTime, sMsg As String, Optional sMsg1 As String = "")
+        Dim sXml = "<visual><binding template='ToastGeneric'><text>" & VBlib.XmlSafeStringQt(sMsg)
+        If sMsg1 <> "" Then sXml = sXml & "</text><text>" & VBlib.XmlSafeStringQt(sMsg1)
+        sXml &= "</text></binding></visual>"
+        Dim oXml = New Windows.Data.Xml.Dom.XmlDocument
+        oXml.LoadXml("<toast>" & sXml & "</toast>")
+        Try
+            ' Dim oToast = New Windows.UI.Notifications.ScheduledToastNotification(oXml, oDate, TimeSpan.FromHours(1), 10)
+            Dim oToast = New Windows.UI.Notifications.ScheduledToastNotification(oXml, oDate)
+            Windows.UI.Notifications.ToastNotificationManager.CreateToastNotifier().AddToSchedule(oToast)
+        Catch ex As Exception
+
+        End Try
     End Sub
 
-    <Obsolete("użyj z nuget toasts")>
     Public Sub RemoveScheduledToasts()
+        Try
+            While Windows.UI.Notifications.ToastNotificationManager.CreateToastNotifier().GetScheduledToastNotifications().Count > 0
+                Windows.UI.Notifications.ToastNotificationManager.CreateToastNotifier().RemoveFromSchedule(Windows.UI.Notifications.ToastNotificationManager.CreateToastNotifier().GetScheduledToastNotifications().Item(0))
+            End While
+        Catch ex As Exception
+            ' ponoc na desktopm nie dziala
+        End Try
+
     End Sub
 
-    <Obsolete("użyj z nuget toasts")>
     Public Sub RemoveCurrentToasts()
+        Windows.UI.Notifications.ToastNotificationManager.History.Clear()
     End Sub
-
-#End If
 
 #End Region
 
 #Region "WinVer, AppVer"
 
-
-    ' <Obsolete("Jest w .Net Standard 2.0 (lib)")>
-    Public Function GetAppVers() As String
-
-#If NETFX_CORE Then
-        Return Windows.ApplicationModel.Package.Current.Id.Version.Major & "." &
-        Windows.ApplicationModel.Package.Current.Id.Version.Minor & "." &
-        Windows.ApplicationModel.Package.Current.Id.Version.Build
-#Else
-        Return System.Reflection.Assembly.GetExecutingAssembly.GetName.Version.ToString()
-
-#End If
-    End Function
-
-#If NETFX_CORE Then
-    Public Function GetBuildTimestamp() As String
-        Dim install_folder As String = Windows.ApplicationModel.Package.Current.InstalledLocation.Path
-        Dim sManifestPath As String = Path.Combine(install_folder, "AppxManifest.xml")
-
-        If File.Exists(sManifestPath) Then
-            Return File.GetLastWriteTime(sManifestPath).ToString("yyyy.MM.dd HH:mm")
-        End If
-
-        Return ""
-    End Function
 
     Public Function WinVer() As Integer
         'Unknown = 0,
@@ -846,12 +690,248 @@ Public Module pkar
         'Return 0
     End Function
 
-#End If
+    ' <Obsolete("Jest w .Net Standard 2.0 (lib)")>
+    Public Function GetAppVers() As String
+
+        Return Windows.ApplicationModel.Package.Current.Id.Version.Major & "." &
+        Windows.ApplicationModel.Package.Current.Id.Version.Minor & "." &
+        Windows.ApplicationModel.Package.Current.Id.Version.Build
+
+    End Function
+
+    Public Function GetBuildTimestamp() As String
+        Dim install_folder As String = Windows.ApplicationModel.Package.Current.InstalledLocation.Path
+        Dim sManifestPath As String = Path.Combine(install_folder, "AppxManifest.xml")
+
+        If File.Exists(sManifestPath) Then
+            Return File.GetLastWriteTime(sManifestPath).ToString("yyyy.MM.dd HH:mm")
+        End If
+
+        Return ""
+    End Function
+
 
 #End Region
 
 
+#Region "triggers"
+#Region "zwykłe"
+
+#If TRIGGERSHERENOTNUGET Then
+
+    Public Function IsTriggersRegistered(sNameMask As String) As Boolean
+        sNameMask = sNameMask.Replace(" ", "").Replace("'", "")
+
+        Try
+            For Each oTask As KeyValuePair(Of Guid, Background.IBackgroundTaskRegistration) In Background.BackgroundTaskRegistration.AllTasks
+                If oTask.Value.Name.ToLower.Contains(sNameMask.ToLower) Then Return True
+            Next
+        Catch ex As Exception
+            ' np. gdy nie ma permissions, to może być FAIL
+        End Try
+
+        Return False
+    End Function
+
+    ''' <summary>
+    ''' jakikolwiek z prefixem Package.Current.DisplayName
+    ''' </summary>
+    Public Function IsTriggersRegistered() As Boolean
+        Return IsTriggersRegistered(Windows.ApplicationModel.Package.Current.DisplayName)
+    End Function
+
+    ''' <summary>
+    ''' wszystkie z prefixem Package.Current.DisplayName
+    ''' </summary>
+    Public Sub UnregisterTriggers()
+        UnregisterTriggers(Windows.ApplicationModel.Package.Current.DisplayName)
+    End Sub
+
+
+
+    Public Sub UnregisterTriggers(sNamePrefix As String)
+        sNamePrefix = sNamePrefix.Replace(" ", "").Replace("'", "")
+
+        Try
+            For Each oTask As KeyValuePair(Of Guid, Background.IBackgroundTaskRegistration) In Background.BackgroundTaskRegistration.AllTasks
+                If String.IsNullOrEmpty(sNamePrefix) OrElse oTask.Value.Name.ToLower.Contains(sNamePrefix.ToLower) Then oTask.Value.Unregister(True)
+            Next
+        Catch ex As Exception
+            ' np. gdy nie ma permissions, to może być FAIL
+        End Try
+
+        ' z innego wyszlo, ze RemoveAccess z wnetrza daje Exception
+        ' If bAll Then BackgroundExecutionManager.RemoveAccess()
+
+    End Sub
+
+    Public Async Function CanRegisterTriggersAsync() As Task(Of Boolean)
+
+        Dim oBAS As Background.BackgroundAccessStatus
+        oBAS = Await Background.BackgroundExecutionManager.RequestAccessAsync()
+
+        If oBAS = Windows.ApplicationModel.Background.BackgroundAccessStatus.AlwaysAllowed Then Return True
+        If oBAS = Windows.ApplicationModel.Background.BackgroundAccessStatus.AllowedSubjectToSystemPolicy Then Return True
+
+        Return False
+
+    End Function
+
+    Public Function RegisterTimerTrigger(sName As String, iMinutes As Integer, Optional bOneShot As Boolean = False, Optional oCondition As Windows.ApplicationModel.Background.SystemCondition = Nothing) As Windows.ApplicationModel.Background.BackgroundTaskRegistration
+
+        Try
+            Dim builder As New Background.BackgroundTaskBuilder
+            Dim oRet As Background.BackgroundTaskRegistration
+
+            builder.SetTrigger(New Windows.ApplicationModel.Background.TimeTrigger(iMinutes, bOneShot))
+            builder.Name = sName
+            If oCondition IsNot Nothing Then builder.AddCondition(oCondition)
+            oRet = builder.Register()
+            Return oRet
+        Catch ex As Exception
+            ' brak możliwości rejestracji (na przykład)
+        End Try
+
+        Return Nothing
+    End Function
+
+    Public Function RegisterUserPresentTrigger(Optional sName As String = "", Optional bOneShot As Boolean = False) As Windows.ApplicationModel.Background.BackgroundTaskRegistration
+
+        Try
+            Dim builder As New Background.BackgroundTaskBuilder
+            Dim oRet As Background.BackgroundTaskRegistration
+
+            Dim oTrigger As Windows.ApplicationModel.Background.SystemTrigger
+            oTrigger = New Background.SystemTrigger(Background.SystemTriggerType.UserPresent, bOneShot)
+
+            builder.SetTrigger(oTrigger)
+            builder.Name = sName
+            If String.IsNullOrEmpty(sName) Then builder.Name = GetTriggerNamePrefix() & "_userpresent"
+
+            oRet = builder.Register()
+            Return oRet
+        Catch ex As Exception
+            ' brak możliwości rejestracji (na przykład)
+        End Try
+
+        Return Nothing
+    End Function
+
+    Private Function GetTriggerNamePrefix() As String
+        Dim sName As String = Windows.ApplicationModel.Package.Current.DisplayName
+        sName = sName.Replace(" ", "").Replace("'", "")
+        Return sName
+    End Function
+
+    Private Function GetTriggerPolnocnyName() As String
+        Return GetTriggerNamePrefix() & "_polnocny"
+    End Function
+
+
+    ''' <summary>
+    ''' Tak naprawdę powtarzalny - w OnBackgroundActivated wywołaj IsThisTriggerPolnocny
+    ''' </summary>
+    Public Async Function DodajTriggerPolnocny() As System.Threading.Tasks.Task
+        If Not Await CanRegisterTriggersAsync() Then Return
+
+        Dim oDateNew As New DateTime(Date.Now.Year, Date.Now.Month, Date.Now.Day, 23, 40, 0)
+        If Date.Now.Hour > 21 Then oDateNew = oDateNew.AddDays(1)
+
+        Dim iMin As Integer = (oDateNew - DateTime.Now).TotalMinutes
+        Dim sName As String = GetTriggerPolnocnyName()
+
+        RegisterTimerTrigger(sName, iMin, False)
+    End Function
+
+    ''' <summary>
+    ''' para z DodajTriggerPolnocny
+    ''' </summary>
+    Public Function IsThisTriggerPolnocny(args As Windows.ApplicationModel.Activation.BackgroundActivatedEventArgs) As Boolean
+
+        Dim sName As String = GetTriggerPolnocnyName()
+        If args.TaskInstance.Task.Name <> sName Then Return False
+
+        Dim sCurrDate As String = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        VBlib.SetSettingsString("lastPolnocnyTry", sCurrDate)
+
+        Dim bRet As Boolean '= False
+        Dim oDateNew As New DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 23, 40, 0)
+
+        If (DateTime.Now.Hour = 23 AndAlso DateTime.Now.Minute > 20) Then
+            ' tak, to jest północny o północy
+            bRet = True
+            oDateNew = oDateNew.AddDays(1)
+            VBlib.SetSettingsString("lastPolnocnyOk", sCurrDate)
+        Else
+            ' północny, ale nie o północy
+            bRet = False
+        End If
+        Dim iMin As Integer = (oDateNew - DateTime.Now).TotalMinutes
+
+        ' Usuwamy istniejący, robimy nowy
+        UnregisterTriggers(sName)
+        RegisterTimerTrigger(sName, iMin, False)
+
+        Return bRet
+
+    End Function
+
+
+
+    Public Function RegisterServicingCompletedTrigger(sName As String) As Background.BackgroundTaskRegistration
+
+        Try
+            Dim builder As New Background.BackgroundTaskBuilder
+
+            builder.SetTrigger(New Background.SystemTrigger(Background.SystemTriggerType.ServicingComplete, True))
+            builder.Name = sName
+
+            Dim oRet As Windows.ApplicationModel.Background.BackgroundTaskRegistration
+            oRet = builder.Register()
+            Return oRet
+        Catch ex As Exception
+            ' brak możliwości rejestracji (na przykład)
+        End Try
+
+        Return Nothing
+    End Function
+
+    Public Function RegisterToastTrigger(sName As String) As Background.BackgroundTaskRegistration
+
+        Try
+            Dim builder As New Background.BackgroundTaskBuilder
+            Dim oRet As Windows.ApplicationModel.Background.BackgroundTaskRegistration
+
+            builder.SetTrigger(New Windows.ApplicationModel.Background.ToastNotificationActionTrigger)
+            builder.Name = sName
+            oRet = builder.Register()
+            Return oRet
+        Catch ex As Exception
+            ' brak możliwości rejestracji (na przykład)
+        End Try
+
+        Return Nothing
+    End Function
+
+        Private Function DumpTriggers() As String
+        Dim sRet As String = "Dumping Triggers" & vbCrLf & vbCrLf
+        Try
+            For Each oTask In Windows.ApplicationModel.Background.BackgroundTaskRegistration.AllTasks
+                sRet &= oTask.Value.Name & vbCrLf ' //GetType niestety nie daje rzeczywistego typu
+            Next
+        Catch
+        End Try
+
+
+        Return sRet
+    End Function
+
+
+#End If
+
+#End Region
 #Region "RemoteSystem"
+
 
     ''' <summary>
     ''' jeśli na wejściu jest jakaś standardowa komenda, to na wyjściu będzie jej rezultat. Else = ""
@@ -862,28 +942,22 @@ Public Module pkar
 
         ' If sCommand.StartsWith("debug loglevel") Then - vbLib
 
-        Select Case sCommand.ToLowerInvariant
+        Select Case sCommand.ToLower()
             ' Case "ping" - vblib
             Case "ver"
                 Return GetAppVers()
             Case "localdir"
-                ' Case "appdir" - vblib
-#If NETFX_CORE Then
                 Return Windows.Storage.ApplicationData.Current.LocalFolder.Path
+            ' Case "appdir" - vblib
             Case "installeddate"
                 Return Windows.ApplicationModel.Package.Current.InstalledDate.ToString("yyyy.MM.dd HH:mm:ss")
-#Else
-                Return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-#End If
             ' Case "help" - vblib
+
             ' Case "debug vars" - vblib
-#If PK_USE_TOASTS Then
+            Case "debug triggers"
+                Return DumpTriggers()
             Case "debug toasts"
-                Return Toasts.DumpToasts()
-#End If
-
-
-#If NETFX_CORE Or WINDOWS8_0_OR_GREATER Then
+                Return DumpToasts()
             Case "debug memsize"
                 Return Windows.System.MemoryManager.AppMemoryUsage.ToString() & "/" & Windows.System.MemoryManager.AppMemoryUsageLimit.ToString()
             Case "debug rungc"
@@ -892,53 +966,62 @@ Public Module pkar
                 GC.WaitForPendingFinalizers()
                 sTmp = sTmp & "After: " & Windows.System.MemoryManager.AppMemoryUsage.ToString() & "/" & Windows.System.MemoryManager.AppMemoryUsageLimit.ToString()
                 Return sTmp
-#End If
             ' Case "debug crashmsg"
             ' Case "debug crashmsg clear"
 
+            Case "lib unregistertriggers"
+                sTmp = DumpTriggers()
+                UnregisterTriggers("") ' // całkiem wszystkie
+                Return sTmp
             Case "lib isfamilymobile"
                 Return IsFamilyMobile().ToString()
             Case "lib isfamilydesktop"
                 Return IsFamilyDesktop().ToString()
             Case "lib netisipavailable"
                 Return NetIsIPavailable(False).ToString()
-#If NETFX_CORE Then
             Case "lib netiscellinet"
                 Return NetIsCellInet().ToString()
-#End If
             Case "lib gethostname"
                 Return GetHostName()
             Case "lib isthismoje"
                 Return IsThisMoje().ToString()
+            Case "lib istriggersregistered"
+                Return IsTriggersRegistered().ToString()
 
                 'Case "lib pkarmode 1"
                 'Case "lib pkarmode 0"
                 'Case "lib pkarmode"
-
-#If PK_USE_TRIGGERS Then
-            Case "debug triggers"
-                Return UI.Triggers.DumpTriggers()
-            Case "lib unregistertriggers"
-                sTmp = UI.Triggers.DumpTriggers()
-                UI.Triggers.UnregisterTriggers("") ' // całkiem wszystkie
-                Return sTmp
-            Case "lib istriggersregistered"
-                Return UI.Triggers.IsTriggersRegistered().ToString()
-#End If
         End Select
 
         Return ""  ' oznacza: to nie jest standardowa komenda
     End Function
 
+
+    Private Function DumpToasts() As String
+
+        Dim sResult As String = ""
+        For Each oToast As Windows.UI.Notifications.ScheduledToastNotification
+            In Windows.UI.Notifications.ToastNotificationManager.CreateToastNotifier().GetScheduledToastNotifications()
+
+            sResult = sResult & oToast.DeliveryTime.ToString("yyyy-MM-dd HH:mm:ss") & vbCrLf
+        Next
+
+        If sResult = "" Then
+            sResult = "(no toasts scheduled)"
+        Else
+            sResult = "Toasts scheduled for dates: " & vbCrLf & sResult
+        End If
+
+        Return sResult
+    End Function
+
 #End Region
 
 
+#End Region
 
 #Region "DataLog folder support"
-
-#If PKAR_USEDATALOG Then
-
-#If NETFX_CORE Then
+#If False Then
 
     Private Async Function GetSDcardFolderAsync() As Task(Of Windows.Storage.StorageFolder)
         ' uwaga: musi być w Manifest RemoteStorage oraz fileext!
@@ -1006,32 +1089,16 @@ Public Module pkar
         If oFold Is Nothing Then Return
         VBlib.LibInitDataLog(oFold.Path)
     End Function
-
-#Else
-    ' datalog folder support, nie UWP
-
-    ''' <summary>
-    ''' do wywolania raz, na poczatku - inicjalizacja zmiennych w VBlib (sciezki root)
-    ''' </summary>
-    Public Async Function InitDatalogFolder(Optional bUseOwnFolderIfNotSD As Boolean = True) As Task
-        Dim sPath As String = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
-        VBlib.LibInitDataLog(io.path.combine(sPath, "datalog")
-    End Function
-
-#End If
-
 #End If
 
 #End Region
 
-    ''' <summary>
-    ''' sprawdza czy to pełna wersja - gdyby próbować komercjalizować app
-    ''' działa tylko na UWP-Release, w innych kompilacjach daje zawsze TRUE
-    ''' </summary>
-    ''' <returns></returns>
-    Public Async Function IsFullVersionAsync() As Task(Of Boolean)
 
-#If Not DEBUG And NETFX_CORE Then
+    Public Async Function IsFullVersion() As Task(Of Boolean)
+#If DEBUG Then
+        Return True
+#End If
+
         If IsThisMoje() Then Return True
 
         ' Windows.Services.Store.StoreContext: min 14393 (1607)
@@ -1039,41 +1106,16 @@ Public Module pkar
         If Not oLicencja.IsActive Then Return False ' bez licencji? jakżeż to możliwe?
 
         If oLicencja.IsTrial Then Return False
-#End If
 
         Return True
 
     End Function
 
-#If Not NETFX_CORE Then
-    
-    ''' <summary>
-    ''' set (or clear) HIDDEN attribute on given file
-    ''' </summary>
-    ''' <param name="filename"></param>
-    ''' <param name="hidden"></param>
-    Public Sub FileAttrHidden(filename As String, hide As Boolean)
-        Dim attrs As IO.FileAttributes
-        attrs = IO.File.GetAttributes(filename)
-
-        If hide Then
-            If attrs And IO.FileAttributes.Hidden Then Return
-            attrs = attrs Or IO.FileAttributes.Hidden
-        Else
-            If Not (attrs And IO.FileAttributes.Hidden) Then Return
-            attrs = attrs And &HFFFE
-        End If
-
-        IO.File.SetAttributes(filename, attrs)
-    End Sub
-#End If
 
 End Module
 
 
 #Region ".Net configuration - UWP settings"
-
-#If NETFX_CORE Then
 
 Public Class UwpConfigurationProvider
     ' Inherits MsExtConfig.ConfigurationProvider
@@ -1215,29 +1257,55 @@ Partial Module Extensions
 End Module
 
 
-#End If
-
 #End Region
 
 Partial Public Module Extensions
 
     ''' <summary>
-    ''' ustaw wskoki z vblib dla danej strony; dla UWP oraz WPF niepotrzebne
+    ''' ustaw wszystkie Properties według resources, jeśli są zdefiniowane dla tego elementu
     ''' </summary>
-    <Obsolete("ale tu coś nie do końca działa, do sprawdzenia!")>
     <Extension>
-    Public Sub InitDialogs(element As FrameworkElement)
-#If Not PK_WPF Then
-        _xamlRoot = element.XamlRoot
-#End If
-        Vblib.LibInitDialogBox(AddressOf FromLibDialogBoxAsync, AddressOf FromLibDialogBoxYNAsync, AddressOf FromLibDialogBoxInputAllDirectAsync)
+    Public Sub SetFromResources(uiElement As FrameworkElement)
+        Vblib.SetUiPropertiesFromLang(uiElement)
     End Sub
 
-#If Not PK_WPF Then
-    Public _xamlRoot As XamlRoot
-#End If
+    ''' <summary>
+    ''' ustaw wszystkie Properties według resources, jeśli są zdefiniowane dla tego elementu bądź jego dzieci
+    ''' </summary>
+    <Extension>
+    Public Sub SetFromResourcesTree(uiElement As FrameworkElement)
+
+        uiElement.SetFromResources
+
+        Dim iMax As Integer = Media.VisualTreeHelper.GetChildrenCount(uiElement)
+        For iLp = 0 To iMax - 1
+            Dim depObj = Media.VisualTreeHelper.GetChild(uiElement, iLp)
+            Dim frmwrkEl As FrameworkElement = TryCast(depObj, FrameworkElement)
+            frmwrkEl?.SetFromResourcesTree
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' ustaw .Text używając podanego stringu z resources
+    ''' </summary>
+    <Extension>
+    Public Sub SetLangText(uiElement As Controls.TextBlock, stringId As String)
+        uiElement.Text = VBlib.GetLangString(stringId)
+    End Sub
+
+    ''' <summary>
+    ''' ustaw .Content używając podanego stringu z resources
+    ''' </summary>
+    <Extension>
+    Public Sub SetLangText(uiElement As Controls.Button, stringId As String)
+        uiElement.Content = VBlib.GetLangString(stringId)
+    End Sub
+
+
 
 End Module
+
 
 #Region "Konwertery Bindings XAML"
 ' nie mogą być w VBlib, bo Implements Microsoft.UI.Xaml.Data.IValueConverter
@@ -1275,40 +1343,27 @@ Public MustInherit Class ValueConverterOneWaySimple
     End Function
 End Class
 
-Public MustInherit Class ValueConverterOneWayWithPar
-    Implements IValueConverter
-
-    Public Function Convert(value As Object, targetType As Type, parameter As Object, language As String) As Object Implements IValueConverter.Convert
-        Dim param As String = ""
-
-        If parameter IsNot Nothing Then param = CType(parameter, String)
-
-        Return Convert(value, param)
-    End Function
-
-    Protected MustOverride Function Convert(value As Object, param As String) As Object
-
-    Public Function ConvertBack(value As Object, targetType As Type, parameter As Object, language As String) As Object Implements IValueConverter.ConvertBack
-        Throw New NotImplementedException()
-    End Function
-End Class
-
-
 #End If
 
 #End Region
 
-
 ' parameter = NEG robi negację
 Public Class KonwersjaVisibility
-    Inherits ValueConverterOneWayWithPar
+    Inherits ValueConverterOneWay
 
-    Protected Overrides Function Convert(value As Object, param As String) As Object
+    Public Overrides Function Convert(ByVal value As Object,
+    ByVal targetType As Type, ByVal parameter As Object,
+    ByVal language As System.String) As Object
 
         Dim bTemp As Boolean = CType(value, Boolean)
-        If param.EqualsCI("NEG") Then bTemp = Not bTemp
+        If parameter IsNot Nothing Then
+            Dim sParam As String = CType(parameter, String)
+            If sParam.ToUpperInvariant = "NEG" Then bTemp = Not bTemp
+        End If
+        If bTemp Then Return Visibility.Visible
 
-        Return If(bTemp, Visibility.Visible, Visibility.Collapsed)
+        Return Visibility.Collapsed
+
     End Function
 
 End Class
@@ -1332,33 +1387,55 @@ Public Class KonwersjaMAC
 
 End Class
 
-''' <summary>
-''' konwersja ToString, ale używając parametru wymuszającego FORMAT (np. %2d)
-''' </summary>
-
 Public Class KonwersjaVal2StringFormat
-    Inherits ValueConverterOneWayWithPar
+    Inherits ValueConverterOneWay
 
-    Protected Overrides Function Convert(value As Object, sFormat As String) As Object
+    ' Define the Convert method to change a DateTime object to
+    ' a month string.
+    Public Overrides Function Convert(ByVal value As Object,
+            ByVal targetType As Type, ByVal parameter As Object,
+            ByVal language As System.String) As Object
 
+        Dim sFormat As String = ""
+        If parameter IsNot Nothing Then
+            sFormat = CType(parameter, String)
+        End If
+
+        ' value is the data from the source object.
         If value.GetType Is GetType(Integer) Then
             Dim temp = CType(value, Integer)
-            Return If(sFormat = "", temp.ToString, temp.ToString(sFormat))
+            If sFormat = "" Then
+                Return temp.ToString
+            Else
+                Return temp.ToString(sFormat)
+            End If
         End If
 
         If value.GetType Is GetType(Long) Then
             Dim temp = CType(value, Long)
-            Return If(sFormat = "", temp.ToString, temp.ToString(sFormat))
+            If sFormat = "" Then
+                Return temp.ToString
+            Else
+                Return temp.ToString(sFormat)
+            End If
         End If
 
         If value.GetType Is GetType(Double) Then
             Dim temp = CType(value, Double)
-            Return If(sFormat = "", temp.ToString, temp.ToString(sFormat))
+            If sFormat = "" Then
+                Return temp.ToString
+            Else
+                Return temp.ToString(sFormat)
+            End If
         End If
 
         If value.GetType Is GetType(String) Then
             Dim temp = CType(value, String)
-            Return If(sFormat = "", temp.ToString, String.Format(sFormat, temp))
+            If sFormat = "" Then
+                Return temp.ToString
+            Else
+                Return String.Format(sFormat, temp)
+            End If
         End If
 
         Return "???"
@@ -1367,18 +1444,5 @@ Public Class KonwersjaVal2StringFormat
 
 End Class
 
-Public Class KonwersjaDaty
-    Inherits ValueConverterOneWaySimple
-
-    Protected Overrides Function Convert(value As Object) As Object
-        Dim temp As DateTime = CType(value, DateTime)
-
-        If temp.Year < 1000 Then Return "--"
-        If temp.Year > 2100 Then Return "--"
-
-        Return temp.ToString("yyyy-MM-dd")
-    End Function
-
-End Class
 
 #End Region

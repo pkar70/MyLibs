@@ -1,0 +1,42 @@
+﻿
+
+H:\Home\PIOTR\VStudio\_Vs2017\Ballots\BallotsWPF\ieeeBallots.xaml.vb(264,20): error BC30401: 'Convert' cannot implement 'Convert' because there is no matching function on interface 'IValueConverter'.
+H:\Home\PIOTR\VStudio\_Vs2017\Ballots\BallotsWPF\ieeeBallots.xaml.vb(285,20): error BC30401: 'ConvertBack' cannot implement 'ConvertBack' because there is no matching function on interface 'IValueConverter'.
+H:\Home\PIOTR\VStudio\_Vs2017\Ballots\BallotsWPF\ieeeBallots.xaml.vb(257,16): error BC30149: Class 'KonwersjaKolor' must implement 'Function Convert(value As Object, targetType As Type, parameter As Object, culture As CultureInfo) As Object' for interface 'IValueConverter'.
+H:\Home\PIOTR\VStudio\_Vs2017\Ballots\BallotsWPF\ieeeBallots.xaml.vb(257,16): error BC30149: Class 'KonwersjaKolor' must implement 'Function ConvertBack(value As Object, targetType As Type, parameter As Object, culture As CultureInfo) As Object' for interface 'IValueConverter'.
+H:\Home\PIOTR\VStudio\_Vs2017\Ballots\BallotsWPF\ieeeeInvitations.xaml.vb(179,56): error BC30002: Type 'DoubleTappedRoutedEventArgs' is not defined.
+H:\Home\PIOTR\VStudio\_Vs2017\Ballots\BallotsWPF\PknPublic.xaml.vb(60,58): error BC30002: Type 'Windows.Storage.StorageFolder' is not defined.
+
+
+    <!--<Page.Resources>
+        <local:KonwersjaKolor x:Key="KonwersjaKolor"/>
+    </Page.Resources>-->
+
+     <!--<Grid ... BorderThickness="2" BorderBrush="Blue" >-->
+
+<Grid.ContextFlyout> -> Grid.ContextMenu
+
+
+      <!--<Page.BottomAppBar>
+
+<AppBarButton Icon="TwoPage" Label="Set folder" AllowFocusOnInteraction="True" Click="uiSetFolder_Click"/>
+->
+<Button Click="uiSetFolder_Click">
+    <Button.Content>
+        <StackPanel Orientation="Vertical">
+            <TextBlock HorizontalAlignment="Center" Text="📂" FontSize="14" />
+            <TextBlock HorizontalAlignment="Center" Text="Set folder" />
+        </StackPanel>
+    </Button.Content>
+</Button>
+
+
+<TextBox Header="Password" Name="uiLoginPswdIEEE" InputScope="Password" IsSpellCheckEnabled="False" />
+->
+<TextBlock Text="Password"  />
+<TextBox Name="uiLoginPswdIEEE" SpellCheck.IsEnabled="False" />
+
+
+      Dim oMFI As MenuFlyoutItem = sender
+      Private Sub uiTitle_DTapped(sender As Object, e As DoubleTappedRoutedEventArgs)
+      RemoveScheduledToasts

@@ -347,33 +347,62 @@ Partial Public Module pkarlibmodule14
     ''' <summary>
     ''' Dialog, z czekaniem
     ''' </summary>
-    Public Async Function DialogBoxAsync(sMsg As String) As Task
+    <Obsolete("Poza UWP i WPF dopilnuj Page.InitDialog")>
+    Public Async Function MsgBoxAsync(sMsg As String) As Task
         If moUIdialogBox Is Nothing Then Throw New InvalidOperationException("DialogBoxAsync w VBLib wymaga wczesniejszego InitMsgBox")
-        Await moUIdialogBox(sMsg)
+        Await moUIdialogBox(Localize.TryGetResManString(sMsg))
     End Function
 
+    ''' <summary>
+    ''' Dialog, z czekaniem
+    ''' </summary>
+    <Obsolete("Poza UWP i WPF dopilnuj Page.InitDialog")>
+    Public Sub MsgBox(sMsg As String)
+        moUIdialogBox(Localize.TryGetResManString(sMsg))
+        'If moUIdialogBox Is Nothing Then Throw New InvalidOperationException("DialogBoxAsync w VBLib wymaga wczesniejszego InitMsgBox")
+        'moUIdialogBox(Localize.TryGetResManString(sMsg)).Wait()
+    End Sub
+
+
+    ''' <summary>
+    ''' Dialog, z czekaniem
+    ''' </summary>
+    <Obsolete("Poza UWP i WPF dopilnuj Page.InitDialog")>
+    Public Async Function DialogBoxAsync(sMsg As String) As Task
+        If moUIdialogBox Is Nothing Then Throw New InvalidOperationException("DialogBoxAsync w VBLib wymaga wczesniejszego InitMsgBox")
+        Await moUIdialogBox(Localize.TryGetResManString(sMsg))
+    End Function
+
+    <Obsolete("Poza UWP i WPF dopilnuj Page.InitDialog")>
     Public Sub DialogBox(sMsg As String)
 #Disable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
         DialogBoxAsync(sMsg)
 #Enable Warning BC42358
     End Sub
 
+    <Obsolete("Teraz res: działa - zmień; To zadziała tylko w UWP i WPF")>
     Public Async Function DialogBoxResAsync(sResId As String) As Task
         sResId = GetLangString(sResId)
         Await DialogBoxAsync(sResId)
     End Function
 
+    <Obsolete("Teraz res: działa - zmień; To zadziała tylko w UWP i WPF")>
     Public Sub DialogBoxRes(sResId As String)
 #Disable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
         DialogBoxResAsync(sResId)
 #Enable Warning BC42358
     End Sub
 
+    <Obsolete("Poza UWP i WPF dopilnuj Page.InitDialog")>
     Public Async Function DialogBoxYNAsync(sMsg As String, Optional sYes As String = "Tak", Optional sNo As String = "Nie") As Task(Of Boolean)
         If moUIdialogBoxYN Is Nothing Then Throw New InvalidOperationException("DialogBoxYNAsync w VBLib wymaga wczesniejszego InitMsgBox")
-        Return Await moUIdialogBoxYN(sMsg, sYes, sNo)
+        Return Await moUIdialogBoxYN(
+            Localize.TryGetResManString(sMsg),
+            Localize.TryGetResManString(sYes),
+            Localize.TryGetResManString(sNo))
     End Function
 
+    <Obsolete("Teraz res: działa - zmień; To zadziała tylko w UWP i WPF")>
     Public Async Function DialogBoxResYNAsync(sMsgResId As String, Optional sYesResId As String = "resDlgYes", Optional sNoResId As String = "resDlgNo") As Task(Of Boolean)
         Dim sMsg = GetLangString(sMsgResId)
         Dim sYes = GetLangString(sYesResId)
@@ -384,14 +413,20 @@ Partial Public Module pkarlibmodule14
     ''' <summary>
     ''' Dla Cancel zwraca ""
     ''' </summary>
+    <Obsolete("Poza UWP i WPF dopilnuj Page.InitDialog")>
     Public Async Function DialogBoxInputAllDirectAsync(sMsg As String, Optional sDefault As String = "", Optional sYes As String = "Yes", Optional sNo As String = "No") As Task(Of String)
         If moUIdialogBoxInput Is Nothing Then Throw New InvalidOperationException("DialogBoxInputAllDirectAsync w VBLib wymaga wczesniejszego InitMsgBox")
-        Return Await moUIdialogBoxInput(sMsg, sDefault, sYes, sNo)
+        Return Await moUIdialogBoxInput(
+            Localize.TryGetResManString(sMsg),
+            Localize.TryGetResManString(sDefault),
+            Localize.TryGetResManString(sYes),
+            Localize.TryGetResManString(sNo))
     End Function
 
     ''' <summary>
     ''' Dla Cancel zwraca ""
     ''' </summary>
+    <Obsolete("Teraz res: działa - zmień; To zadziała tylko w UWP i WPF")>
     Public Async Function DialogBoxInputDirectAsync(sMsg As String, Optional sDefault As String = "", Optional sYesResId As String = "resDlgContinue", Optional sNoResId As String = "resDlgCancel") As Task(Of String)
         Dim sYes = GetLangString(sYesResId)
         Dim sNo = GetLangString(sNoResId)
@@ -401,12 +436,27 @@ Partial Public Module pkarlibmodule14
     ''' <summary>
     ''' Dla Cancel zwraca ""
     ''' </summary>
+    <Obsolete("Teraz res: działa - zmień; To zadziała tylko w UWP i WPF")>
     Public Async Function DialogBoxInputResAsync(sMsgResId As String, Optional sDefaultResId As String = "", Optional sYesResId As String = "resDlgContinue", Optional sNoResId As String = "resDlgCancel") As Task(Of String)
         Dim sDefault = ""
         Dim sMsg = GetLangString(sMsgResId)
         If sDefaultResId <> "" Then sDefault = GetLangString(sDefaultResId)
         Return Await DialogBoxInputDirectAsync(sMsg, sDefault, sYesResId, sNoResId)
     End Function
+
+    ''' <summary>
+    ''' Dla Cancel zwraca ""
+    ''' </summary>
+    <Obsolete("To zadziała chyba tylko w UWP i WPF")>
+    Public Async Function InputBoxAsync(message As String, Optional defValue As String = "", Optional continueButton As String = "res:DlgContinue", Optional cancelButton As String = "res:DlgCancel") As Task(Of String)
+        If moUIdialogBoxInput Is Nothing Then Throw New InvalidOperationException("DialogBoxInputAllDirectAsync w VBLib wymaga wczesniejszego InitMsgBox")
+        Return Await moUIdialogBoxInput(
+            Localize.TryGetResManString(message),
+            Localize.TryGetResManString(defValue),
+            Localize.TryGetResManString(continueButton),
+            Localize.TryGetResManString(cancelButton))
+    End Function
+
 
 #End Region
 
@@ -418,32 +468,59 @@ Partial Public Module pkarlibmodule14
     ''' Wymuszenie języka (na razie "pl*" versus cokolwiek innego trafiające na en)
     ''' </summary>
     ''' <param name="forceLang"></param>
+    <Obsolete("przejdź na Localize")>
     Public Sub LangForce(Optional forceLang As String = "")
         moResManForced = forceLang
         moResMan = Nothing
     End Sub
 
+    <Obsolete("przejdź na Localize")>
     Public Function LangGetCurrent() As String
         If Not String.IsNullOrWhiteSpace(moResManForced) Then Return moResManForced
 
         Return Globalization.CultureInfo.CurrentCulture.Name
     End Function
 
+    <Obsolete("przejdź na Localize")>
     Public Function LangIsCurrent(Optional lang As String = "pl") As Boolean
         Return LangGetCurrent.StartsWithCI(lang)
     End Function
 
 
+    <Obsolete("przejdź na Localize")>
+    Public Class ResManLang
+        Public Property lang As String
+        Public Property resman As Resources.ResourceManager
+        Public Sub New(forLang As String, Resources As Resources.ResourceManager)
+            lang = forLang
+            resman = Resources
+
+        End Sub
+    End Class
+
     ''' <summary>
     ''' uprawnia się że moResMan jest ustawiony i można z niego korzystać
     ''' </summary>
-    Private Sub LangEnsureInit()
+    <Obsolete("Uwaga! Zmiana działania!")>
+    Public Sub LangEnsureInit(Optional forcePL As Boolean = False)
+#If False Then
         If moResMan IsNot Nothing Then Return
 
         If LangGetCurrent.StartsWithCI("PL") Then
             moResMan = My.Resources.Resource_PL.ResourceManager
         Else
             moResMan = My.Resources.Resource_EN.ResourceManager
+        End If
+#End If
+        If pkar.Localize.IsInitialized Then Return
+        pkar.Localize.InitResMan()
+        pkar.Localize.AddResMan("pl", My.Resources.Resource_PL.ResourceManager, forcePL)
+        pkar.Localize.AddResMan("en", My.Resources.Resource_EN.ResourceManager, Not forcePL)
+
+        If forcePL Then
+            pkar.Localize.LangOverride("pl")
+        Else
+            pkar.Localize.SelectCurrentLang()
         End If
     End Sub
 
@@ -454,6 +531,7 @@ Partial Public Module pkarlibmodule14
     ''' <param name="sResID">identyfikator żądanego tekstu</param>
     ''' <param name="sDefault">default, może być NULL</param>
     ''' <returns>tekst z resources gdy istnieje, a gdy nie to default o ile jest; gdy default = "" to sResId, lub NULL gdy nie ma stringu a default is null </returns>
+    <Obsolete("przejdź na Localize")>
     Public Function GetLangString(sResID As String, Optional sDefault As String = "") As String
         If sResID = "" Then Return ""
         LangEnsureInit()
@@ -476,6 +554,7 @@ Partial Public Module pkarlibmodule14
     End Function
 
 
+    <Obsolete("przejdź na Localize lub pkar.UI")>
     Public Sub SetUiPropertiesFromLang(anyObject As Object)
         If anyObject Is Nothing Then Return
         LangEnsureInit()
@@ -519,11 +598,12 @@ Partial Public Module pkarlibmodule14
 
 
     ' SetBadgeNo - not in .Net
-
+    <Obsolete("użyj z nuget toasts")>
     Public Function XmlSafeString(sInput As String) As String
         Return New XText(sInput).ToString()
     End Function
 
+    <Obsolete("użyj z nuget toasts")>
     Public Function XmlSafeStringQt(sInput As String) As String
         Dim sTmp As String
         sTmp = XmlSafeString(sInput)
@@ -699,7 +779,7 @@ Partial Public Module pkarlibmodule14
 #End Region
 
 #Region "triggers"
-    '    #Region "zwykłe" - not in .Net
+
 #Region "RemoteSystem"
 
     ''' <summary>
@@ -821,6 +901,7 @@ Partial Public Module pkarlibmodule14
     ''' <param name="iTolerance">tolerancja w sekundach</param>
     ''' <param name="bLastWas2">gdy oDate1 > oDate2, i bLastWas2, to kolizja</param>
     ''' <returns></returns>
+    <Obsolete("do poprawienia na res:")>
     Public Async Function SelectOneContentChoose(oDate1 As DateTimeOffset, oDate2 As DateTimeOffset, bLastWas2 As Boolean,
                                                  Optional iTolerance As Integer = 10,
                                                  Optional resIdCollisionMsg As String = "msgConflictModifiedODandLocal",

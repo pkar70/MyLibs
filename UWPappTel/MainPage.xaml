@@ -11,10 +11,10 @@
     <Grid>
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
 
-            <TextBox Name="uiSetLocal" Width="50" Header="via LOCAL"/>
+            <!--<TextBox Name="uiSetLocal" Width="50" Header="via LOCAL"/>
             <Button Content="Set" Click="uiSetLocal_Click"/>
             <TextBox Name="uiSetVblib" Width="50" Header="via VBlib"/>
-            <Button Content="Set" Click="uiSetVblib_Click"/>
+            <Button Content="Set" Click="uiSetVblib_Click"/>-->
 
         </StackPanel>
     </Grid>

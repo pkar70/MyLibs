@@ -54,10 +54,9 @@ Imports pkar.DotNetExtensions
 Imports pkar.UI.Toasts
 #End If
 
-
-
 Partial Public Class App
     Inherits Application
+
 #If NETFX_CORE Then
 
 #Region "Back button"
@@ -236,7 +235,7 @@ Partial Public Class App
         Dim sResult As String = ""
         Dim messageDeferral As Windows.ApplicationModel.AppService.AppServiceDeferral = args.GetDeferral()
 
-        If VBlib.GetSettingsBool("remoteSystemDisabled") Then
+        If Vblib.GetSettingsBool("remoteSystemDisabled") Then
             sStatus = "No permission"
         Else
 
@@ -267,8 +266,8 @@ Partial Public Class App
 
 
 #End Region
-
 #Else
+
 #Region "Commandline"
     Private msLocalCmdsHelp As String = ""
 
@@ -310,6 +309,7 @@ Partial Public Class App
 
 #End Region
 
+
 #If NETFX_CORE Then
     Public Shared Sub OpenRateIt()
         Dim sUri As New Uri("ms-windows-store://review/?PFN=" & Package.Current.Id.FamilyName)
@@ -317,7 +317,9 @@ Partial Public Class App
     End Sub
 #End If
 
+
 End Class
+
 
 Public Module pkar
 
@@ -364,7 +366,7 @@ Public Module pkar
         IO.File.Copy(srcFile, dstFile)
     End Sub
 
-    Public Function GetAppName() As String
+    Private Function GetAppName() As String
         Dim sAssemblyFullName = Reflection.Assembly.GetEntryAssembly().FullName
         Dim oAss As New Reflection.AssemblyName(sAssemblyFullName)
         Return oAss.Name
@@ -376,11 +378,13 @@ Public Module pkar
 
 
 
+
     ''' <summary>
     ''' dla starszych: InitLib(Nothing)
     ''' dla nowszych:  InitLib(Environment.GetCommandLineArgs)
     ''' </summary>
     Public Sub InitLib(aCmdLineArgs As List(Of String), Optional bUseOwnFolderIfNotSD As Boolean = True)
+
 #If NETFX_CORE Then
         UI.Configs.InitSettings(VBlib.IniLikeDefaults.sIniContent, False, aCmdLineArgs)
 #Else
@@ -393,19 +397,21 @@ Public Module pkar
 
 #End If
 
+
 #If PK_USE_TOASTS Then
         VBlib.LibInitToast(AddressOf FromLibMakeToast)
 #End If
-
         VBlib.LibInitDialogBox(AddressOf FromLibDialogBoxAsync, AddressOf FromLibDialogBoxYNAsync, AddressOf FromLibDialogBoxInputAllDirectAsync)
 
         VBlib.LibInitClip(AddressOf FromLibClipPut, AddressOf FromLibClipPutHtml)
 #Disable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
         ' InitDatalogFolder(bUseOwnFolderIfNotSD)
 #Enable Warning BC42358 ' Because this call is not awaited, execution of the current method continues before the call is completed
+
 #Disable Warning BC40000 ' Type or member is obsolete
         VBlib.LangEnsureInit()  ' od tej pory na pewno zadziała lokalizacja
 #Enable Warning BC40000 ' Type or member is obsolete
+
     End Sub
 
 #Region "CrashMessage"
@@ -464,7 +470,7 @@ Public Module pkar
 #If PK_WPF Then
         Return Clipboard.GetText()
 #Else
-        Dim oClipCont As DataTransfer.DataPackageView = DataTransfer.Clipboard.GetContent
+                Dim oClipCont As DataTransfer.DataPackageView = DataTransfer.Clipboard.GetContent
         Try
             Return Await oClipCont.GetTextAsync()
         Catch ex As Exception
@@ -472,9 +478,7 @@ Public Module pkar
         End Try
 #End If
     End Function
-
 #End Region
-
 
     ' -- Testy sieciowe ---------------------------------------------
 
@@ -543,7 +547,6 @@ Public Module pkar
 #End If
     End Function
 
-
     Public Function GetHostName() As String
 #If NETFX_CORE Then
         Dim hostNames As IReadOnlyList(Of Windows.Networking.HostName) =
@@ -607,12 +610,14 @@ Public Module pkar
 
 #End If
 
+
     Public Sub OpenBrowser(sLink As String)
         Dim oUri As New Uri(sLink)
         oUri.OpenBrowser
     End Sub
 
 #Region "Bluetooth"
+
 
 #If WINDOWS8_0_OR_GREATER Or NETFX_CORE Then
 
@@ -706,7 +711,6 @@ Public Module pkar
         Return True
     End Function
 
-
 #End If
 
 
@@ -747,6 +751,7 @@ Public Module pkar
     End Function
 
 #End Region
+
 
 
     ' --- INNE FUNKCJE ------------------------
@@ -851,6 +856,7 @@ Public Module pkar
 #End Region
 
 
+
 #Region "RemoteSystem"
 
     ''' <summary>
@@ -877,11 +883,11 @@ Public Module pkar
 #End If
             ' Case "help" - vblib
             ' Case "debug vars" - vblib
+
 #If PK_USE_TOASTS Then
             Case "debug toasts"
                 Return Toasts.DumpToasts()
 #End If
-
 
 #If NETFX_CORE Or WINDOWS8_0_OR_GREATER Then
             Case "debug memsize"
@@ -895,6 +901,7 @@ Public Module pkar
 #End If
             ' Case "debug crashmsg"
             ' Case "debug crashmsg clear"
+
 
             Case "lib isfamilymobile"
                 Return IsFamilyMobile().ToString()
@@ -925,14 +932,13 @@ Public Module pkar
             Case "lib istriggersregistered"
                 Return UI.Triggers.IsTriggersRegistered().ToString()
 #End If
+
         End Select
 
         Return ""  ' oznacza: to nie jest standardowa komenda
     End Function
 
 #End Region
-
-
 
 #Region "DataLog folder support"
 
@@ -1045,8 +1051,10 @@ Public Module pkar
 
     End Function
 
+
+
 #If Not NETFX_CORE Then
-    
+
     ''' <summary>
     ''' set (or clear) HIDDEN attribute on given file
     ''' </summary>
@@ -1066,10 +1074,10 @@ Public Module pkar
 
         IO.File.SetAttributes(filename, attrs)
     End Sub
+
 #End If
 
 End Module
-
 
 #Region ".Net configuration - UWP settings"
 
@@ -1293,11 +1301,9 @@ Public MustInherit Class ValueConverterOneWayWithPar
     End Function
 End Class
 
-
 #End If
 
 #End Region
-
 
 ' parameter = NEG robi negację
 Public Class KonwersjaVisibility
@@ -1335,7 +1341,6 @@ End Class
 ''' <summary>
 ''' konwersja ToString, ale używając parametru wymuszającego FORMAT (np. %2d)
 ''' </summary>
-
 Public Class KonwersjaVal2StringFormat
     Inherits ValueConverterOneWayWithPar
 
@@ -1382,3 +1387,5 @@ Public Class KonwersjaDaty
 End Class
 
 #End Region
+
+
