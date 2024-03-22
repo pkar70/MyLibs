@@ -14,7 +14,7 @@
     <PackageProjectUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.winui3.Configs</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.winui3.Configs</RepositoryUrl>
-    <Version>1.1.6</Version>
+    <Version>2.0.1</Version>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>

@@ -1,16 +1,16 @@
 ﻿
 Imports VBlib = pkar.NetConfigs
 
-#If PK_WPF Then
 Imports System.Runtime.CompilerServices
+
+#If PK_WPF Then
 Imports System.Windows.Controls
 Imports System.Windows.Controls.Primitives
 ' rename, tak by działały extension z UWP dla WPF
 Imports CalendarDatePicker = System.Windows.Controls.Calendar
 #End If
 
-#If PK_WINUI Then
-Imports System.Runtime.CompilerServices
+#If PK_WINUI Or (Not NETFX_CORE And Not PK_WPF) Then
 Imports Microsoft.UI.Xaml.Controls
 Imports Microsoft.UI.Xaml.Controls.Primitives
 #End If
