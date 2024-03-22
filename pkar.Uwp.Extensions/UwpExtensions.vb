@@ -1,6 +1,8 @@
 ﻿
 Imports pkar.Localize
-Imports System.Runtime.InteropServices.WindowsRuntime
+'Imports System.Runtime.InteropServices.WindowsRuntime
+'Imports System.Net.Mime.MediaTypeNames
+
 
 
 #If PK_WPF Then
@@ -454,6 +456,7 @@ Partial Public Module extensions
     'Private _mProgBar As ProgressBar = Nothing
     Private _mProgRingShowCnt As Integer = 0
 
+
     ''' <summary>
     ''' Initialization of ProgressRing (center of Page) and ProgressBar (top of last Page.Grid.Row)
     ''' </summary>
@@ -461,24 +464,13 @@ Partial Public Module extensions
     ''' <param name="bBar">True if ProgressBar should be created</param>
     ''' <exception cref="ArgumentException">Thrown if Page is not based on Grid</exception>
     <Extension()>
-    Public Sub ProgRingInit(ByVal oPage As Page, bRing As Boolean, bBar As Boolean)
+    Private Sub ProgRingInitPriv(ByVal oPage As Grid, bRing As Boolean, bBar As Boolean)
+
+        ' tak dziwnie, bo wcześniej było oPage.ProgRingInit, i to wyciągało oGrid
+        Dim oGrid As Grid = oPage
 
         ' 2020.11.24: dodaję force-off do ProgRing na Init
         _mProgRingShowCnt = 0   ' skoro inicjalizuje, to znaczy że na pewno trzeba wyłączyć
-
-        'Dim oFrame As Frame = Window.Current.Content
-        'Dim oPage As Page = oFrame.Content
-        Dim oGrid As Grid = TryCast(oPage.Content, Grid)
-        If oGrid Is Nothing Then
-            ' skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
-            Debug.WriteLine("ProgRingInit wymaga Grid jako podstawy Page")
-            Throw New ArgumentException("Page.ProgRingInit requires Grid")
-        End If
-
-        Dim iCols As Integer = 0
-        If oGrid.ColumnDefinitions IsNot Nothing Then iCols = oGrid.ColumnDefinitions.Count ' może być 0
-        Dim iRows As Integer = 0
-        If oGrid.RowDefinitions IsNot Nothing Then iRows = oGrid.RowDefinitions.Count ' może być 0
 
         If oPage.FindName("uiPkAutoProgRing") Is Nothing Then
             If bRing Then
@@ -489,14 +481,7 @@ Partial Public Module extensions
                     .Visibility = Visibility.Collapsed
                 }
                 Canvas.SetZIndex(_mProgRing, 10000)
-                If iRows > 1 Then
-                    Grid.SetRow(_mProgRing, 0)
-                    Grid.SetRowSpan(_mProgRing, iRows)
-                End If
-                If iCols > 1 Then
-                    Grid.SetColumn(_mProgRing, 0)
-                    Grid.SetColumnSpan(_mProgRing, iCols)
-                End If
+                _mProgRing.EscapeGrid(oGrid, True, True)
                 oGrid.Children.Add(_mProgRing)
 
 #If PK_WPF Then
@@ -521,14 +506,8 @@ Partial Public Module extensions
                 .Foreground = New Media.SolidColorBrush(color)
             }
             Canvas.SetZIndex(_mProgText, 10000)
-            If iRows > 1 Then
-                Grid.SetRow(_mProgText, 0)
-                Grid.SetRowSpan(_mProgText, iRows)
-            End If
-            If iCols > 1 Then
-                Grid.SetColumn(_mProgText, 0)
-                Grid.SetColumnSpan(_mProgText, iCols)
-            End If
+            _mProgText.EscapeGrid(oGrid, True, True)
+
             oGrid.Children.Add(_mProgText)
 
 #If PK_WPF Then
@@ -546,11 +525,10 @@ Partial Public Module extensions
                     .Visibility = Visibility.Collapsed
                 }
                 Canvas.SetZIndex(_mProgBar, 10000)
+                Dim iRows As Integer = 0
+                If oGrid.RowDefinitions IsNot Nothing Then iRows = oGrid.RowDefinitions.Count ' może być 0
                 If iRows > 1 Then Grid.SetRow(_mProgBar, iRows - 1)
-                If iCols > 1 Then
-                    Grid.SetColumn(_mProgBar, 0)
-                    Grid.SetColumnSpan(_mProgBar, iCols)
-                End If
+                _mProgBar.EscapeGrid(oGrid, False, True)
                 oGrid.Children.Add(_mProgBar)
 #If PK_WPF Then
                 oPage.RegisterName("uiPkAutoProgBar", _mProgBar)
@@ -559,6 +537,49 @@ Partial Public Module extensions
         End If
 
     End Sub
+
+    ''' <summary>
+    ''' Initialization of ProgressRing (center of Page) and ProgressBar (top of last Page.Grid.Row)
+    ''' </summary>
+    ''' <param name="bRing">True if ProgressRing should be created</param>
+    ''' <param name="bBar">True if ProgressBar should be created</param>
+    ''' <exception cref="ArgumentException">Thrown if Page is not based on Grid</exception>
+    <Extension()>
+    Public Sub ProgRingInit(ByVal oPage As Page, bRing As Boolean, bBar As Boolean)
+        'Dim oFrame As Frame = Window.Current.Content
+        'Dim oWin As Page = oFrame.Content
+        Dim oGrid As Grid = TryCast(oPage.Content, Grid)
+        If oGrid Is Nothing Then
+            ' skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
+            Debug.WriteLine("ProgRingInit wymaga Grid jako podstawy Page")
+            Throw New ArgumentException("Page.ProgRingInit requires Grid")
+        End If
+
+        oGrid.ProgRingInitPriv(bRing, bBar)
+    End Sub
+
+#If PK_WPF Then
+    ''' <summary>
+    ''' Initialization of ProgressRing (center of Page) and ProgressBar (top of last Page.Grid.Row)
+    ''' </summary>
+    ''' <param name="bRing">True if ProgressRing should be created</param>
+    ''' <param name="bBar">True if ProgressBar should be created</param>
+    ''' <exception cref="ArgumentException">Thrown if Page is not based on Grid</exception>
+    <Extension()>
+    Public Sub ProgRingInit(ByVal oWin As Window, bRing As Boolean, bBar As Boolean)
+        'Dim oFrame As Frame = Window.Current.Content
+        'Dim oWin As Page = oFrame.Content
+        Dim oGrid As Grid = TryCast(oWin.Content, Grid)
+        If oGrid Is Nothing Then
+            ' skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
+            Debug.WriteLine("ProgRingInit wymaga Grid jako podstawy Page")
+            Throw New ArgumentException("Page.ProgRingInit requires Grid")
+        End If
+
+        oGrid.ProgRingInitPriv(bRing, bBar)
+    End Sub
+
+#End If
 
     ''' <summary>
     ''' Show/Hide of ProgressRing/Bar, Bar has Min=0 and Max=100
@@ -587,6 +608,11 @@ Partial Public Module extensions
         oPage.ProgRingShow(bVisible, bForce, 0, dMax)
     End Sub
 
+#If Not PK_WPF Then
+    ' UWP, WinUI
+    Private _PoprzedniKursor As Windows.UI.Core.CoreCursor
+#End If
+
     ''' <summary>
     ''' Show/Hide of ProgressRing/Bar
     ''' </summary>
@@ -594,7 +620,7 @@ Partial Public Module extensions
     ''' <param name="dMax">Value to be used as ProgressBar.Max</param>
     ''' <param name="dMin">Value to be used as ProgressBar.Min</param>
     <Extension()>
-    Public Sub ProgRingShow(ByVal oPage As Page, bVisible As Boolean, bForce As Boolean, dMin As Double, dMax As Double)
+    Private Sub ProgRingShowPriv(ByVal oPage As FrameworkElement, bVisible As Boolean, bForce As Boolean, dMin As Double, dMax As Double)
 
         '2021.10.02: tylko gdy jeszcze nie jest pokazywany
         '2021.10.13: gdy min<>max, oraz tylko gdy ma pokazać - inaczej nie zmieniaj zakresu!
@@ -628,9 +654,26 @@ Partial Public Module extensions
         End If
         Debug.WriteLine("ProgRingShow(" & bVisible & ", " & bForce & "...), current ShowCnt=" & _mProgRingShowCnt)
 
+        If _mProgRingShowCnt > 0 Then
+#If PK_WPF Then
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait
+#Else
+            If _PoprzedniKursor Is Nothing Then _PoprzedniKursor = Window.Current.CoreWindow.PointerCursor
+            Window.Current.CoreWindow.PointerCursor = New Core.CoreCursor(Core.CoreCursorType.Wait, 1)
+#End If
+        Else
+#If PK_WPF Then
+            Mouse.OverrideCursor = Nothing
+#ElseIf NETFX_CORE Then
+            If _PoprzedniKursor IsNot Nothing Then
+                Window.Current.CoreWindow.PointerCursor = _PoprzedniKursor
+            End If
+#End If
+        End If
 
 
-        Try
+
+            Try
             Dim _mProgRing As ProgressRing = TryCast(oPage.FindName("uiPkAutoProgRing"), ProgressRing)
             Dim _mProgText As TextBlock = TryCast(oPage.FindName("uiPkAutoProgText"), TextBlock)
 
@@ -664,11 +707,62 @@ Partial Public Module extensions
     End Sub
 
     ''' <summary>
-    ''' Set message inside ProgressRing
+    ''' Show/Hide of ProgressRing/Bar
     ''' </summary>
-    ''' <exception cref="ArgumentException">Thrown if Init was not called</exception>
+    ''' <param name="bForce">True if Show/Hide should be done without using nested levels count</param>
+    ''' <param name="dMax">Value to be used as ProgressBar.Max</param>
+    ''' <param name="dMin">Value to be used as ProgressBar.Min</param>
     <Extension()>
-    Public Sub ProgRingSetText(ByVal oPage As Page, message As String)
+    Public Sub ProgRingShow(ByVal oPage As Page, bVisible As Boolean, bForce As Boolean, dMin As Double, dMax As Double)
+        oPage.ProgRingShowPriv(bVisible, bForce, dMin, dMax)
+    End Sub
+
+#If PK_WPF Then
+    ''' <summary>
+    ''' Show/Hide of ProgressRing/Bar
+    ''' </summary>
+    ''' <param name="bForce">True if Show/Hide should be done without using nested levels count</param>
+    ''' <param name="dMax">Value to be used as ProgressBar.Max</param>
+    ''' <param name="dMin">Value to be used as ProgressBar.Min</param>
+    <Extension()>
+    Public Sub ProgRingShow(ByVal oWin As Window, bVisible As Boolean, bForce As Boolean, dMin As Double, dMax As Double)
+        oWin.ProgRingShowPriv(bVisible, bForce, dMin, dMax)
+    End Sub
+
+    ''' <summary>
+    ''' Show/Hide of ProgressRing/Bar, Bar has Min=0 and Max=100
+    ''' </summary>
+    <Extension()>
+    Public Sub ProgRingShow(ByVal oPage As Window, bVisible As Boolean)
+        oPage.ProgRingShowPriv(bVisible, False, 0, 100)
+    End Sub
+
+    ''' <summary>
+    ''' Forced Show/Hide of ProgressRing/Bar, Bar has Min=0 and Max=100
+    ''' </summary>
+    ''' <param name="bForce">True if Show/Hide should be done without using nested levels count</param>
+    <Extension()>
+    Public Sub ProgRingShow(ByVal oPage As Window, bVisible As Boolean, bForce As Boolean)
+        oPage.ProgRingShowPriv(bVisible, bForce, 0, 100)
+    End Sub
+
+    ''' <summary>
+    ''' Show/Hide of ProgressRing/Bar
+    ''' </summary>
+    ''' <param name="bForce">True if Show/Hide should be done without using nested levels count</param>
+    ''' <param name="dMax">Value to be used as ProgressBar.Max (default Min=0)</param>
+    <Extension()>
+    Public Sub ProgRingShow(ByVal oPage As Window, bVisible As Boolean, bForce As Boolean, dMax As Double)
+        oPage.ProgRingShowPriv(bVisible, bForce, 0, dMax)
+    End Sub
+
+
+#End If
+
+
+
+    <Extension()>
+    Private Sub ProgRingSetTextPriv(ByVal oPage As FrameworkElement, message As String)
         Dim _mProgText As TextBlock = TryCast(oPage.FindName("uiPkAutoProgText"), TextBlock)
         If _mProgText Is Nothing Then
             ' skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
@@ -681,11 +775,29 @@ Partial Public Module extensions
     End Sub
 
     ''' <summary>
-    ''' Set ProgressBar.Max
+    ''' Set message inside ProgressRing
     ''' </summary>
     ''' <exception cref="ArgumentException">Thrown if Init was not called</exception>
     <Extension()>
-    Public Sub ProgRingSetMax(ByVal oPage As Page, dMaxValue As Double)
+    Public Sub ProgRingSetText(ByVal oPage As Page, message As String)
+        oPage.ProgRingSetTextPriv(message)
+    End Sub
+
+#If PK_WPF Then
+    ''' <summary>
+    ''' Set message inside ProgressRing
+    ''' </summary>
+    ''' <exception cref="ArgumentException">Thrown if Init was not called</exception>
+    <Extension()>
+    Public Sub ProgRingSetText(ByVal oWin As Window, message As String)
+        oWin.ProgRingSetTextPriv(message)
+    End Sub
+
+#End If
+
+
+    <Extension()>
+    Private Sub ProgRingSetMaxPriv(ByVal oPage As FrameworkElement, dMaxValue As Double)
         Dim _mProgBar As ProgressBar = TryCast(oPage.FindName("uiPkAutoProgBar"), ProgressBar)
         If _mProgBar Is Nothing Then
             ' skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
@@ -698,11 +810,28 @@ Partial Public Module extensions
     End Sub
 
     ''' <summary>
-    ''' Set ProgressBar.Value
+    ''' Set ProgressBar.Max
     ''' </summary>
     ''' <exception cref="ArgumentException">Thrown if Init was not called</exception>
     <Extension()>
-    Public Sub ProgRingSetVal(ByVal oPage As Page, dValue As Double)
+    Public Sub ProgRingSetMax(ByVal oPage As Page, dMaxValue As Double)
+        oPage.ProgRingSetMaxPriv(dMaxValue)
+    End Sub
+
+#If PK_WPF Then
+    ''' <summary>
+    ''' Set ProgressBar.Max
+    ''' </summary>
+    ''' <exception cref="ArgumentException">Thrown if Init was not called</exception>
+    <Extension()>
+    Public Sub ProgRingSetMax(ByVal oWin As Window, dMaxValue As Double)
+        oWin.ProgRingSetMaxPriv(dMaxValue)
+    End Sub
+
+#End If
+
+    <Extension()>
+    Private Sub ProgRingSetValPriv(ByVal oPage As FrameworkElement, dValue As Double)
         Dim _mProgBar As ProgressBar = TryCast(oPage.FindName("uiPkAutoProgBar"), ProgressBar)
         If _mProgBar Is Nothing Then
             Debug.WriteLine("ProgRing(double) wymaga wczesniej ProgRingInit")
@@ -713,18 +842,30 @@ Partial Public Module extensions
 
     End Sub
 
+#If PK_WPF Then
     ''' <summary>
-    ''' Increment ProgressBar.Value
+    ''' Set ProgressBar.Value
     ''' </summary>
     ''' <exception cref="ArgumentException">Thrown if Init was not called</exception>
-#If PK_WPF Then
     <Extension()>
-    Public Async Function ProgRingInc(ByVal oPage As Page) As Task
-#Else
-    <Extension()>
-    Public Sub ProgRingInc(ByVal oPage As Page)
+    Public Sub ProgRingSetVal(ByVal oWin As Window, dValue As Double)
+        oWin.ProgRingSetValPriv(dValue)
+    End Sub
+
 #End If
-        Dim _mProgBar As ProgressBar = TryCast(oPage.FindName("uiPkAutoProgBar"), ProgressBar)
+
+    ''' <summary>
+    ''' Set ProgressBar.Value
+    ''' </summary>
+    ''' <exception cref="ArgumentException">Thrown if Init was not called</exception>
+    <Extension()>
+    Public Sub ProgRingSetVal(ByVal oPage As Page, dValue As Double)
+        oPage.ProgRingSetValPriv(dValue)
+    End Sub
+
+    <Extension()>
+    Private Sub ProgRingIncPriv(ByVal oFE As FrameworkElement)
+        Dim _mProgBar As ProgressBar = TryCast(oFE.FindName("uiPkAutoProgBar"), ProgressBar)
         If _mProgBar Is Nothing Then
             Debug.WriteLine("ProgRing(double) wymaga wczesniej ProgRingInit")
             Throw New ArgumentException("Page.ProgRingInc called, but Init was not called")
@@ -737,6 +878,32 @@ Partial Public Module extensions
         Else
             _mProgBar.Value = dVal
         End If
+    End Sub
+
+
+    ''' <summary>
+    ''' Increment ProgressBar.Value
+    ''' </summary>
+    ''' <exception cref="ArgumentException">Thrown if Init was not called</exception>
+#If PK_WPF Then
+    <Extension()>
+    Public Async Function ProgRingInc(ByVal oWin As Window) As Task
+        oWin.ProgRingIncPriv
+        Await Task.Delay(1)
+    End Function
+
+
+    ''' <summary>
+    ''' Increment ProgressBar.Value
+    ''' </summary>
+    ''' <exception cref="ArgumentException">Thrown if Init was not called</exception>
+    <Extension()>
+    Public Async Function ProgRingInc(ByVal oPage As Page) As Task
+#Else
+    <Extension()>
+    Public Sub ProgRingInc(ByVal oPage As Page)
+#End If
+        oPage.ProgRingIncPriv
 
 #If PK_WPF Then
         Await Task.Delay(1)
@@ -802,7 +969,7 @@ Partial Public Module extensions
     ''' <param name="message">message to be shown</param>
     <Extension()>
     Public Async Function MsgBoxAsync(ByVal oPage As FrameworkElement, message As String) As Task
-        await oPage.MsgBoxAsyncTask(message)
+        Await oPage.MsgBoxAsyncTask(message)
     End Function
 
 #End If
@@ -892,8 +1059,8 @@ Partial Public Module extensions
         Return oCmd = ContentDialogResult.Secondary
 #End If
     End Function
-#End If
 
+#End If
 #If PK_WPF Then
     ''' <summary>
     ''' Show message on screen, waits for Continue/Cancel buttons and return text entered by user
@@ -904,7 +1071,7 @@ Partial Public Module extensions
     ''' <param name="buttonCancel">text to be shown instead of "Cancel"</param>
     ''' <returns>text entered by user, or empty if Cancel was pressed</returns>
     <Extension()>
-    Public Async Function InputBoxAsync(ByVal oPage As FrameworkElement, message As String, optional defaultText As String="", Optional buttonContinue As String = "Continue", Optional buttonCancel As String = "Cancel") As Task(Of String)
+    Public Async Function InputBoxAsync(ByVal oPage As FrameworkElement, message As String, Optional defaultText As String = "", Optional buttonContinue As String = "Continue", Optional buttonCancel As String = "Cancel") As Task(Of String)
         If Not IsInteractive() Then Return ""
 
         Dim sAppName As String = Application.Current.MainWindow.GetType().Assembly.GetName.Name

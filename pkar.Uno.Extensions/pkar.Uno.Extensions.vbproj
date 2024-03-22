@@ -8,7 +8,7 @@
     <Authors>pkar</Authors>
     <Company>none</Company>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>2.0.2</Version>
+    <Version>2.0.11</Version>
     <PackageReleaseNotes>Now all texts in Dialogs can be Localized (see pkar.Localize nuget)</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>

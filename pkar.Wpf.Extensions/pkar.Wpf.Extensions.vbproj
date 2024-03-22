@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>pkar.UI.Extensions</RootNamespace>
     <UseWPF>true</UseWPF>
-    <Version>2.0.8</Version>
+    <Version>2.0.11</Version>
     <Title>Several extensions of WPF UI classes</Title>
     <Authors>pkar</Authors>
     <Company>none</Company>
