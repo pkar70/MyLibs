@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>pkar.UWP.Toasts</id>
+    <version>1.0.0</version>
+    <authors>pkar</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">GPL-3.0-or-later</license>
+    <projectUrl>https://github.com/pkar70/MyLibs/pkar.uwp.toasts/</projectUrl>
+    <description>some wrappers to make toasts using simpler</description>
+    <releaseNotes>First release</releaseNotes>
+    <copyright>Piotr Karocki</copyright>
+    <tags>Extension Configuration ApplicationData</tags>
+	<readme>docs\README.md</readme>
+
+    <dependencies>
+      <group targetFramework="UAP10.0">
+<dependency id="pkar.Localize" version="1.0.2"/>
+      </group>
+    </dependencies>
+
+
+  </metadata>
+
+    <files>
+        <!-- WinMd and IntelliSense files -->
+      <file src="bin\Release\pkar.UI.Toasts.winmd" target="lib\uap10.0"/>
+      <file src="bin\Release\pkar.UI.Toasts.xml" target="lib\uap10.0"/>
+
+ <file src="README.md" target="docs\" />
+
+ <!-- WINMDs and resources -->
+      <file src="bin\ARM\Release\pkar.UI.Toasts.winmd" target="runtimes\win10-arm"/>
+      <file src="bin\ARM\Release\pkar.UI.Toasts.pri" target="runtimes\win10-arm"/>
+
+      <file src="bin\x64\Release\pkar.UI.Toasts.winmd" target="runtimes\win10-x64"/>
+      <file src="bin\x64\Release\pkar.UI.Toasts.pri" target="runtimes\win10-x64"/>
+
+      <file src="bin\x86\Release\pkar.UI.Toasts.winmd" target="runtimes\win10-x86"/>
+      <file src="bin\x86\Release\pkar.UI.Toasts.pri" target="runtimes\win10-x86"/>
+
+    </files>
+
+
+
+</package>
