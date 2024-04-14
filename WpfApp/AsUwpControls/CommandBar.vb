@@ -1,4 +1,5 @@
-﻿Imports pkar.DotNetExtensions
+﻿Imports System.Security.RightsManagement
+Imports pkar.DotNetExtensions
 
 Public Class CommandBar
     Inherits StackPanel
@@ -27,7 +28,7 @@ Public Class CommandBar
     Public Overrides Sub EndInit()
         MyBase.EndInit()
 
-        Dim rozwijacz As New AppBarButton With {.Icon = "⋯", .Label = ""}
+        Dim rozwijacz As New AppBarButton With {.Icon = "⋯", .Label = "", .IsCompact = True}
         AddHandler rozwijacz.Click, AddressOf Rozwijanie_Click
         Me.Children.Add(rozwijacz)
 
@@ -41,6 +42,8 @@ Public Class CommandBar
             Dim oABButt As AppBarButton = TryCast(oChild, AppBarButton)
             If oABButt Is Nothing Then Continue For
 
+            If oABButt.Icon = "⋯" Then Continue For
+
             If _NotClosed Then
                 oABButt.Visibility = Visibility.Visible
                 oABButt.IsCompact = False
@@ -49,7 +52,7 @@ Public Class CommandBar
                     oABButt.Visibility = Visibility.Visible
                     oABButt.IsCompact = True
                 Else
-                    If oABButt.Icon <> "⋯" Then oABButt.Visibility = Visibility.Collapsed
+                    oABButt.Visibility = Visibility.Collapsed
                 End If
             End If
 
