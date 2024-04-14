@@ -1961,248 +1961,248 @@ public static void GetSettingsBool(this Windows.UI.Xaml.Controls.AppBarToggleBut
 #endif
 #endregion
 
-#region "ProgressBar/Ring"
-    //  dodałem 25 X 2020
+//#region "ProgressBar/Ring"
+//    //  dodałem 25 X 2020
 
-    private static int _mProgRingShowCnt; // = 0;
+//    private static int _mProgRingShowCnt; // = 0;
 
-        public static void ProgRingInit(this Windows.UI.Xaml.Controls.Page oPage, bool bRing, bool bBar)
-        {
-            // 2020.11.24: dodaję force-off do ProgRing na Init
-            _mProgRingShowCnt = 0;   // skoro inicjalizuje, to znaczy że na pewno trzeba wyłączyć
+//        public static void ProgRingInit(this Windows.UI.Xaml.Controls.Page oPage, bool bRing, bool bBar)
+//        {
+//            // 2020.11.24: dodaję force-off do ProgRing na Init
+//            _mProgRingShowCnt = 0;   // skoro inicjalizuje, to znaczy że na pewno trzeba wyłączyć
 
-#pragma warning disable IDE0019 // Use pattern matching
-            Windows.UI.Xaml.Controls.Grid oGrid = oPage?.Content as Windows.UI.Xaml.Controls.Grid;
-#pragma warning restore IDE0019 // Use pattern matching
-            if (oGrid is null)
-            {
-                // skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
-                vb14.DebugOut("ProgRingInit wymaga Grid jako podstawy Page");
-                throw new ArgumentException("ProgRingInit wymaga Grid jako podstawy Page");
-            }
+//#pragma warning disable IDE0019 // Use pattern matching
+//            Windows.UI.Xaml.Controls.Grid oGrid = oPage?.Content as Windows.UI.Xaml.Controls.Grid;
+//#pragma warning restore IDE0019 // Use pattern matching
+//            if (oGrid is null)
+//            {
+//                // skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
+//                vb14.DebugOut("ProgRingInit wymaga Grid jako podstawy Page");
+//                throw new ArgumentException("ProgRingInit wymaga Grid jako podstawy Page");
+//            }
 
-            // *TODO* sprawdz czy istnieje juz taki Control?
+//            // *TODO* sprawdz czy istnieje juz taki Control?
 
-            int iCols = 0;
-            if (oGrid.ColumnDefinitions is object)
-                iCols = oGrid.ColumnDefinitions.Count; // moze byc 0
-            int iRows = 0;
-            if (oGrid.RowDefinitions is object)
-                iRows = oGrid.RowDefinitions.Count; // moze byc 0
+//            int iCols = 0;
+//            if (oGrid.ColumnDefinitions is object)
+//                iCols = oGrid.ColumnDefinitions.Count; // moze byc 0
+//            int iRows = 0;
+//            if (oGrid.RowDefinitions is object)
+//                iRows = oGrid.RowDefinitions.Count; // moze byc 0
 
-            if (bRing && (oPage.FindName("uiPkAutoProgRing") is null))
-            {
-                var _mProgRing = new Windows.UI.Xaml.Controls.ProgressRing
-                {
-                    Name = "uiPkAutoProgRing",
-                    VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Center,
-                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,
-                    Visibility = Windows.UI.Xaml.Visibility.Collapsed
-                };
-                Windows.UI.Xaml.Controls.Canvas.SetZIndex(_mProgRing, 10000);
-
-
-
-                if (iRows > 1)
-                {
-                    Windows.UI.Xaml.Controls.Grid.SetRow(_mProgRing, 0);
-                    Windows.UI.Xaml.Controls.Grid.SetRowSpan(_mProgRing, iRows);
-                }
-
-                if (iCols > 1)
-                {
-                    Windows.UI.Xaml.Controls.Grid.SetColumn(_mProgRing, 0);
-                    Windows.UI.Xaml.Controls.Grid.SetColumnSpan(_mProgRing, iCols);
-                }
-
-                oGrid.Children.Add(_mProgRing);
-            }
-
-            if (bBar && (oPage.FindName("uiPkAutoProgBar") is null))
-            {
-                Windows.UI.Xaml.Controls.ProgressBar _mProgBar = new Windows.UI.Xaml.Controls.ProgressBar
-                {
-                    Name = "uiPkAutoProgBar",
-                    VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Bottom,
-                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch,
-                    Visibility = Windows.UI.Xaml.Visibility.Collapsed
-                };
-                Windows.UI.Xaml.Controls.Canvas.SetZIndex(_mProgBar, 10000);
-                if (iRows > 1)
-                    Windows.UI.Xaml.Controls.Grid.SetRow(_mProgBar, iRows - 1);
-                if (iCols > 1)
-                {
-                    Windows.UI.Xaml.Controls.Grid.SetColumn(_mProgBar, 0);
-                    Windows.UI.Xaml.Controls.Grid.SetColumnSpan(_mProgBar, iCols);
-                }
-
-                oGrid.Children.Add(_mProgBar);
-            }
-
-            if (oPage.FindName("uiPkAutoProgText") is null)
-            {
-                //var uiSett = new Windows.UI.ViewManagement.UISettings();
-                //var color = uiSett.GetColorValue(Windows.UI.ViewManagement.UIColorType.Accent);
-                var color = (Windows.UI.Color)oPage.Resources["SystemAccentColor"];
-
-                var _mProgText = new Windows.UI.Xaml.Controls.TextBlock
-                {
-                    Name = "uiPkAutoProgText",
-                    VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Center,
-                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,
-                    Visibility = Windows.UI.Xaml.Visibility.Collapsed,
-                    Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(color)
-                };
-                Windows.UI.Xaml.Controls.Canvas.SetZIndex(_mProgText, 10000);
-
-                if (iRows > 1)
-                {
-                    Windows.UI.Xaml.Controls.Grid.SetRow(_mProgText, 0);
-                    Windows.UI.Xaml.Controls.Grid.SetRowSpan(_mProgText, iRows);
-                }
-
-                if (iCols > 1)
-                {
-                    Windows.UI.Xaml.Controls.Grid.SetColumn(_mProgText, 0);
-                    Windows.UI.Xaml.Controls.Grid.SetColumnSpan(_mProgText, iCols);
-                }
-
-                oGrid.Children.Add(_mProgText);
-            }
-        }
-            public static void ProgRingShow(this Windows.UI.Xaml.Controls.Page oPage, bool bVisible, bool bForce = false, double dMin = 0d, double dMax = 100d)
-    {
-        var _mProgBar = (Windows.UI.Xaml.Controls.ProgressBar)oPage.FindName("uiPkAutoProgBar");
-            var _mProgText = (Windows.UI.Xaml.Controls.TextBlock)oPage.FindName("uiPkAutoProgText");
-            var _mProgRing = (Windows.UI.Xaml.Controls.ProgressRing)oPage.FindName("uiPkAutoProgRing");
-
-        if (_mProgBar is object)
-        {
-            _mProgBar.Minimum = dMin;
-            _mProgBar.Value = dMin;
-            _mProgBar.Maximum = dMax;
-        }
-
-        if (bForce)
-        {
-            if (bVisible)
-            {
-                _mProgRingShowCnt = 1;
-            }
-            else
-            {
-                _mProgRingShowCnt = 0;
-            }
-        }
-        else if (bVisible)
-        {
-            _mProgRingShowCnt += 1;
-        }
-        else
-        {
-            _mProgRingShowCnt -= 1;
-        }
-
-        vb14.DebugOut("ProgRingShow(" + bVisible + ", " + bForce + "...), current ShowCnt=" + _mProgRingShowCnt);
-
-        try
-        {
-            if (_mProgRingShowCnt > 0)
-            {
-                vb14.DebugOut("ProgRingShow - mam pokazac");
-                if (_mProgRing is object)
-                {
-                    double dSize;
-                    var oGrid = _mProgRing.Parent as Windows.UI.Xaml.Controls.Grid;
-                    dSize = Math.Min(oGrid.ActualHeight, oGrid.ActualWidth) / 2;
-                    dSize = Math.Max(dSize, 200); // jakby jeszcze nie było ustawione (Android!)
-                    _mProgRing.Width = dSize;
-                    _mProgRing.Height = dSize;
-                    _mProgRing.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                    _mProgRing.IsActive = true;
-                }
-
-                if (_mProgBar is object)
-                    _mProgBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
-
-                    if (_mProgText is object)
-                    {
-                        _mProgText.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                        _mProgText.Text = "";
-                    }
-
-                }
-                else
-            {
-                vb14.DebugOut("ProgRingShow - mam ukryc");
-                if (_mProgRing is object)
-                {
-                    _mProgRing.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-                    _mProgRing.IsActive = false;
-                }
-
-                    if (_mProgText is object)
-                        _mProgText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+//            if (bRing && (oPage.FindName("uiPkAutoProgRing") is null))
+//            {
+//                var _mProgRing = new Windows.UI.Xaml.Controls.ProgressRing
+//                {
+//                    Name = "uiPkAutoProgRing",
+//                    VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Center,
+//                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,
+//                    Visibility = Windows.UI.Xaml.Visibility.Collapsed
+//                };
+//                Windows.UI.Xaml.Controls.Canvas.SetZIndex(_mProgRing, 10000);
 
 
-                    if (_mProgBar is object)
-                    _mProgBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            }
-        }
-        catch
-        {
 
-        }
+//                if (iRows > 1)
+//                {
+//                    Windows.UI.Xaml.Controls.Grid.SetRow(_mProgRing, 0);
+//                    Windows.UI.Xaml.Controls.Grid.SetRowSpan(_mProgRing, iRows);
+//                }
 
-    }
+//                if (iCols > 1)
+//                {
+//                    Windows.UI.Xaml.Controls.Grid.SetColumn(_mProgRing, 0);
+//                    Windows.UI.Xaml.Controls.Grid.SetColumnSpan(_mProgRing, iCols);
+//                }
 
-        public static void ProgRingText(this Windows.UI.Xaml.Controls.Page oPage, string message)
-        {
-            var _mProgText = (Windows.UI.Xaml.Controls.TextBlock)oPage.FindName("uiPkAutoProgText");
-            if (_mProgText is object)
-                _mProgText.Text = message;
-            else
-                throw new ArgumentException("ProgRingText called, ale nie ma uiPkAutoProgText");
+//                oGrid.Children.Add(_mProgRing);
+//            }
 
-        }
+//            if (bBar && (oPage.FindName("uiPkAutoProgBar") is null))
+//            {
+//                Windows.UI.Xaml.Controls.ProgressBar _mProgBar = new Windows.UI.Xaml.Controls.ProgressBar
+//                {
+//                    Name = "uiPkAutoProgBar",
+//                    VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Bottom,
+//                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Stretch,
+//                    Visibility = Windows.UI.Xaml.Visibility.Collapsed
+//                };
+//                Windows.UI.Xaml.Controls.Canvas.SetZIndex(_mProgBar, 10000);
+//                if (iRows > 1)
+//                    Windows.UI.Xaml.Controls.Grid.SetRow(_mProgBar, iRows - 1);
+//                if (iCols > 1)
+//                {
+//                    Windows.UI.Xaml.Controls.Grid.SetColumn(_mProgBar, 0);
+//                    Windows.UI.Xaml.Controls.Grid.SetColumnSpan(_mProgBar, iCols);
+//                }
 
-        public static void ProgRingVal(this Windows.UI.Xaml.Controls.Page oPage, double dValue)
-    {
-        var _mProgBar = (Windows.UI.Xaml.Controls.ProgressBar)oPage.FindName("uiPkAutoProgBar");
-        if (_mProgBar is null)
-        {
-            // skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
-            vb14.DebugOut("ProgRing(double) wymaga wczesniej ProgRingInit");
-            throw new ArgumentException("ProgRing(double) wymaga wczesniej ProgRingInit");
-        }
+//                oGrid.Children.Add(_mProgBar);
+//            }
 
-        _mProgBar.Value = dValue;
-    }
+//            if (oPage.FindName("uiPkAutoProgText") is null)
+//            {
+//                //var uiSett = new Windows.UI.ViewManagement.UISettings();
+//                //var color = uiSett.GetColorValue(Windows.UI.ViewManagement.UIColorType.Accent);
+//                var color = (Windows.UI.Color)oPage.Resources["SystemAccentColor"];
 
-    public static void ProgRingInc(this Windows.UI.Xaml.Controls.Page oPage)
-    {
-        var _mProgBar = (Windows.UI.Xaml.Controls.ProgressBar)oPage.FindName("uiPkAutoProgBar");
-        if (_mProgBar is null)
-        {
-            // skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
-            vb14.DebugOut("ProgRing(double) wymaga wczesniej ProgRingInit");
-            throw new ArgumentException("ProgRing(double) wymaga wczesniej ProgRingInit");
-        }
+//                var _mProgText = new Windows.UI.Xaml.Controls.TextBlock
+//                {
+//                    Name = "uiPkAutoProgText",
+//                    VerticalAlignment = Windows.UI.Xaml.VerticalAlignment.Center,
+//                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,
+//                    Visibility = Windows.UI.Xaml.Visibility.Collapsed,
+//                    Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(color)
+//                };
+//                Windows.UI.Xaml.Controls.Canvas.SetZIndex(_mProgText, 10000);
 
-        double dVal = _mProgBar.Value + 1;
-        if (dVal > _mProgBar.Maximum)
-        {
-            vb14.DebugOut("ProgRingInc na wiecej niz Maximum?");
-            _mProgBar.Value = _mProgBar.Maximum;
-        }
-        else
-        {
-            _mProgBar.Value = dVal;
-        }
-    }
+//                if (iRows > 1)
+//                {
+//                    Windows.UI.Xaml.Controls.Grid.SetRow(_mProgText, 0);
+//                    Windows.UI.Xaml.Controls.Grid.SetRowSpan(_mProgText, iRows);
+//                }
+
+//                if (iCols > 1)
+//                {
+//                    Windows.UI.Xaml.Controls.Grid.SetColumn(_mProgText, 0);
+//                    Windows.UI.Xaml.Controls.Grid.SetColumnSpan(_mProgText, iCols);
+//                }
+
+//                oGrid.Children.Add(_mProgText);
+//            }
+//        }
+//            public static void ProgRingShow(this Windows.UI.Xaml.Controls.Page oPage, bool bVisible, bool bForce = false, double dMin = 0d, double dMax = 100d)
+//    {
+//        var _mProgBar = (Windows.UI.Xaml.Controls.ProgressBar)oPage.FindName("uiPkAutoProgBar");
+//            var _mProgText = (Windows.UI.Xaml.Controls.TextBlock)oPage.FindName("uiPkAutoProgText");
+//            var _mProgRing = (Windows.UI.Xaml.Controls.ProgressRing)oPage.FindName("uiPkAutoProgRing");
+
+//        if (_mProgBar is object)
+//        {
+//            _mProgBar.Minimum = dMin;
+//            _mProgBar.Value = dMin;
+//            _mProgBar.Maximum = dMax;
+//        }
+
+//        if (bForce)
+//        {
+//            if (bVisible)
+//            {
+//                _mProgRingShowCnt = 1;
+//            }
+//            else
+//            {
+//                _mProgRingShowCnt = 0;
+//            }
+//        }
+//        else if (bVisible)
+//        {
+//            _mProgRingShowCnt += 1;
+//        }
+//        else
+//        {
+//            _mProgRingShowCnt -= 1;
+//        }
+
+//        vb14.DebugOut("ProgRingShow(" + bVisible + ", " + bForce + "...), current ShowCnt=" + _mProgRingShowCnt);
+
+//        try
+//        {
+//            if (_mProgRingShowCnt > 0)
+//            {
+//                vb14.DebugOut("ProgRingShow - mam pokazac");
+//                if (_mProgRing is object)
+//                {
+//                    double dSize;
+//                    var oGrid = _mProgRing.Parent as Windows.UI.Xaml.Controls.Grid;
+//                    dSize = Math.Min(oGrid.ActualHeight, oGrid.ActualWidth) / 2;
+//                    dSize = Math.Max(dSize, 200); // jakby jeszcze nie było ustawione (Android!)
+//                    _mProgRing.Width = dSize;
+//                    _mProgRing.Height = dSize;
+//                    _mProgRing.Visibility = Windows.UI.Xaml.Visibility.Visible;
+//                    _mProgRing.IsActive = true;
+//                }
+
+//                if (_mProgBar is object)
+//                    _mProgBar.Visibility = Windows.UI.Xaml.Visibility.Visible;
+
+//                    if (_mProgText is object)
+//                    {
+//                        _mProgText.Visibility = Windows.UI.Xaml.Visibility.Visible;
+//                        _mProgText.Text = "";
+//                    }
+
+//                }
+//                else
+//            {
+//                vb14.DebugOut("ProgRingShow - mam ukryc");
+//                if (_mProgRing is object)
+//                {
+//                    _mProgRing.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+//                    _mProgRing.IsActive = false;
+//                }
+
+//                    if (_mProgText is object)
+//                        _mProgText.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
 
 
-#endregion
+//                    if (_mProgBar is object)
+//                    _mProgBar.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+//            }
+//        }
+//        catch
+//        {
+
+//        }
+
+//    }
+
+//        public static void ProgRingText(this Windows.UI.Xaml.Controls.Page oPage, string message)
+//        {
+//            var _mProgText = (Windows.UI.Xaml.Controls.TextBlock)oPage.FindName("uiPkAutoProgText");
+//            if (_mProgText is object)
+//                _mProgText.Text = message;
+//            else
+//                throw new ArgumentException("ProgRingText called, ale nie ma uiPkAutoProgText");
+
+//        }
+
+//        public static void ProgRingVal(this Windows.UI.Xaml.Controls.Page oPage, double dValue)
+//    {
+//        var _mProgBar = (Windows.UI.Xaml.Controls.ProgressBar)oPage.FindName("uiPkAutoProgBar");
+//        if (_mProgBar is null)
+//        {
+//            // skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
+//            vb14.DebugOut("ProgRing(double) wymaga wczesniej ProgRingInit");
+//            throw new ArgumentException("ProgRing(double) wymaga wczesniej ProgRingInit");
+//        }
+
+//        _mProgBar.Value = dValue;
+//    }
+
+//    public static void ProgRingInc(this Windows.UI.Xaml.Controls.Page oPage)
+//    {
+//        var _mProgBar = (Windows.UI.Xaml.Controls.ProgressBar)oPage.FindName("uiPkAutoProgBar");
+//        if (_mProgBar is null)
+//        {
+//            // skoro to nie Grid, to nie ma jak umiescic koniecznych elementow
+//            vb14.DebugOut("ProgRing(double) wymaga wczesniej ProgRingInit");
+//            throw new ArgumentException("ProgRing(double) wymaga wczesniej ProgRingInit");
+//        }
+
+//        double dVal = _mProgBar.Value + 1;
+//        if (dVal > _mProgBar.Maximum)
+//        {
+//            vb14.DebugOut("ProgRingInc na wiecej niz Maximum?");
+//            _mProgBar.Value = _mProgBar.Maximum;
+//        }
+//        else
+//        {
+//            _mProgBar.Value = dVal;
+//        }
+//    }
+
+
+//#endregion
 
 
     //public static async System.Threading.Tasks.Task<bool> FileExistsAsync(this Windows.Storage.StorageFolder oFold, string sFileName)
