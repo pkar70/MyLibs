@@ -116,6 +116,12 @@ Known mapservices:
 // since v1.2.8:
 * geouri (geo: without altitude)
 * geouriAlt (geo: with altitude)
+// since v1.5.0
+* geohack
+* herewego
+* copernix
+* wikimap
+* oldmaps
 
 
 # BasicGeoposWithRadius

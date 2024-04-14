@@ -1,4 +1,9 @@
 ﻿
+v1.5.0
+* Added %dmslat, %dmslon placeholders in FormatLink
+* Added %ew, %ns placeholders in String*DM
+* Added services: geohack, herewego,copernix,wikimap,oldmaps
+
 v1.4.0
 * Add: FromQTH, ToQTH
 * Added some unit tests

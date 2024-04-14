@@ -333,11 +333,14 @@ Public Class BasicGeopos
     ''' <summary>
     ''' insert Latitude, Longitude, Altitude and given zoomLevel into string (%lat, %lon, %alt, %zoom)
     ''' </summary>
-    ''' <param name="sBaseLink">base link, use %lat and %lon as placeholders</param>
+    ''' <param name="sBaseLink">base link, use %lat, %lon, %alt, %zoom, %dmslat, %dmslon as placeholders</param>
     Public Function FormatLink(sBaseLink As String, zoomLevel As Integer) As String
         sBaseLink = sBaseLink.Replace("%lat", StringLat)
         sBaseLink = sBaseLink.Replace("%lon", StringLon)
         sBaseLink = sBaseLink.Replace("%alt", StringLon)
+        sBaseLink = sBaseLink.Replace("%dmslat", StringLatDM("%d_%m_%s_%nw", 0)) ' 50_03_41_N_19_56_14_E
+        sBaseLink = sBaseLink.Replace("%dmslon", StringLonDM("%d_%m_%s_%ew", 0))
+        sBaseLink = sBaseLink.Replace("%bbox", Double2String(Longitude - 0.01, 5) & "," & Double2String(Latitude - 0.01, 5) & "," & Double2String(Longitude + 0.01, 5) & "," & Double2String(Latitude + 0.01, 5))
         sBaseLink = sBaseLink.Replace("%zoom", zoomLevel)
         Return sBaseLink
     End Function
@@ -423,10 +426,15 @@ Public Class BasicGeopos
     Public Shared MapServices As New Dictionary(Of String, String) From
         {
         {"openstreetmap", "https://www.openstreetmap.org/#map=%zoom/%lat/%lon"},
+        {"geohack", "https://geohack.toolforge.org/geohack.php?params=%dmslat_%dmslon_type:landmark"},
         {"bing", "https://bing.com/maps/default.aspx?lvl=%zoom&cp=%lat~%lon"},
+        {"herewego", "https://wego.here.com/location/?map=%lat,%lon,15"},
         {"google", "https://www.google.pl/maps/@%lat,%lon,%zoomz"},
         {"wirtszlaki", "https://mapa.wirtualneszlaki.pl/#%zoom/%lat/%lon"},
+        {"copernix", "https://copernix.io/#?where=%lon,%lat,%zoom&query=&map_type=roadmap&pagename=?language=en"},
         {"arcgis", "https://www.arcgis.com/home/webmap/viewer.html?center=%lon,%lat&level=%zoom"},
+        {"wikimap", "https://wikimap.toolforge.org/?lat=%lat&lon=%lon&zoom=%zoom&lang=en&wp=false"},
+        {"oldmaps", "https://www.oldmapsonline.org/en/Krakow#bbox=%bbox"},
         {"geouri", "geo:%lat,%lon"},
         {"geouriAlt", "geo:%lat,%lon,%alt"}
         }
@@ -543,23 +551,33 @@ Public Class BasicGeopos
     End Function
 
     ''' <summary>
-    ''' return Latitude as DMS string with iDigits decimal digits
+    ''' return Latitude as DMS string with iDigits decimal digits. If %ns is used, then use absolute value degrees and N/S, if not - degrees can be negative., 
     ''' </summary>
-    ''' <param name="sFormat">format of value, use %d %m %s as placeholders</param>
+    ''' <param name="sFormat">format of value, use %d %m %s %ns as placeholders</param>
     ''' <param name="iDigits">decimal digits (max 5)</param>
     ''' <returns></returns>
     Public Function StringLatDM(Optional sFormat As String = "%d°%m′%s″", Optional iDigits As Integer = 5) As String
-        Return Double2StringDMS(Latitude, sFormat, iDigits)
+        If sFormat.Contains("%ns") Then
+            sFormat = sFormat.Replace("%ns", If(Latitude > 0, "N", "S"))
+            Return Double2StringDMS(Math.Abs(Latitude), sFormat, iDigits)
+        Else
+            Return Double2StringDMS(Latitude, sFormat, iDigits)
+        End If
     End Function
 
     ''' <summary>
     ''' return Longitude as DMS string with iDigits decimal digits
     ''' </summary>
-    ''' <param name="sFormat">format of value, use %d %m %s as placeholders</param>
+    ''' <param name="sFormat">format of value, use %d %m %s %ew as placeholders. If %ew is used, then use absolute value degrees and E/W, if not - degrees can be negative.</param>
     ''' <param name="iDigits">decimal digits (max 5)</param>
     ''' <returns></returns>
     Public Function StringLonDM(Optional sFormat As String = "%d°%m′%s″", Optional iDigits As Integer = 5) As String
-        Return Double2StringDMS(Longitude, sFormat, iDigits)
+        If sFormat.Contains("%ew") Then
+            sFormat = sFormat.Replace("%ew", If(Latitude > 0, "E", "W"))
+            Return Double2StringDMS(Math.Abs(Latitude), sFormat, iDigits)
+        Else
+            Return Double2StringDMS(Longitude, sFormat, iDigits)
+        End If
     End Function
 
     ''' <summary>
