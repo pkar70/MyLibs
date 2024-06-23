@@ -1,4 +1,10 @@
 ﻿
+v1.5.3
+* correction of ToOSMlink
+
+v1.5.2
+* BasicGeoposWithRadius has own .Clone
+
 v1.5.0
 * Added %dmslat, %dmslon placeholders in FormatLink
 * Added %ew, %ns placeholders in String*DM

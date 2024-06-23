@@ -34,4 +34,13 @@
         Return MyBase.IsInsideCircle(center, Radius)
     End Function
 
+    ''' <summary>
+    ''' returns clone of current item
+    ''' </summary>
+    ''' <returns></returns>
+    Public Overrides Function Clone()
+        Return New BasicGeoposWithRadius(New BasicGeopos(Latitude, Longitude, Altitude), Radius)
+    End Function
+
+
 End Class

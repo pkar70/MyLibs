@@ -72,7 +72,7 @@ Public Class BasicGeopos
     ''' returns clone of current item
     ''' </summary>
     ''' <returns></returns>
-    Public Function Clone()
+    Public Overridable Function Clone()
         Return New BasicGeopos(Latitude, Longitude, Altitude)
     End Function
 
@@ -357,8 +357,8 @@ Public Class BasicGeopos
         Dim iLat As Integer = baselink.IndexOf("%lat")
         Dim iLon As Integer = baselink.IndexOf("%lon")
 
-        Dim sRegMask As String = baselink.Replace("%lon", "([\.0-9]*)").
-            Replace("%lat", "([\.0-9]*)").
+        Dim sRegMask As String = baselink.Replace("%lon", "(-?[\.0-9]*)").
+            Replace("%lat", "(-?[\.0-9]*)").
             Replace("%zoom", "[0-9]*").
             Replace("%alt", "[0-9]*")
 
@@ -395,7 +395,7 @@ Public Class BasicGeopos
     ''' </summary>
     ''' <param name="zoom">zoom level to be used</param>
     Public Function ToOSMLink(Optional zoom As Integer = 16) As String
-        Return FormatLink("openstreetmap", Math.Min(zoom, 19))
+        Return ToLink("openstreetmap", Math.Min(zoom, 19))
         ' Return FormatLink(_OSMlink, zoom)
     End Function
 
