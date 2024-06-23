@@ -1,4 +1,7 @@
 ﻿
+v1.5.4
+* Added more map services
+
 v1.5.3
 * correction of ToOSMlink
 

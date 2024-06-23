@@ -1,6 +1,7 @@
 ﻿
 
 Imports System.Collections.Specialized
+Imports System.Net
 Imports System.Reflection
 Imports System.Text.RegularExpressions
 
@@ -428,16 +429,21 @@ Public Class BasicGeopos
         {"openstreetmap", "https://www.openstreetmap.org/#map=%zoom/%lat/%lon"},
         {"geohack", "https://geohack.toolforge.org/geohack.php?params=%dmslat_%dmslon_type:landmark"},
         {"bing", "https://bing.com/maps/default.aspx?lvl=%zoom&cp=%lat~%lon"},
-        {"herewego", "https://wego.here.com/location/?map=%lat,%lon,15"},
-        {"google", "https://www.google.pl/maps/@%lat,%lon,%zoomz"},
-        {"wirtszlaki", "https://mapa.wirtualneszlaki.pl/#%zoom/%lat/%lon"},
-        {"copernix", "https://copernix.io/#?where=%lon,%lat,%zoom&query=&map_type=roadmap&pagename=?language=en"},
+        {"google", "https://www.google.com/maps/@%lat,%lon,%zoomz"},
         {"arcgis", "https://www.arcgis.com/home/webmap/viewer.html?center=%lon,%lat&level=%zoom"},
-        {"wikimap", "https://wikimap.toolforge.org/?lat=%lat&lon=%lon&zoom=%zoom&lang=en&wp=false"},
+        {"copernix", "https://copernix.io/#?where=%lon,%lat,%zoom&query=&map_type=roadmap&pagename=?language=en"},
+        {"google.pl", "https://www.google.pl/maps/@%lat,%lon,%zoomz"},
+        {"herewego", "https://wego.here.com/location/?map=%lat,%lon,15"},
+{"mapquest", "https://www.waze.com/livemap/?zoom=%zoom&lat=%lat&lon=%lon"},
         {"oldmaps", "https://www.oldmapsonline.org/en/Krakow#bbox=%bbox"},
+{"waze", "https://www.waze.com/livemap/?zoom=%zoom&lat=%lat&lon=%lon"},
+        {"wirtszlaki", "https://mapa.wirtualneszlaki.pl/#%zoom/%lat/%lon"},
+        {"wikimap", "https://wikimap.toolforge.org/?lat=%lat&lon=%lon&zoom=%zoom&lang=en&wp=false"},
+{"yandex", "https://www.waze.com/livemap/?zoom=%zoom&lat=%lat&lon=%lon"},
         {"geouri", "geo:%lat,%lon"},
         {"geouriAlt", "geo:%lat,%lon,%alt"}
         }
+
 
 
     ''' <summary>
