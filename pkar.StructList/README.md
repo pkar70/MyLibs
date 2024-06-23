@@ -46,7 +46,8 @@ methods you can utilize in code, and sometimes even you can love it:
     Function GetFileDate() As Date
     Function IsObsolete(iDays As Integer)   // since 1.5.0: for memory-only lists, always returns false
     Sub MaintainCopy(folderForCopy As String)   // since 1.4.0
-
+    UseBak As Boolean // since 1.6.0; if TRUE, .Save creates .bak file
+    Function SaveTemp(Optional bIgnoreNulls As Boolean = False) As Boolean // since 1.6.1
 
 ## proxies for internal list
 
@@ -60,13 +61,13 @@ methods you can utilize in code, and sometimes even you can love it:
     Sub Remove(oDel As TYP)
     Function Find(match As Predicate(Of TYP)) As TYP
     Sub Remove(match As Predicate(Of TYP))
-
+    Function Export(Optional bIgnoreNulls As Boolean = False) As String // since 1.6.1
 
 
 ## other functions
 
     Function LoadItem(sJSON As String) As TYP
-
+    Public Function GetOnLoadMemSizeKB() As Integer // since 1.6.0; gets memory "consumed" while reading file (if your app doesn't consume memory in other threads, it would be size of List)
 
 # BaseDict [since 1.2.0]
 
@@ -94,6 +95,8 @@ methods you can utilize in code, and sometimes even you can love it:
     Function GetFileDate() As Date
     Function IsObsolete(iDays As Integer)
     Sub MaintainCopy(folderForCopy As String)   // since 1.4.0
+    UseBak As Boolean // since 1.6.0; if TRUE, .Save creates .bak file
+    Function SaveTemp(Optional bIgnoreNulls As Boolean = False) As Boolean // since 1.6.1
 
 
 ## proxies for internal list
@@ -112,6 +115,8 @@ methods you can utilize in code, and sometimes even you can love it:
 ## other functions
 
     Function LoadItem(sJSON As String) As TYP
+    Public Function GetOnLoadMemSizeKB() As Integer // since 1.6.0; gets memory "consumed" while reading file (if your app doesn't consume memory in other threads, it would be size of Dict)
+    Function Export(Optional bIgnoreNulls As Boolean = False) As String // since 1.6.1
 
 
 # ObservableList [since 1.3.0]

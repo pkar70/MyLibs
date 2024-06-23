@@ -16,8 +16,8 @@
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
-    <Version>1.5.0</Version>
-    <PackageReleaseNotes>Now you can use all LINQ expressions on BaseList</PackageReleaseNotes>
+    <Version>1.6.2</Version>
+    <PackageReleaseNotes>UseBak, GetOnLoadMemSizeKB, SaveTemp, Export</PackageReleaseNotes>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <PackageId>pkar.$(AssemblyName)</PackageId>
   </PropertyGroup>

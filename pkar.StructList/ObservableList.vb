@@ -56,12 +56,12 @@ Public Class ObservableList(Of TYP)
     ''' </summary>
     ''' <param name="item">The object to remove from the list. The value can be null for reference types.</param>
     Public Overloads Sub Remove(item As TYP)
-        MyBase.Remove(item)
-
         Dim oldItems As New List(Of TYP)
         oldItems.Add(item)
         Dim eventArgs As New NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldItems)
         RaiseEvent CollectionChanged(Me, eventArgs)
+
+        MyBase.Remove(item)
     End Sub
 
     ''' <summary>

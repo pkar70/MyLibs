@@ -8,6 +8,13 @@ Public Class BaseDict(Of TKEY, TVALUE)
     Private _copyFilename As String
 
     ''' <summary>
+    ''' If TRUE, .Save makes .bak file with previous state
+    ''' </summary>
+    Public UseBak As Boolean = False
+
+    Private _loadMemSizeKB As Integer
+
+    ''' <summary>
     ''' create new Dictionary, and use given file in given folder as data backing
     ''' </summary>
     Public Sub New(sFolder As String, Optional sFileName As String = "items.json")
@@ -75,13 +82,29 @@ Public Class BaseDict(Of TKEY, TVALUE)
     End Function
 
     ''' <summary>
+    ''' return difference in managed memory before and after loading data from file (using GC.GetTotalMemory)
+    ''' </summary>
+    ''' <returns>KiB of consumed memory, or -1 if something goes bad</returns>
+    Public Function GetOnLoadMemSizeKB() As Integer
+        Return Math.Max(-1, _loadMemSizeKB)
+    End Function
+
+    Private Shared Function GetKibibytes() As Long
+        Return GC.GetTotalMemory(False) / 1024
+        'Return Process.GetCurrentProcess.WorkingSet64 / 1024
+        ' Windows.System.MemoryManager.AppMemoryUsage
+    End Function
+
+    ''' <summary>
     ''' load dictionary from string
     ''' </summary>
     ''' <returns>False if string cannot be deserialized</returns>
     Public Overridable Function Import(JsonContent As String) As Boolean
 
         Try
+            Dim initMem As Long = GetKibibytes()
             _dict = Newtonsoft.Json.JsonConvert.DeserializeObject(JsonContent, GetType(Dictionary(Of TKEY, TVALUE)))
+            _loadMemSizeKB = GetKibibytes() - initMem
             Return True
         Catch ex As Exception
         End Try
@@ -104,28 +127,61 @@ Public Class BaseDict(Of TKEY, TVALUE)
     End Function
 
     ''' <summary>
+    ''' Export data to string
+    ''' </summary>
+    ''' <param name="bIgnoreNulls">if NullValueHandling.Ignore and DefaultValueHandling.Ignore should be true (shorten file)</param>
+    ''' <returns>Empty if no items, else formatted JSON with data dump</returns>
+    Public Function Export(Optional bIgnoreNulls As Boolean = False) As String
+        If _dict Is Nothing Then Return ""
+        If _dict.Count < 1 Then Return ""
+
+        If bIgnoreNulls Then
+            Dim oSerSet As New Newtonsoft.Json.JsonSerializerSettings With {.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, .DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore}
+            Return Newtonsoft.Json.JsonConvert.SerializeObject(_dict, Newtonsoft.Json.Formatting.Indented, oSerSet)
+        Else
+            Return Newtonsoft.Json.JsonConvert.SerializeObject(_dict, Newtonsoft.Json.Formatting.Indented)
+        End If
+    End Function
+
+
+    ''' <summary>
     '''  save data to file
     ''' </summary>
     ''' <param name="bIgnoreNulls">if NullValueHandling.Ignore and DefaultValueHandling.Ignore should be true (shorten file)</param>
     Public Overridable Function Save(Optional bIgnoreNulls As Boolean = False) As Boolean
 
-        If _dict Is Nothing Then
-            Return False
-        End If
-        If _dict.Count < 1 Then
-            Return False
-        End If
+        If _dict Is Nothing Then Return False
+        If _dict.Count < 1 Then Return False
 
-        Dim sTxt As String
-        If bIgnoreNulls Then
-            Dim oSerSet As New Newtonsoft.Json.JsonSerializerSettings With {.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, .DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore}
-            sTxt = Newtonsoft.Json.JsonConvert.SerializeObject(_dict, Newtonsoft.Json.Formatting.Indented, oSerSet)
-        Else
-            sTxt = Newtonsoft.Json.JsonConvert.SerializeObject(_dict, Newtonsoft.Json.Formatting.Indented)
+        Dim sTxt As String = Export(bIgnoreNulls)
+
+        If UseBak AndAlso IO.File.Exists(_filename) Then
+            IO.File.Delete(_filename & ".bak")
+            IO.File.Move(_filename, _filename & ".bak")
         End If
 
         IO.File.WriteAllText(_filename, sTxt)
         TryMakeCopy()
+
+        Return True
+    End Function
+
+
+    ''' <summary>
+    '''  save data to file with filename suffixed with '.tmp'
+    ''' </summary>
+    ''' <param name="bIgnoreNulls">if NullValueHandling.Ignore and DefaultValueHandling.Ignore should be true (shorten file)</param>
+    ''' <returns></returns>
+    Public Overridable Function SaveTemp(Optional bIgnoreNulls As Boolean = False) As Boolean
+        If _filename = "" Then
+            Throw New ArgumentException("List is not file backed - cannot save it")
+        End If
+
+        If _dict.Count < 1 Then Return False
+
+        Dim sTxt As String = Export(bIgnoreNulls)
+
+        IO.File.WriteAllText(_filename & ".tmp", sTxt)
 
         Return True
     End Function

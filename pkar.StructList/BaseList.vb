@@ -12,6 +12,13 @@ Public Class BaseList(Of TYP)
     Private _copyFilename As String
 
     ''' <summary>
+    ''' If TRUE, .Save makes .bak file with previous state
+    ''' </summary>
+    Public UseBak As Boolean = False
+
+    Private _loadMemSizeKB As Integer
+
+    ''' <summary>
     ''' create new list, and use given file in given folder as data backing
     ''' </summary>
     ''' <param name="folder">If NULL, then list would be not file backed</param>
@@ -92,15 +99,32 @@ Public Class BaseList(Of TYP)
 
     End Function
 
+    ''' <summary>
+    ''' return difference in managed memory before and after loading data from file (using GC.GetTotalMemory)
+    ''' </summary>
+    ''' <returns>KiB of consumed memory, or -1 if something goes bad</returns>
+    Public Function GetOnLoadMemSizeKB() As Integer
+        Return Math.Max(-1, _loadMemSizeKB)
+    End Function
+
+    Private Shared Function GetKibibytes() As Long
+        Return GC.GetTotalMemory(False) / 1024
+        'Return Process.GetCurrentProcess.WorkingSet64 / 1024
+        ' Windows.System.MemoryManager.AppMemoryUsage
+    End Function
 
     ''' <summary>
     ''' load list from string
     ''' </summary>
     ''' <returns>False if string cannot be deserialized</returns>
     Public Overridable Function Import(jsonContent As String) As Boolean
+
+        Dim initMem As Long = GetKibibytes()
+
         Try
             Dim lista As ObservableList(Of TYP) = Newtonsoft.Json.JsonConvert.DeserializeObject(jsonContent, GetType(ObservableList(Of TYP)))
             MyBase.AddRange(lista)
+            _loadMemSizeKB = GetKibibytes() - initMem
             Return True
         Catch ex As Exception
         End Try
@@ -121,6 +145,24 @@ Public Class BaseList(Of TYP)
     End Function
 
     ''' <summary>
+    ''' Export data to string
+    ''' </summary>
+    ''' <param name="bIgnoreNulls">if NullValueHandling.Ignore and DefaultValueHandling.Ignore should be true (shorten file)</param>
+    ''' <returns>Empty if no items, else formatted JSON with data dump</returns>
+    Public Function Export(Optional bIgnoreNulls As Boolean = False) As String
+        If MyBase.Count < 1 Then Return ""
+
+        If bIgnoreNulls Then
+            Dim oSerSet As New Newtonsoft.Json.JsonSerializerSettings With {.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, .DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore}
+            Return Newtonsoft.Json.JsonConvert.SerializeObject(MyBase.AsEnumerable, Newtonsoft.Json.Formatting.Indented, oSerSet)
+        Else
+            Return Newtonsoft.Json.JsonConvert.SerializeObject(MyBase.AsEnumerable, Newtonsoft.Json.Formatting.Indented)
+        End If
+
+    End Function
+
+
+    ''' <summary>
     '''  save data to file
     ''' </summary>
     ''' <param name="bIgnoreNulls">if NullValueHandling.Ignore and DefaultValueHandling.Ignore should be true (shorten file)</param>
@@ -132,12 +174,11 @@ Public Class BaseList(Of TYP)
 
         If MyBase.Count < 1 Then Return False
 
-        Dim sTxt As String
-        If bIgnoreNulls Then
-            Dim oSerSet As New Newtonsoft.Json.JsonSerializerSettings With {.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, .DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore}
-            sTxt = Newtonsoft.Json.JsonConvert.SerializeObject(MyBase.AsEnumerable, Newtonsoft.Json.Formatting.Indented, oSerSet)
-        Else
-            sTxt = Newtonsoft.Json.JsonConvert.SerializeObject(MyBase.AsEnumerable, Newtonsoft.Json.Formatting.Indented)
+        Dim sTxt As String = Export(bIgnoreNulls)
+
+        If UseBak AndAlso IO.File.Exists(_filename) Then
+            IO.File.Delete(_filename & ".bak")
+            IO.File.Move(_filename, _filename & ".bak")
         End If
 
         IO.File.WriteAllText(_filename, sTxt)
@@ -145,6 +186,26 @@ Public Class BaseList(Of TYP)
 
         Return True
     End Function
+
+    ''' <summary>
+    '''  save data to file with filename suffixed with '.tmp'
+    ''' </summary>
+    ''' <param name="bIgnoreNulls">if NullValueHandling.Ignore and DefaultValueHandling.Ignore should be true (shorten file)</param>
+    ''' <returns></returns>
+    Public Overridable Function SaveTemp(Optional bIgnoreNulls As Boolean = False) As Boolean
+        If _filename = "" Then
+            Throw New ArgumentException("List is not file backed - cannot save it")
+        End If
+
+        If MyBase.Count < 1 Then Return False
+
+        Dim sTxt As String = Export(bIgnoreNulls)
+
+        IO.File.WriteAllText(_filename & ".tmp", sTxt)
+
+        Return True
+    End Function
+
 
     ''' <summary>
     ''' GetLastWriteTime of data file, or 1 I 1970 if file doesn't exist (so it would seem as very old) 

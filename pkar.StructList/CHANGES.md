@@ -1,4 +1,10 @@
 ﻿
+# version 1.6.1, 2024.06.14
+ a) UseBak property, for .Save
+ b) GetOnLoadMemSizeKB (very coarse)
+ c) SaveTemp, saving temporary file
+ d) Export to JSON string
+
 # version 1.5.0, 2023.10.04
  As BaseList now inherits ObservableList (previously it was only Protected field), you can use BaseList directly in all LINQ expressions.
 
