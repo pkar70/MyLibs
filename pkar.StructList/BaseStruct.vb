@@ -1,9 +1,12 @@
+Imports System.ComponentModel
 Imports System.Reflection
 
 ''' <summary>
 ''' inherit from this to add Clone() and dumping properties' values
 ''' </summary>
 Public MustInherit Class BaseStruct
+    Implements INotifyPropertyChanged, INotifyPropertyChanging
+
 
     ''' <summary>
     '''  to be used in debugging, dump all properties inside class as string
@@ -135,6 +138,33 @@ Public MustInherit Class BaseStruct
         Next
 
     End Sub
+
+#Region "notify property changed"
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
+    ''' <summary>
+    ''' Helper to raise PropertyChanged event, for given property
+    ''' </summary>
+    ''' <param name="propertyName"></param>
+    Public Sub NotifyPropChange(propertyName As String)
+        Dim evChProp As New PropertyChangedEventArgs(propertyName)
+        RaiseEvent PropertyChanged(Me, evChProp)
+    End Sub
+
+    Public Event PropertyChanging As PropertyChangingEventHandler Implements INotifyPropertyChanging.PropertyChanging
+
+    ''' <summary>
+    ''' Helper to raise PropertyChanging event, for given property (so you can get old value of property before change occurs)
+    ''' </summary>
+    ''' <param name="propertyName"></param>
+    Public Sub NotifyPropChanging(propertyName As String)
+        Dim evChProp As New PropertyChangingEventArgs(propertyName)
+        RaiseEvent PropertyChanging(Me, evChProp)
+    End Sub
+
+
+
+#End Region
 
 
 

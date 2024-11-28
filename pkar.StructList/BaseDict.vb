@@ -204,6 +204,60 @@ Public Class BaseDict(Of TKEY, TVALUE)
         If GetFileDate.AddDays(iDays) < Date.Now Then Return True
         Return False
     End Function
+
+
+#Region "delayed save"
+
+
+    Private _SaveMetaDataAfterCount As UInt16 = 1
+    Private _SaveMetaDataAfterTime As New TimeSpan(0, 0, 60)
+
+    Private _CurrSaveMetaDataCounter As UInt16 = 1
+    Private _SaveMetaDataTimer As System.Threading.Timer
+
+    Private _isDirty As Boolean
+
+    ''' <summary>
+    ''' Configure DelayedSave (and saves dictionary if it is dirty now). 
+    ''' </summary>
+    ''' <param name="count">Save after defined number of DelayedSave call</param>
+    ''' <param name="time">Save after defined TimeSpan after last DelayedSave call</param>
+    Public Sub SetDelay(count As UInt16, time As TimeSpan)
+        _SaveMetaDataTimer.Dispose()
+        _SaveMetaDataTimer = Nothing
+
+        If _isDirty Then Save()
+        _isDirty = False
+
+        _SaveMetaDataAfterTime = time
+        _SaveMetaDataAfterCount = Math.Max(count, 1)
+        _CurrSaveMetaDataCounter = _SaveMetaDataAfterCount
+    End Sub
+
+    ''' <summary>
+    ''' mark dictionary as dirty for DelayedSave.
+    ''' </summary>
+    ''' <param name="force">TRUE if it should be saved without delay</param>
+    Public Sub DelayedSave(Optional force As Boolean = False)
+        _isDirty = True
+
+        _SaveMetaDataTimer.Dispose()
+        _SaveMetaDataTimer = Nothing
+
+        _CurrSaveMetaDataCounter -= 1
+        If force Then _CurrSaveMetaDataCounter = 0
+
+        If _CurrSaveMetaDataCounter > 0 Then
+            _SaveMetaDataTimer = New System.Threading.Timer(Sub() DelayedSave(True), Nothing, _SaveMetaDataAfterTime, Threading.Timeout.InfiniteTimeSpan)
+            Return
+        End If
+
+        Save()
+        _isDirty = False
+        _CurrSaveMetaDataCounter = 0
+    End Sub
+
+#End Region
 #End Region
 
 #Region "proxies for internal dictionary"

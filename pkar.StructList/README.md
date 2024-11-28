@@ -17,6 +17,12 @@ methods you can utilize in code, and sometimes even you can love it:
     Sub CopyFrom(anyObject)     // copy all properties/fields from anyObject, if their names matches, since 1.1.0
     Sub CopyTo(anyObject)       // copy all properties/fields to anyObject, if their names matches, since 1.1.0
 
+Also, BaseStruct implements INotifyPropertyChanged and INotifyPropertyChanging, and gives you helper method:
+
+    Sub NotifyPropChange(propertyName As String) // raise Event notifying that given property is changed
+    Sub NotifyPropChanging(propertyName As String) // raise Event notifying that given property is about to be changed (so you can get old value of property before change occurs)
+
+
 # BaseList
 
  It is base for lists backed by JSON file; in many cases your app would be relieved from Nugetting JSON. It uses ObservableList as internal data storage.
@@ -48,6 +54,12 @@ methods you can utilize in code, and sometimes even you can love it:
     Sub MaintainCopy(folderForCopy As String)   // since 1.4.0
     UseBak As Boolean // since 1.6.0; if TRUE, .Save creates .bak file
     Function SaveTemp(Optional bIgnoreNulls As Boolean = False) As Boolean // since 1.6.1
+
+ Sometimes list is backed by SSD storage - so we can group together many changes and save only when really needed. Behaviour can be controlled using two methods: first, save is done after defined number of calls to DelayedSave; second, save is done after defined TimeSpan after last change. Functionality added in 1.8 version.
+
+    Sub SetDelay(count As UInt16, time As TimeSpan) // save current list (if IsDirty), and set both counter and timespan
+    Sub DelayedSave(Optional force As Boolean = False) // mark as dirty, and wait for saving
+
 
 ## proxies for internal list
 
@@ -97,6 +109,11 @@ methods you can utilize in code, and sometimes even you can love it:
     Sub MaintainCopy(folderForCopy As String)   // since 1.4.0
     UseBak As Boolean // since 1.6.0; if TRUE, .Save creates .bak file
     Function SaveTemp(Optional bIgnoreNulls As Boolean = False) As Boolean // since 1.6.1
+
+Sometimes list is backed by SSD storage - so we can group together many changes and save only when really needed. Behaviour can be controlled using two methods: first, save is done after defined number of calls to DelayedSave; second, save is done after defined TimeSpan after last change. Functionality added in 1.8 version.
+
+    Sub SetDelay(count As UInt16, time As TimeSpan) // save current list (if IsDirty), and set both counter and timespan
+    Sub DelayedSave(Optional force As Boolean = False) // mark as dirty, and wait for saving
 
 
 ## proxies for internal list

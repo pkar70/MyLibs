@@ -1,4 +1,7 @@
 ﻿
+# version 1.7, 2024.09.13
+ BaseStruct now implements INotifyPropertyChanged and INotifyPropertyChanging, and two new helper methods: .NotifyPropChange(propname), .NotifyPropChanging(propname)
+
 # version 1.6.1, 2024.06.14
  a) UseBak property, for .Save
  b) GetOnLoadMemSizeKB (very coarse)
