@@ -21,6 +21,19 @@
     End Sub
 
     ''' <summary>
+    ''' create new object, as we don't know any data, it is same as Empty() with radius=0. Also, used by JSON deserialization.
+    ''' </summary>
+    Public Sub New()
+        ' this is required for JSON deserialization, as we have more than one ctor with parameters
+        Dim emptyGeo As BasicGeopos = Empty()
+        Me.Altitude = emptyGeo.Altitude
+        Me.Longitude = emptyGeo.Longitude
+        Me.Latitude = emptyGeo.Latitude
+    End Sub
+
+
+
+    ''' <summary>
     ''' True if distance between centers is less than sum of radiuses
     ''' </summary>
     Public Overloads Function IsInsideCircle(center As BasicGeoposWithRadius) As Boolean

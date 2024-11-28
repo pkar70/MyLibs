@@ -1,4 +1,9 @@
-﻿
+﻿v1.5.6
+* add: empty BasicGeoposWithRadius (for JSON deserialization)
+
+v1.5.5
+* while recognizing links, zoom level could be non-integer now (as sometimes in Google)
+
 v1.5.4
 * Added more map services
 

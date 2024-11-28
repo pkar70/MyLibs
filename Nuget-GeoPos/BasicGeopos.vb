@@ -12,7 +12,7 @@ Public Class BasicGeopos
 
 
     ''' <summary>
-    ''' create new object, as we don't know any data, it is same as Empty()
+    ''' create new object, as we don't know any data, it is same as Empty(). Also, used by JSON deserialization.
     ''' </summary>
     Public Sub New()
         ' this is required for JSON deserialization, as we have more than one ctor: New(double) and New(string)
@@ -360,7 +360,7 @@ Public Class BasicGeopos
 
         Dim sRegMask As String = baselink.Replace("%lon", "(-?[\.0-9]*)").
             Replace("%lat", "(-?[\.0-9]*)").
-            Replace("%zoom", "[0-9]*").
+            Replace("%zoom", "[\.0-9]*").
             Replace("%alt", "[0-9]*")
 
         ' special case: geouri

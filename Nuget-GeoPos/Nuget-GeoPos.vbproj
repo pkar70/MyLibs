@@ -18,8 +18,8 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <Authors>pkar</Authors>
     <PackageTags>geoposition, geolocation, helpers</PackageTags>
-    <Version>1.5.4</Version>
-    <PackageReleaseNotes>More map services</PackageReleaseNotes>
+    <Version>1.5.6</Version>
+    <PackageReleaseNotes>add: empty BasicGeoposWithRadius (for JSON deserialization)</PackageReleaseNotes>
     <SymbolPackageFormat>symbols.nupkg</SymbolPackageFormat>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <PackageId>pkar.$(AssemblyName)</PackageId>
