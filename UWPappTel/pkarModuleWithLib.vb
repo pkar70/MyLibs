@@ -306,9 +306,10 @@ Partial Public Class App
 
         Console.WriteLine(sResult)
     End Function
-#End If
 
 #End Region
+#End If
+
 
 #If NETFX_CORE Then
     Public Shared Sub OpenRateIt()
@@ -1029,7 +1030,9 @@ Public Module pkar
     ''' działa tylko na UWP-Release, w innych kompilacjach daje zawsze TRUE
     ''' </summary>
     ''' <returns></returns>
+#Disable Warning BC42356 ' This async method lacks 'Await' operators and so will run synchronously
     Public Async Function IsFullVersionAsync() As Task(Of Boolean)
+#Enable Warning BC42356 ' This async method lacks 'Await' operators and so will run synchronously
 
 #If Not DEBUG And NETFX_CORE Then
         If IsThisMoje() Then Return True
@@ -1046,7 +1049,7 @@ Public Module pkar
     End Function
 
 #If Not NETFX_CORE Then
-    
+
     ''' <summary>
     ''' set (or clear) HIDDEN attribute on given file
     ''' </summary>
@@ -1221,12 +1224,20 @@ End Module
 
 Partial Public Module Extensions
 
+#If Not PK_WPF Then
     ''' <summary>
     ''' ustaw wskoki z vblib dla danej strony; dla UWP oraz WPF niepotrzebne
     ''' </summary>
     <Obsolete("ale tu coś nie do końca działa, do sprawdzenia!")>
     <Extension>
     Public Sub InitDialogs(element As FrameworkElement)
+#Else
+    ''' <summary>
+    ''' ustaw wskoki z vblib dla danej strony; dla UWP oraz WPF niepotrzebne
+    ''' </summary>
+    <Extension>
+    Public Sub InitDialogs(element As FrameworkElement)
+#End If
 #If Not PK_WPF Then
         _xamlRoot = element.XamlRoot
 #End If
