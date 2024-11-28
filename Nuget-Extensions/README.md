@@ -72,7 +72,22 @@ If some extension is added in v1.x.y, then it would be present also in v2.x.y (n
     String.EndsWithCIAI     // since 2.2.3
     String.EqualsCIAI       // since 2.2.3
 
+    // "macros" to make some expressions more readable, since x.2.7
+    String.NotContainsCI
+    String.NotStartSwithCI
+    String.NotStartsWith
+    String.NotEndsWithCI
+    String.NotEndsWith
+    String.NotEqualsCI
+    String.NotEquals
 
+    // parse "macros" to make some expressions more readable, since x.2.7
+
+    String.ParseInt
+    String.ParseDouble
+    String.ParseExifDate
+
+    String.CountChar    // since x.2.7
 
 
 # for Integer
@@ -113,7 +128,7 @@ If some extension is added in v1.x.y, then it would be present also in v2.x.y (n
     Double.Ceiling // since x.2.5, same as Math.Ceiling
     Double.Round // since x.2.5, same as Math.Round
     Double.Round(digits) // since x.2.5, same as Math.Round(digits)
-
+    Double.Equals(value, epsilon) As Boolean // since x.2.6
 
 # for dates
 

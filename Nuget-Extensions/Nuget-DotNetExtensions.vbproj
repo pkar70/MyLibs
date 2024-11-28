@@ -13,9 +13,9 @@
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
     <PackageTags>extensions; string; MAC; path; integer; ISO string; SI prefixes; Julian Day</PackageTags>
-    <Version>1.2.5</Version>
+    <Version>1.2.7</Version>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
-	  <PackageReleaseNotes>(int|long).(Abs|Sign); Double..(Abs|Sign|Floor|Round|Ceiling)</PackageReleaseNotes>
+	  <PackageReleaseNotes>string.Parse*, string.Not*, string.CountChar</PackageReleaseNotes>
     <Company>none</Company>
     <PackageId>pkar.$(AssemblyName)</PackageId>
   </PropertyGroup>

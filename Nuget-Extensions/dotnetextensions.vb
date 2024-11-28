@@ -1,4 +1,5 @@
-﻿Imports System.IO
+﻿Imports System.Globalization
+Imports System.IO
 Imports System.Reflection
 
 Partial Public Module DotNetExtensions
@@ -64,7 +65,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' wrapper for StartsWith(value, StringComparison.Ordinal)
+    ''' wrapper for StartsWith(baseval, StringComparison.Ordinal)
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     <CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification:="<Pending>")>
@@ -73,7 +74,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' wrapper for EndsWith(value, StringComparison.Ordinal)
+    ''' wrapper for EndsWith(baseval, StringComparison.Ordinal)
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     <CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification:="<Pending>")>
@@ -82,7 +83,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' wrapper for IndexOf(value) z StringComparison.Ordinal
+    ''' wrapper for IndexOf(baseval) z StringComparison.Ordinal
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     <CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification:="<Pending>")>
@@ -99,7 +100,7 @@ Partial Public Module DotNetExtensions
     ''' <summary>
     ''' Simple wrapper for string.contains
     ''' </summary>
-    ''' <returns>TRUE if value is empty or is inside baseString</returns>
+    ''' <returns>TRUE if baseval is empty or is inside baseString</returns>
     <Runtime.CompilerServices.Extension()>
     Public Function ContainsCS(ByVal baseString As String, value As String) As Boolean
         Return baseString.Contains(value)
@@ -108,7 +109,7 @@ Partial Public Module DotNetExtensions
     ''' <summary>
     ''' Simple wrapper for string.startswith with StringComparison.Ordinal
     ''' </summary>
-    ''' <returns>TRUE if string starts with value</returns>
+    ''' <returns>TRUE if string starts with baseval</returns>
     <Runtime.CompilerServices.Extension()>
     Public Function StartsWithCS(ByVal baseString As String, value As String) As Boolean
         Return baseString.StartsWith(value, StringComparison.Ordinal)
@@ -117,7 +118,7 @@ Partial Public Module DotNetExtensions
     ''' <summary>
     ''' Simple wrapper for string.EndsWith with StringComparison.Ordinal
     ''' </summary>
-    ''' <returns>TRUE if string ends with value</returns>
+    ''' <returns>TRUE if string ends with baseval</returns>
     <Runtime.CompilerServices.Extension()>
     Public Function EndsWithCS(ByVal baseString As String, value As String) As Boolean
         Return baseString.EndsWith(value, StringComparison.Ordinal)
@@ -126,7 +127,7 @@ Partial Public Module DotNetExtensions
     ''' <summary>
     ''' Simple wrapper for string.Equals with StringComparison.Ordinal
     ''' </summary>
-    ''' <returns>TRUE if string ends with value</returns>
+    ''' <returns>TRUE if string ends with baseval</returns>
     <Runtime.CompilerServices.Extension()>
     Public Function EqualsCS(ByVal baseString As String, value As String) As Boolean
         Return baseString.Equals(value, StringComparison.Ordinal)
@@ -350,14 +351,14 @@ Partial Public Module DotNetExtensions
 
 #Else
 
- 'w .Net 1.4 nie ma InvariantCultureIgnoreCase, więc używamy CurrentCulture
+    'w .Net 1.4 nie ma InvariantCultureIgnoreCase, więc używamy CurrentCulture
 
 #Region "CI"
 
     ''' <summary>
     ''' Simple wrapper for string.contains, with ToLowerInvariant
     ''' </summary>
-    ''' <returns>TRUE if value is empty or is inside baseString</returns>
+    ''' <returns>TRUE if baseval is empty or is inside baseString</returns>
     <Runtime.CompilerServices.Extension()>
     Public Function ContainsCI(ByVal baseString As String, value As String) As Boolean
         Return baseString.ToLowerInvariant.Contains(value.ToLowerInvariant)
@@ -366,7 +367,7 @@ Partial Public Module DotNetExtensions
     ''' <summary>
     ''' Simple wrapper for string.startswith with StringComparison.CurrentCultureIgnoreCase
     ''' </summary>
-    ''' <returns>TRUE if string starts with value</returns>
+    ''' <returns>TRUE if string starts with baseval</returns>
     <Runtime.CompilerServices.Extension()>
     Public Function StartsWithCI(ByVal baseString As String, value As String) As Boolean
         Return baseString.StartsWith(value, StringComparison.CurrentCultureIgnoreCase)
@@ -375,7 +376,7 @@ Partial Public Module DotNetExtensions
     ''' <summary>
     ''' Simple wrapper for string.EndsWith with StringComparison.CurrentCultureIgnoreCase
     ''' </summary>
-    ''' <returns>TRUE if string ends with value</returns>
+    ''' <returns>TRUE if string ends with baseval</returns>
     <Runtime.CompilerServices.Extension()>
     Public Function EndsWithCI(ByVal baseString As String, value As String) As Boolean
         Return baseString.EndsWith(value, StringComparison.CurrentCultureIgnoreCase)
@@ -384,7 +385,7 @@ Partial Public Module DotNetExtensions
     ''' <summary>
     ''' Simple wrapper for string.Equals with StringComparison.CurrentCultureIgnoreCase
     ''' </summary>
-    ''' <returns>TRUE if string ends with value</returns>
+    ''' <returns>TRUE if string ends with baseval</returns>
     <Runtime.CompilerServices.Extension()>
     Public Function EqualsCI(ByVal baseString As String, value As String) As Boolean
         Return baseString.Equals(value, StringComparison.CurrentCultureIgnoreCase)
@@ -393,6 +394,10 @@ Partial Public Module DotNetExtensions
 #End Region
 
 #End If
+
+
+#Region "Trims"
+
     ''' <summary>
     ''' trim beginning of string (same as Substring(IndexOf(startString), no trimminig if startString is not found)
     ''' </summary>
@@ -444,6 +449,7 @@ Partial Public Module DotNetExtensions
         If iInd < 0 Then Return baseString
         Return baseString.Substring(0, iInd + endString.Length)
     End Function
+#End Region
 
     ''' <summary>
     ''' get substring between startString and endString (including these strings)
@@ -559,7 +565,61 @@ Partial Public Module DotNetExtensions
         Return Not basestring.Contains(value)
     End Function
 
+    ''' <summary>
+    ''' same as Not string.ContainsCI, making expressions look nicer
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function NotContainsCI(ByVal basestring As String, value As String) As Boolean
+        Return Not basestring.ContainsCI(value)
+    End Function
 
+    ''' <summary>
+    ''' same as Not string.StartswithCI, making expressions look nicer
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function NotStartsWithCI(ByVal basestring As String, value As String) As Boolean
+        Return Not basestring.StartsWithCI(value)
+    End Function
+
+    ''' <summary>
+    ''' same as Not string.Startswith, making expressions look nicer
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function NotStartsWith(ByVal basestring As String, value As String) As Boolean
+        Return Not basestring.StartsWith(value)
+    End Function
+
+    ''' <summary>
+    ''' same as Not string.EndswithCI, making expressions look nicer
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function NotEndsWithCI(ByVal basestring As String, value As String) As Boolean
+        Return Not basestring.EndsWithCI(value)
+    End Function
+
+    ''' <summary>
+    ''' same as Not string.EndsWith, making expressions look nicer
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function NotEndsWith(ByVal basestring As String, value As String) As Boolean
+        Return Not basestring.EndsWith(value)
+    End Function
+
+    ''' <summary>
+    ''' same as Not string.EqualsCI, making expressions look nicer
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function NotEqualsCI(ByVal basestring As String, value As String) As Boolean
+        Return Not basestring.EqualsCI(value)
+    End Function
+
+    ''' <summary>
+    ''' same as Not string.Equals, making expressions look nicer
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function NotEquals(ByVal basestring As String, value As String) As Boolean
+        Return Not basestring.Equals(value)
+    End Function
 
 #If NETSTANDARD2_0_OR_GREATER Then
 
@@ -833,6 +893,67 @@ Partial Public Module DotNetExtensions
         Return (basestring = basestring.ToUpperInvariant)
     End Function
 
+#Region "converters"
+
+    ''' <summary>
+    ''' return integer parsed from string (or default value, if conversion fails)
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ParseInt(ByVal basestring As String, Optional defVal As Integer = -1) As Integer
+        Dim temp As Integer
+        If Not Integer.TryParse(basestring.Trim,
+                                NumberStyles.AllowDecimalPoint Or NumberStyles.AllowLeadingSign,
+                                CultureInfo.InvariantCulture, temp) Then Return defVal
+        Return temp
+    End Function
+
+    ''' <summary>
+    ''' return doubled parsed from string (or default value, if conversion fails)
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ParseDouble(ByVal basestring As String, Optional defVal As Double = -1) As Double
+        Dim temp As Double
+        If Not Double.TryParse(basestring.Trim,
+                                NumberStyles.AllowDecimalPoint Or NumberStyles.AllowLeadingSign,
+                                CultureInfo.InvariantCulture, temp) Then Return defVal
+        Return temp
+    End Function
+
+    ''' <summary>
+    ''' return date parsed from string in EXIF format (or default value, if conversion fails)
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ParseExifDate(ByVal basestring As String, defVal As Date) As Date
+        Dim temp As Date = defVal
+
+        If Not Date.TryParseExact(basestring.Trim, "yyyy.MM.dd HH:mm:ss",
+                                  CultureInfo.InvariantCulture,
+                                  DateTimeStyles.None, temp) Then Return defVal
+        Return temp
+    End Function
+
+    ''' <summary>
+    ''' return date parsed from string in EXIF format (or Date.Min)
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function ParseExifDate(ByVal basestring As String) As Date
+        Return basestring.ParseExifDate(Date.MinValue)
+    End Function
+
+
+    ''' <summary>
+    ''' return number of occurences of given character in a string
+    ''' </summary>
+    <Runtime.CompilerServices.Extension()>
+    Public Function CountChar(ByVal basestring As String, whichChar As Char) As Integer
+        Dim temp As String = basestring.Replace(whichChar, "")
+        Return basestring.Length - temp.Length
+    End Function
+
+
+#End Region
+
+
 #End Region
 
 #Region "Integer"
@@ -866,7 +987,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' Shortcut for taking max value (Math.Max(x,y))
+    ''' Shortcut for taking max baseval (Math.Max(x,y))
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Max(ByVal value As Integer, value1 As Integer) As Integer
@@ -874,7 +995,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' Shortcut for taking min value (Math.Min(x,y))
+    ''' Shortcut for taking min baseval (Math.Min(x,y))
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Min(ByVal value As Integer, value1 As Integer) As Integer
@@ -894,7 +1015,7 @@ Partial Public Module DotNetExtensions
     ' since x.2.5
 
     ''' <summary>
-    ''' shortcut for Math.Abs - returns the absolute value of an integer
+    ''' shortcut for Math.Abs - returns the absolute baseval of an integer
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Abs(ByVal value As Integer) As Integer
@@ -1025,7 +1146,7 @@ Partial Public Module DotNetExtensions
     ' since x.2.5
 
     ''' <summary>
-    ''' shortcut for Math.Abs - returns the absolute value
+    ''' shortcut for Math.Abs - returns the absolute baseval
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Abs(ByVal value As Long) As Long
@@ -1055,7 +1176,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' Shortcut for taking max value (Math.Max(x,y))
+    ''' Shortcut for taking max baseval (Math.Max(x,y))
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Max(ByVal value As Double, value1 As Double) As Double
@@ -1063,7 +1184,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' Shortcut for taking min value (Math.Min(x,y))
+    ''' Shortcut for taking min baseval (Math.Min(x,y))
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Min(ByVal value As Double, value1 As Double) As Double
@@ -1071,7 +1192,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' shortcut for Math.Abs - returns the absolute value
+    ''' shortcut for Math.Abs - returns the absolute baseval
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Abs(ByVal value As Double) As Double
@@ -1087,7 +1208,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' shortcut for Math.Round - Rounds a double-precision floating-point value to the nearest integral value, and rounds midpoint values to the nearest even number.
+    ''' shortcut for Math.Round - Rounds a double-precision floating-point baseval to the nearest integral baseval, and rounds midpoint values to the nearest even number.
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Round(ByVal value As Double) As Integer
@@ -1095,7 +1216,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' shortcut for Math.Round - Rounds a double-precision floating-point value to a specified number of fractional digits, and rounds midpoint values to the nearest even number.
+    ''' shortcut for Math.Round - Rounds a double-precision floating-point baseval to a specified number of fractional digits, and rounds midpoint values to the nearest even number.
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Round(ByVal value As Double, digits As Integer) As Double
@@ -1103,7 +1224,7 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' shortcut for Math.Floor - Returns the largest integral value less than or equal to the specified number
+    ''' shortcut for Math.Floor - Returns the largest integral baseval less than or equal to the specified number
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Floor(ByVal value As Double) As Double
@@ -1111,11 +1232,21 @@ Partial Public Module DotNetExtensions
     End Function
 
     ''' <summary>
-    ''' shortcut for Math.Ceiling - Returns the smallest integral value greater than or equal to the specified number
+    ''' shortcut for Math.Ceiling - Returns the smallest integral baseval greater than or equal to the specified number
     ''' </summary>
     <Runtime.CompilerServices.Extension()>
     Public Function Ceiling(ByVal value As Double) As Double
         Return Math.Ceiling(value)
+    End Function
+
+    ''' <summary>
+    ''' similar to Equals; returns True if two values are almost equals, using epsilon as maximum difference
+    ''' </summary>
+    ''' <param name="value">compare with this value</param>
+    ''' <param name="epsilon">maximum difference between two Double numbers</param>
+    ''' <returns></returns>
+    Public Function Equals(ByVal baseval As Double, value As Double, epsilon As Double) As Boolean
+        Return (baseval - value).Abs < epsilon
     End Function
 
 #End Region
@@ -1920,9 +2051,9 @@ Partial Public Module DotNetExtensions
     ''' <summary>
     ''' Same as Clamp in .Net 7
     ''' </summary>
-    ''' <param name="value">current value</param>
-    ''' <param name="minVal">The inclusive minimum to which value should clamp</param>
-    ''' <param name="maxVal">The inclusive maximum to which value should clamp</param>
+    ''' <param name="value">current baseval</param>
+    ''' <param name="minVal">The inclusive minimum to which baseval should clamp</param>
+    ''' <param name="maxVal">The inclusive maximum to which baseval should clamp</param>
     ''' <returns></returns>
     <Runtime.CompilerServices.Extension()>
     Public Function Between(Of T)(ByVal value As T, minVal As T, maxVal As T) As T

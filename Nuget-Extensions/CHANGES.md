@@ -1,4 +1,12 @@
 ﻿
+# version x.2.7
+* string.Not*
+* string.Parse*
+* string.CountChar
+
+# version x.2.6
+* double.Equals(double, epsilon)
+
 # version x.2.5
 * (int|long).(Abs|Sign)
 * Double.(Abs|Sign|Floor|Round|Ceiling)
