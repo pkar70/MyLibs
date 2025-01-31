@@ -18,12 +18,16 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <Authors>pkar</Authors>
     <PackageTags>geoposition, geolocation, helpers</PackageTags>
-    <Version>1.5.6</Version>
-    <PackageReleaseNotes>add: empty BasicGeoposWithRadius (for JSON deserialization)</PackageReleaseNotes>
+    <Version>1.6.4</Version>
+    <PackageReleaseNotes>add: geowiki search</PackageReleaseNotes>
     <SymbolPackageFormat>symbols.nupkg</SymbolPackageFormat>
 	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	  <PackageId>pkar.$(AssemblyName)</PackageId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="pkar.StructList" Version="1.8.2" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="README.md">

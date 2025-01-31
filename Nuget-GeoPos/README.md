@@ -97,6 +97,16 @@
     Function ToQTH(Optional depth As UInt16 = 4) As String [since v1.4.0]
     Shared Function FromQTH(qth As String) As BasicGeopos [since v1.4.0]
 
+## wikipedia geography
+ Wikipedia allows to search for articles using geolocation, so some helpers can be useful.
+
+    Async Function GeoWikiGetItemsAsync(lang As String, Optional radiusMeters As Integer = 500, Optional count As Integer = 10, Optional sortmode As GeoWikiSort = GeoWikiSort.None) As Task(Of List(Of GeoWikiItem))
+
+ or, if you want to handle http by yourself (e.g. using internal pool of http clients), you can use two "low level" helpers:
+
+    GeoWikiGetQueryUri(lang As String, Optional radiusMeters As Integer = 500, Optional count As Integer = 10) As Uri
+    GeoWikiImport(page As String, lang As String, Optional sortmode As GeoWikiSort = GeoWikiSort.None) As List(Of GeoWikiItem)
+
 
 # Working with BasicGeopos lists
 

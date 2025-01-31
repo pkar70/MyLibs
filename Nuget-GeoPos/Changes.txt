@@ -1,4 +1,7 @@
-﻿v1.5.6
+﻿v1.5.7
+* add: map service mapa-turystyczna.pl
+
+v1.5.6
 * add: empty BasicGeoposWithRadius (for JSON deserialization)
 
 v1.5.5

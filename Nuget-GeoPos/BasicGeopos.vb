@@ -6,6 +6,7 @@ Imports System.Reflection
 Imports System.Text.RegularExpressions
 
 Public Class BasicGeopos
+
     Public Property Altitude As Double
     Public Property Latitude As Double
     Public Property Longitude As Double
@@ -437,7 +438,8 @@ Public Class BasicGeopos
 {"mapquest", "https://www.waze.com/livemap/?zoom=%zoom&lat=%lat&lon=%lon"},
         {"oldmaps", "https://www.oldmapsonline.org/en/Krakow#bbox=%bbox"},
 {"waze", "https://www.waze.com/livemap/?zoom=%zoom&lat=%lat&lon=%lon"},
-        {"wirtszlaki", "https://mapa.wirtualneszlaki.pl/#%zoom/%lat/%lon"},
+        {"wirtszlaki", "https://mapa.wirtualneszlaki.pl/#%zoom/%lat/%lon/OSM_bw:100-Szlaki_rowerowe_osm:100-Szlaki_piesze_osm:100"},
+        {"mapaturyst", "https://mapa-turystyczna.pl/#%lat/%lon/%zoom"},
         {"wikimap", "https://wikimap.toolforge.org/?lat=%lat&lon=%lon&zoom=%zoom&lang=en&wp=false"},
 {"yandex", "https://www.waze.com/livemap/?zoom=%zoom&lat=%lat&lon=%lon"},
         {"geouri", "geo:%lat,%lon"},
@@ -958,5 +960,157 @@ Public Class BasicGeopos
     End Function
 #End Region
 
-End Class
+
+#Region "geowiki"
+
+    ' https://www.mediawiki.org/wiki/Extension:GeoData
+
+    ''' <summary>
+    ''' Create link for querying wikipedia by geo - use this function if you want to make HttpClient's stuff by yourself (e.g. from own http pool)
+    ''' </summary>
+    ''' <param name="lang">Two letter lang code (prefix for wikipedia.org), e.g. 'en' or 'pl'</param>
+    ''' <param name="radiusMeters">Max distance, throws if more than 10 km or if less than 0</param>
+    ''' <param name="count">Limit of returned matches (if you specify more than 20, it would be reduced to 20)</param>
+    ''' <returns></returns>
+    Public Function GeoWikiGetQueryUri(lang As String, Optional radiusMeters As Integer = 500, Optional count As Integer = 10) As Uri
+        count = Math.Min(count, 20)
+        If count < 1 Then Throw New ArgumentException("count should be >=1")
+        radiusMeters = Math.Abs(radiusMeters)
+        If radiusMeters = 0 Then Throw New ArgumentException("radius cannot be 0")
+        If radiusMeters > 10000 Then Throw New ArgumentException("radius cannot be greater than 10k")
+
+        Return New Uri($"https://{lang}.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord={Latitude}|{Longitude}&gsradius={radiusMeters}&gslimit={count}&format=json")
+    End Function
+
+    ''' <summary>
+    ''' Convert wikipedia JSON response to list - use this function if you want to make HttpClient's stuff by yourself (e.g. from own http pool)
+    ''' </summary>
+    ''' <param name="page">JSON response</param>
+    ''' <param name="lang">Two letter lang code (prefix for wikipedia.org), e.g. 'en' or 'pl'</param>
+    ''' <param name="sortmode">How to sort data</param>
+    ''' <returns></returns>
+    Public Function GeoWikiImport(page As String, lang As String, Optional sortmode As GeoWikiSort = GeoWikiSort.None) As List(Of GeoWikiItem)
+
+        '{
+        '"batchcomplete": "",
+        '"query": {
+        '    "geosearch": [
+        '        {},{}]}}
+
+        Dim iInd As Integer = page.IndexOf("[")
+        If iInd < 1 Then Return Nothing
+        page = page.Substring(iInd)
+        iInd = page.LastIndexOf("]")
+        If iInd < 1 Then Return Nothing
+        page = page.Substring(0, iInd + 1)
+
+        Dim lista As New pkar.BaseList(Of GeoWikiJSONitem)(Nothing)
+        lista.Import(page)
+
+        Dim ret As New List(Of GeoWikiItem)
+        For Each oItem As GeoWikiJSONitem In lista
+            ret.Add(oItem.AsGeoWikiItem(lang))
+        Next
+
+        Select Case sortmode
+            Case GeoWikiSort.Name
+                Return ret.OrderBy(Of String)(Function(x) x.title).ToList
+            Case GeoWikiSort.Distance
+                Return ret.OrderBy(Of Integer)(Function(x) x.geo.Radius).ToList
+            Case Else
+                Return ret
+        End Select
+
+    End Function
+
+    ' kopia z pkarlibmodule
+    Private Shared moHttp As Net.Http.HttpClient
+    '    Private Const msDefaultHttpAgent As String = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4321.0 Safari/537.36 Edg/88.0.702.0"
+    Private Const msDefaultHttpAgent As String = "pkar.BasicGeopos Nuget"
+
+    Private Shared Async Function GeoWikiGetResultPageAsync(link As Uri) As Task(Of String)
+        If moHttp Is Nothing Then
+            moHttp = New Net.Http.HttpClient()
+            moHttp.DefaultRequestHeaders.UserAgent.TryParseAdd(msDefaultHttpAgent)
+            'moHttp.DefaultRequestHeaders.Accept.Clear()
+            'moHttp.DefaultRequestHeaders.Accept.Add(New Http.Headers.MediaTypeWithQualityHeaderValue())
+        End If
+
+        Try
+            Return Await moHttp.GetStringAsync(link)
+        Catch
+        End Try
+
+        Return ""
+
+    End Function
+
+
+    ''' <summary>
+    ''' Query wikipedia by geo
+    ''' </summary>
+    ''' <param name="lang">Two letter lang code (prefix for wikipedia.org), e.g. 'en' or 'pl'</param>
+    ''' <param name="radiusMeters">Max distance, throws if more than 10 km or if less than 0</param>
+    ''' <param name="count">Limit of returned matches (if you specify more than 20, it would be reduced to 20)</param>
+    ''' <param name="sortmode">How to sort data</param>
+    ''' <returns></returns>
+    Public Async Function GeoWikiGetItemsAsync(lang As String, Optional radiusMeters As Integer = 500, Optional count As Integer = 10, Optional sortmode As GeoWikiSort = GeoWikiSort.None) As Task(Of List(Of GeoWikiItem))
+
+        Dim link As Uri = GeoWikiGetQueryUri(lang, radiusMeters, count)
+        Dim page As String = Await GeoWikiGetResultPageAsync(link)
+
+        Return GeoWikiImport(page, lang, sortmode)
+
+    End Function
+
+    ' https://en.wikipedia.org/?curid=16699231
+
+
+    Public Enum GeoWikiSort
+        None
+        Distance
+        Name
+    End Enum
+
+    Protected Class GeoWikiJSONitem
+        Public Property pageid As Integer
+        'Public Property ns As Integer
+        Public Property title As String
+        Public Property lat As Double
+        Public Property lon As Double
+        Public Property dist As Double
+        Public Property primary As String
+
+        Public Function AsGeoWikiItem(lang As String) As GeoWikiItem
+            Dim ret As New GeoWikiItem
+            ret.pageid = pageid
+            ret.title = title
+            ret.pageUri = New Uri($"https://{lang}.wikipedia.org/?curid={pageid}")
+            ret.primary = primary
+            ret.geo = New BasicGeoposWithRadius(New BasicGeopos(lat, lon), dist)
+            ret.lang = lang
+            Return ret
+        End Function
+    End Class
+
+    Public Class GeoWikiItem
+            Public Property pageid As Integer
+            Public Property title As String
+            Public Property pageUri As Uri
+            Public Property geo As BasicGeoposWithRadius
+        Public Property lang As String
+        ''' <summary>
+        ''' primary coordinates define article subject's location, while secondary coordinates are other coordinates mentioned in the article. There can be only one primary coordinate per article, but as many secondaries as you like
+        ''' </summary>
+        ''' <returns></returns>
+        Public Property primary As String
+
+        End Class
+
+
+
+#End Region
+
+
+    End Class
 
