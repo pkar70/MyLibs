@@ -80,8 +80,8 @@ Public Module Triggers
             ' np. gdy nie ma permissions, to może być FAIL
         End Try
 
-        For Each oTask In doUsuniecia
-            oTask.Unregister(True)
+        For Each oTaskUsun As Background.IBackgroundTaskRegistration In doUsuniecia
+            oTaskUsun.Unregister(True)
         Next
 
         ' z innego wyszlo, ze RemoveAccess z wnetrza daje Exception
@@ -103,7 +103,11 @@ Public Module Triggers
         Return GetTriggerNamePrefix() & "_" & sufix
     End Function
 
-    Private Function GetTriggerPolnocnyName() As String
+
+    ''' <summary>
+    ''' get internal Midnight timer name
+    ''' </summary>
+    Public Function GetMidnightTriggerName() As String
         Return GetTriggerName("polnocny")
     End Function
 #End Region
@@ -116,7 +120,7 @@ Public Module Triggers
     Public Function DumpTriggers() As String
         Dim sRet As String = "Dumping Triggers" & vbCrLf & vbCrLf
         Try
-            For Each oTask In Background.BackgroundTaskRegistration.AllTasks
+            For Each oTask As KeyValuePair(Of Guid, Background.IBackgroundTaskRegistration) In Background.BackgroundTaskRegistration.AllTasks
                 sRet &= oTask.Value.Name & vbCrLf ' //GetType niestety nie daje rzeczywistego typu
             Next
         Catch
@@ -190,20 +194,31 @@ Public Module Triggers
         ' w Nuget tego nie będzie - zwróci po prostu NULLa
         'If Not Await CanRegisterTriggersAsync() Then Return
 
+        ' w Nuget tego nie będzie - zwróci po prostu NULLa
+        'If Not Await CanRegisterTriggersAsync() Then Return
+
         Dim oDateNew As New DateTime(Date.Now.Year, Date.Now.Month, Date.Now.Day, 23, 40, 0)
-            If Date.Now.Hour > 21 Then oDateNew = oDateNew.AddDays(1)
+        If Date.Now.Hour > 21 Then oDateNew = oDateNew.AddDays(1)
 
-            Dim iMin As Integer = (oDateNew - DateTime.Now).TotalMinutes
+        Dim iMin As Integer = (oDateNew - DateTime.Now).TotalMinutes
 
-            Return RegisterTimerTrigger(GetTriggerPolnocnyName(), iMin, False)
+        Return RegisterTimerTrigger(GetMidnightTriggerName, iMin, False)
     End Function
+
+    ''' <summary>
+    ''' unregister trigger that is run about midnight
+    ''' </summary>
+    Public Sub UnregisterMidnightTrigger()
+        UnregisterTriggers(GetMidnightTriggerName)
+    End Sub
+
 
     ''' <summary>
     ''' If this is midnight trigger, than save current datetime (see GetLastMidnightTriggerDate) and adjust trigger run time to be more midnight
     ''' </summary>
     Public Function IsThisMidnightTrigger(args As Activation.BackgroundActivatedEventArgs) As Boolean
 
-        Dim sName As String = GetTriggerPolnocnyName()
+        Dim sName As String = GetMidnightTriggerName()
         If args.TaskInstance.Task.Name <> sName Then Return False
 
         gLastPolnoc = Date.Now
@@ -236,7 +251,6 @@ Public Module Triggers
     ''' <summary>
     ''' Register UserPresentTrigger
     ''' </summary>
-    ''' <param name="Name">if not given, use default name, "_userpresent", prefixed with app name</param>
     ''' <returns>BackgroundTaskRegistration of created trigger, or NULL if fails</returns>
 
     Public Function RegisterUserPresentTrigger() As Background.BackgroundTaskRegistration

@@ -1,4 +1,8 @@
 ﻿
+v1.2.0
+* +UnregisterMidnightTrigger
+* +AppBarClockTriggerToggleButton
+
 v1.1.1
 * with changes.txt
 
