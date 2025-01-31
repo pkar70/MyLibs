@@ -155,6 +155,10 @@ Public Class BaseDict(Of TKEY, TVALUE)
 
         Dim sTxt As String = Export(bIgnoreNulls)
 
+        If Not IO.Directory.Exists(IO.Path.GetDirectoryName(_filename)) Then
+            IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(_filename))
+        End If
+
         If UseBak AndAlso IO.File.Exists(_filename) Then
             IO.File.Delete(_filename & ".bak")
             IO.File.Move(_filename, _filename & ".bak")
@@ -203,6 +207,18 @@ Public Class BaseDict(Of TKEY, TVALUE)
     Public Function IsObsolete(iDays As Integer)
         If GetFileDate.AddDays(iDays) < Date.Now Then Return True
         Return False
+    End Function
+
+    ''' <summary>
+    ''' Returns file size (in bytes) - size of file as it is, before Save
+    ''' </summary>
+    ''' <returns></returns>
+    Public Function GetFileSize() As Integer
+        If _filename = "" Then Return 0
+        If Not IO.File.Exists(_filename) Then Return 0
+
+        Return New IO.FileInfo(_filename).Length
+
     End Function
 
 

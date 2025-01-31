@@ -16,7 +16,7 @@ Public MustInherit Class BaseStruct
         Dim sTxt As String = Me.ToString & ":" & vbCrLf
 
         For Each oProp As PropertyInfo In oTypek.GetRuntimeProperties
-            sTxt = sTxt & oProp.Name & ":" & vbTab
+            sTxt = sTxt & vbCrLf & oProp.Name & ":" & vbTab
             If oProp.GetValue(Me) Is Nothing Then
                 sTxt &= " (null)"
             Else
@@ -24,7 +24,7 @@ Public MustInherit Class BaseStruct
             End If
         Next
 
-        Return sTxt
+        Return sTxt.Trim
     End Function
 
     ''' <summary>

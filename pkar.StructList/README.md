@@ -51,6 +51,7 @@ Also, BaseStruct implements INotifyPropertyChanged and INotifyPropertyChanging, 
     Overridable Function Save(Optional bIgnoreNulls As Boolean = False) As Boolean
     Function GetFileDate() As Date
     Function IsObsolete(iDays As Integer)   // since 1.5.0: for memory-only lists, always returns false
+    Function GetFileSize() As Integer       // since 1.8.1
     Sub MaintainCopy(folderForCopy As String)   // since 1.4.0
     UseBak As Boolean // since 1.6.0; if TRUE, .Save creates .bak file
     Function SaveTemp(Optional bIgnoreNulls As Boolean = False) As Boolean // since 1.6.1
@@ -106,6 +107,7 @@ Also, BaseStruct implements INotifyPropertyChanged and INotifyPropertyChanging, 
     Overridable Function Save(Optional bIgnoreNulls As Boolean = False) As Boolean
     Function GetFileDate() As Date
     Function IsObsolete(iDays As Integer)
+    Function GetFileSize() As Integer       // since x.8.1
     Sub MaintainCopy(folderForCopy As String)   // since 1.4.0
     UseBak As Boolean // since 1.6.0; if TRUE, .Save creates .bak file
     Function SaveTemp(Optional bIgnoreNulls As Boolean = False) As Boolean // since 1.6.1
