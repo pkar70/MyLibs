@@ -17,7 +17,24 @@ public partial class TERYT
     public class TerytCache
     {
         private static string _folder;
-        private static string[] _terc;
+        private static string[] _terc = {
+            "02;;;;DOLNOŚLĄSKIE;województwo;2024-01-01",
+            "04;;;;KUJAWSKO-POMORSKIE;województwo;2024-01-01",
+            "06;;;;LUBELSKIE;województwo;2024-01-01",
+            "08;;;;LUBUSKIE;województwo;2024-01-01",
+            "10;;;;ŁÓDZKIE;województwo;2024-01-01",
+            "12;;;;MAŁOPOLSKIE;województwo;2024-01-01",
+            "14;;;;MAZOWIECKIE;województwo;2024-01-01",
+            "16;;;;OPOLSKIE;województwo;2024-01-01",
+            "18;;;;PODKARPACKIE;województwo;2024-01-01",
+            "20;;;;PODLASKIE;województwo;2024-01-01",
+            "22;;;;POMORSKIE;województwo;2024-01-01",
+            "24;;;;ŚLĄSKIE;województwo;2024-01-01",
+            "26;;;;ŚWIĘTOKRZYSKIE;województwo;2024-01-01",
+            "28;;;;WARMIŃSKO-MAZURSKIE;województwo;2024-01-01",
+            "30;;;;WIELKOPOLSKIE;województwo;2024-01-01",
+            "32;;;;ZACHODNIOPOMORSKIE;województwo;2024-01-01"
+             };
         private static string[] _simc;
         private static string[] _ulic;
         private TERYT _Parent;
@@ -40,7 +57,7 @@ public partial class TERYT
         /// wczytaj pliki cache do pamięci
         /// </summary>
         /// <param name="ktory"></param>
-        public void Load(KtoryPlik ktory)
+        public void Load(KtoryPlik ktory = KtoryPlik.All)
         {
             string pth;
 
@@ -75,7 +92,7 @@ public partial class TERYT
         /// <summary>
         /// Porównaj daty plików z datami bieżąego katalogu, jeśli plik jest starszy (ale jest!) to ściągnij nowszą wersję
         /// </summary>
-        public async Task<bool> SyncAsync(KtoryPlik ktory)
+        public async Task<bool> SyncAsync(KtoryPlik ktory = KtoryPlik.All)
         {
             // ma sens tylko po logowaniu (nie w publicznym), bo potrzebujemy datę zmiany
             if (!await _Parent.CzyZalogowanyAsync()) return false;
@@ -146,7 +163,7 @@ public partial class TERYT
                     return true;
 
                 case KtoryPlik.TERC:
-                    if (!DownloadZipExtract("TERYT.TERC.csv", await _Parent.PobierzKatalogTERCAsync()))
+                    if (!DownloadZipExtract("TERYT.TERC.csv", await _Parent.PobierzKatalogTERCAdrAsync()))
                         return false;
 
                     if(_terc is null) return true;
@@ -157,7 +174,7 @@ public partial class TERYT
 
                     return true;
                 case KtoryPlik.SIMC:
-                    if (!DownloadZipExtract("TERYT.SIMC.csv", await _Parent.PobierzKatalogSIMCAsync()))
+                    if (!DownloadZipExtract("TERYT.SIMC.csv", await _Parent.PobierzKatalogSIMCAdrAsync()))
                         return false;
 
                     if (_simc is null) return true;
@@ -168,7 +185,7 @@ public partial class TERYT
 
                     return true;
                 case KtoryPlik.ULIC:
-                    if (!DownloadZipExtract("TERYT.ULIC.csv", await _Parent.PobierzKatalogULICAsync()))
+                    if (!DownloadZipExtract("TERYT.ULIC.csv", await _Parent.PobierzKatalogULICAdrAsync()))
                         return false;
 
                     if (_ulic is null) return true;
@@ -275,13 +292,72 @@ public partial class TERYT
 
             // 02;01;01;1;Bolesławiec;gmina miejska;2024-01-01
             string prefix = Woj + ";" + Pow + ";";
-            foreach (string linia in _terc.Where(x => x.StartsWith(prefix)).Where(x => x.Substring(5, 1) != ";"))
+            // prefix
+            // + .Where(x => x.Substring(6, 1) != ";") żeby symbol gminy nie był pusty (czyli bez linijki powiat - ale wtedy również znika "miasto na prawach powiatu")
+            foreach (string linia in _terc.Where(x => x.StartsWith(prefix)))
             {
-                ret.Add(TerytLine2JT(linia));
+                var newek = TerytLine2JT(linia);
+                // filtrowanie wg typu gminy
+                if (newek.rodzaj == RodzajJednostki.DZIELNICA) continue;
+                if (newek.rodzaj == RodzajJednostki.DELEGATURA) continue;
+                ret.Add(newek);
             }
 
             return ret.ToArray();
         }
+
+
+        /// <summary>
+        /// Zwraca listę miejscowości wg parametrów (id) z cache
+        /// </summary>
+        /// <param name="symbolWoj">Dwuznakowy symbol województwa</param>
+        /// <param name="symbolPow">Dwuznakowy symbol powiatu</param>
+        /// <param name="symbolGmi">Dwuznakowy symbol gminy</param>
+        public Miejscowosc[] PobierzListeMiejscowosci(string Woj, string Pow, string Gmi)
+        {
+            var ret = new List<Miejscowosc>();
+
+            if (_simc is null ||  _simc.Length < 1) return null;
+
+            // 02;24;04;2;01;1;Rudnica;0855492;0855492;2024-01-01
+            string prefix = Woj + ";" + Pow + ";" + Gmi + ";";
+            foreach (string linia in _simc.Where(x => x.StartsWith(prefix)).Where(x => x.Substring(5, 1) != ";"))
+            {
+                var newek = SimcLine2Msc(linia);
+
+                // filtrowanie wg typu gminy
+                if (newek.rodzaj == RodzajJednostki.DZIELNICA) continue;
+                if (newek.rodzaj == RodzajJednostki.DELEGATURA) continue;
+
+                // filtrowanie wg RM
+
+
+                ret.Add(newek);
+            }
+
+            return ret.ToArray();
+        }
+
+        private Miejscowosc SimcLine2Msc(string linia)
+        {
+            var pola = linia.Split(';');
+            var ret = new Miejscowosc();
+            // WOJ;POW;GMI;RODZ_GMI;RM;MZ;NAZWA;SYM;SYMPOD;STAN_NA
+            // 02;24;04;2;01;1;Rudnica;0855492;0855492;2024-01-01
+            ret.WojSymbol= pola[0];
+            ret.PowSymbol = pola[1];
+            ret.GmiSymbol = pola[2];
+            ret.GmiRodzaj = pola[3];
+
+            ret.Nazwa= pola[7];
+            ret.Symbol = pola[8];
+
+            // nie ma nazw woj, powiatu, gminy!
+            // jak obsłużyć RM, MZ, SYMPOD, STAN_NA 
+
+            return ret;
+        }
+
 
 
         public enum KtoryPlik

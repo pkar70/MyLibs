@@ -7,13 +7,15 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Wrapper dla TERYT (GUS)</Title>
     <Authors>Piotr Karocki</Authors>
-    <Description>Wrapper do TERYT (eteryt.stat.gov.pl)</Description>
+    <Description>Wrapper do TERYT (eteryt.stat.gov.pl). Wrapper for polish official/government address service.</Description>
     <Copyright>Piotr Karocki</Copyright>
     <PackageTags>TERYT; adres</PackageTags>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
     <Version>1.0.1</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.Teryt</RepositoryUrl>
+    <PackageReleaseNotes>First release.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

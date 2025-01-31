@@ -23,12 +23,14 @@ public partial class TERYT : System.ServiceModel.ClientBase<ITerytWs1>, ITerytWs
 
 
     public TERYT(string user, string pswd) :
-            base(TERYT.GetDefaultBinding(), TERYT.GetDefaultEndpointAddress())
+            base(TERYT.GetDefaultBinding(), TERYT.GetDefaultEndpointAddress(user))
     {
         this.ClientCredentials.UserName.UserName = user;
         this.ClientCredentials.UserName.Password = pswd;
 
         this.Endpoint.Name = EndpointConfiguration.custom.ToString();
+        if(user == "TestPubliczny")
+            this.Endpoint.Name = EndpointConfiguration.test.ToString();
         //ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         Cache = new TerytCache(this);
     }
@@ -1000,7 +1002,7 @@ public partial class TERYT : System.ServiceModel.ClientBase<ITerytWs1>, ITerytWs
     }
 
     /// <summary>
-    /// Wyszukiwanie miejscowości według zadanych kryteriów
+    /// Wyszukiwanie miejscowości według zadanych kryteriów - w bieżącej bazie
     /// </summary>
     /// <param name="nazwaWoj">prefiks nazwy województwa (może być Empty)</param>
     /// <param name="nazwaPow">prefiks nazwy powiatu (może być Empty)</param>
@@ -1013,6 +1015,13 @@ public partial class TERYT : System.ServiceModel.ClientBase<ITerytWs1>, ITerytWs
         return base.Channel.WyszukajMiejscowoscWJPTAsync(nazwaWoj, nazwaPow, nazwaGmi, nazwaMiejscowosci, identyfikatorMiejscowosci);
     }
 
+/// <summary>
+/// Wyszukiwaie ulic według zadanych kryteriów - w bieżącej bazie
+/// </summary>
+/// <param name="nazwaulicy">prefiks nazwy ulicy</param>
+/// <param name="cecha">prefiks cechy (może być Empty)</param>
+/// <param name="nazwamiejscowosci">prefiks nazwy miejscowości (może być Empty)</param>
+/// <returns></returns>
     public System.Threading.Tasks.Task<Ulica[]> WyszukajUliceAsync(string nazwaulicy, string cecha, string nazwamiejscowosci)
     {
         return base.Channel.WyszukajUliceAsync(nazwaulicy, cecha, nazwamiejscowosci);
@@ -1096,11 +1105,17 @@ public partial class TERYT : System.ServiceModel.ClientBase<ITerytWs1>, ITerytWs
         return base.Channel.LicznoscJednostekAsync();
     }
 
+    /// <summary>
+    /// Nie zadziała: The message with Action 'http://tempuri.org/ITerytWs1/AdresBudynkow' cannot be processed at the receiver, due to a ContractFilter mismatch at the EndpointDispatcher. This may be because of either a contract mismatch (mismatched Actions between sender and receiver) or a binding/security mismatch between the sender and the receiver.  Check that sender and receiver have the same contract and the same binding (including security requirements, e.g. Message, Transport, None).
+    /// </summary>
     public System.Threading.Tasks.Task<ObiektyZZ[]> ObiektyZZAsync(string woj, string pow, string gmi, string rodz, string symbolMsc, string SymUl)
     {
         return base.Channel.ObiektyZZAsync(woj, pow, gmi, rodz, symbolMsc, SymUl);
     }
 
+    /// <summary>
+    /// Nie zadziała: The message with Action 'http://tempuri.org/ITerytWs1/AdresBudynkow' cannot be processed at the receiver, due to a ContractFilter mismatch at the EndpointDispatcher. This may be because of either a contract mismatch (mismatched Actions between sender and receiver) or a binding/security mismatch between the sender and the receiver.  Check that sender and receiver have the same contract and the same binding (including security requirements, e.g. Message, Transport, None).
+    /// </summary>
     public System.Threading.Tasks.Task<AdresoBudynki[]> AdresBudynkowAsync(string woj, string pow, string gmi, string rodz, string symbolMsc, string SymUl)
     {
         return base.Channel.AdresBudynkowAsync(woj, pow, gmi, rodz, symbolMsc, SymUl);
@@ -1188,8 +1203,11 @@ public partial class TERYT : System.ServiceModel.ClientBase<ITerytWs1>, ITerytWs
         return TERYT.GetBindingForEndpoint(EndpointConfiguration.custom);
     }
 
-    private static System.ServiceModel.EndpointAddress GetDefaultEndpointAddress()
+    private static System.ServiceModel.EndpointAddress GetDefaultEndpointAddress(string username)
     {
+        if (username == "TestPubliczny")
+            return TERYT.GetEndpointAddress(EndpointConfiguration.test);
+
         return TERYT.GetEndpointAddress(EndpointConfiguration.custom);
     }
 

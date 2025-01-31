@@ -11,7 +11,7 @@ Skorzystanie z TERYT staje się tak proste jak dodanie Nuget oraz wywołanie:
 
 Aby uzyskać dane logowania do serwisu zob. https://api.stat.gov.pl/Home/TerytApi
 
-Teoretycznie powinno się dać korzystać z tych usług bez czytania dokumentacji, używając jedynie Intellisense, jednak mocno sugeruję sięgnięcie do strony https://api.stat.gov.pl/Home/TerytApi .
+Teoretycznie powinno się dać korzystać z tych usług bez czytania dokumentacji, używając jedynie Intellisense, jednak mocno sugeruję sięgnięcie do strony https://api.stat.gov.pl/Home/TerytApi . Wszystko jest w namespace pkar.obiekty.TERYT
 
 Poza funkcjami opisanymi w dokumentacji, Nuget zawiera także następujące helpery:
 * większość metod wymagających podania daty ma bliźniacze metody bez daty (wtedy chodzi o stan "na Date.Now")
@@ -26,11 +26,16 @@ Pliki TERYT mogą być skopiowane lokalnie, i wykorzystywane zamiast odwołań o
         void Cache.Init(string folder);    // może być wspólny dla wszystkich app, albo niezależny dla app
         void Cache.Load(KtoryPlik ktory);  // wczytanie pliku lokalnego
         async Task<bool> Cache.SyncAsync(KtoryPlik ktory); // wczytanie plików z serwera jeśli nowszy niż lokalny
-        async Task<bool> Cache.ForceDownloadAsync(KtoryPlik ktory); // wymuszenie wczytania pliku
+        async Task<bool> Cache.ForceDownloadAsync(KtoryPlik ktory); // wymuszenie wczytania pliku (wersja adresowa)
 
         JednostkaTerytorialna[] Cache.PobierzListeWojewodztw();    // pobierz listę województw z cache, odpowiednik teryt.PobierzListeWojewodztwAsync
         JednostkaTerytorialna[] Cache.PobierzListePowiatow(string Woj); // pobierz listę powiatów w województwie z cache, odpowiednik teryt.PobierzListePowiatowAsync, 
         JednostkaTerytorialna[] Cache.PobierzListeGmin(string Woj, string Pow); // pobierz listę gmin w powiecie z cache, odpowiednik teryt.PobierzListeGminAsync, 
+
+
+"Gratis", bez żadnego ściągania/wczytywania plików, uzyskujemy listę województw (jest ona niezmienna od 1999 roku). Lista powiatów się jednak regularnie zmienia, dlatego potrzebne są już aktualne pliki.
+
+Cache można też wykorzystać w systemach odciętych od Internet - po prostu wrzucając aktualne wersje plików do katalogu (nazwy: TERYT.TERC.csv, TERYT.SIMC.csv, TERYT.ULIC.csv). Pliki te mają wielkości około, odpowiednio, 160 kB, 5.2 MB, 16.2 MB; dwa pierwsze zmieniają się mniej więcej raz do roku (1 stycznia), zaś katalog ulic praktycznie codziennie.
 
 
 Niestety, biblioteka nie może być .Net Std 1.4, minimum to .Net Std 2.0. Tak więc Nuget nie zadziała na telefonach z Windows; ale zadziała na desktop WPF/UWP/WinUI, oraz wieloplarformowo w Uno, i w MAUI...

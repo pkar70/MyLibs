@@ -190,6 +190,15 @@
         /// </summary>
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string woj;
+
+
+    public string DumpIt()
+    {
+        return $"Województwo {nazwa.ToLowerInvariant()} (TERYT: {woj}).\n" +
+        $"Podstawowe: {podstawoweOgolem} = {podstawoweWsie} wsie + {podstawoweInne} inne.\n" +
+        $"Integralne: {integralneOgolem} = {integralneWsie} wsie + {integralnePrzysiolki} przysiółki + {integralneInne} inne.\n";
+    }
+
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -240,6 +249,17 @@
         /// </summary>
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string symbol;
+
+
+    public string DumpIt()
+    {
+        return $"Województwo {nazwa.ToLowerInvariant()} (TERYT: {symbol}).\n" + 
+            $"Powiaty: {powiaty} + {powiatyMiasta} miasta na prawach powiatu.\n" +
+            $"Gminy: {gminy} = {gminyMiejskie} miejskie + {gminyMW} miejsko-wiejskie + {gminyWiejskie} wiejskie.\n" +
+            $"Miasta: {miasta} + {miastaGMW} w gminach miejsko-wiejskich.\n" +
+            $"Delegatury: {delegatury}; Dzielnice: {dzielnice}.\n";
+    }
+
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1210,185 +1230,41 @@
     public partial class Ulica : object
     {
 
-        private string CechaField;
-
-        private string GmiRodzajField;
-
-        private string GmiSymbolField;
-
-        private string GminaField;
-
-        private string IdentyfikatorMiejscowosciField;
-
-        private string IdentyfikatorUlicyField;
-
-        private string NazwaField;
-
-        private string NazwaMiejscowosciField;
-
-        private string PowSymbolField;
-
-        private string PowiatField;
-
-        private string WojSymbolField;
-
-        private string WojewodztwoField;
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Cecha;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Cecha
-        {
-            get
-            {
-                return this.CechaField;
-            }
-            set
-            {
-                this.CechaField = value;
-            }
-        }
+        public string GmiRodzaj;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string GmiRodzaj
-        {
-            get
-            {
-                return this.GmiRodzajField;
-            }
-            set
-            {
-                this.GmiRodzajField = value;
-            }
-        }
+        public string GmiSymbol;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string GmiSymbol
-        {
-            get
-            {
-                return this.GmiSymbolField;
-            }
-            set
-            {
-                this.GmiSymbolField = value;
-            }
-        }
+        public string Gmina;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Gmina
-        {
-            get
-            {
-                return this.GminaField;
-            }
-            set
-            {
-                this.GminaField = value;
-            }
-        }
+        public string IdentyfikatorMiejscowosci;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string IdentyfikatorMiejscowosci
-        {
-            get
-            {
-                return this.IdentyfikatorMiejscowosciField;
-            }
-            set
-            {
-                this.IdentyfikatorMiejscowosciField = value;
-            }
-        }
+        public string IdentyfikatorUlicy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string IdentyfikatorUlicy
-        {
-            get
-            {
-                return this.IdentyfikatorUlicyField;
-            }
-            set
-            {
-                this.IdentyfikatorUlicyField = value;
-            }
-        }
+        public string Nazwa;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa
-        {
-            get
-            {
-                return this.NazwaField;
-            }
-            set
-            {
-                this.NazwaField = value;
-            }
-        }
+        public string NazwaMiejscowosci;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaMiejscowosci
-        {
-            get
-            {
-                return this.NazwaMiejscowosciField;
-            }
-            set
-            {
-                this.NazwaMiejscowosciField = value;
-            }
-        }
+        public string PowSymbol;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string PowSymbol
-        {
-            get
-            {
-                return this.PowSymbolField;
-            }
-            set
-            {
-                this.PowSymbolField = value;
-            }
-        }
+        public string Powiat;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Powiat
-        {
-            get
-            {
-                return this.PowiatField;
-            }
-            set
-            {
-                this.PowiatField = value;
-            }
-        }
+        public string WojSymbol;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string WojSymbol
-        {
-            get
-            {
-                return this.WojSymbolField;
-            }
-            set
-            {
-                this.WojSymbolField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Wojewodztwo
-        {
-            get
-            {
-                return this.WojewodztwoField;
-            }
-            set
-            {
-                this.WojewodztwoField = value;
-            }
-        }
+        public string Wojewodztwo;
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1397,35 +1273,12 @@
     public partial class identyfikatory : object
     {
 
-        private string simcField;
-
-        private string tercField;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string simc
-        {
-            get
-            {
-                return this.simcField;
-            }
-            set
-            {
-                this.simcField = value;
-            }
-        }
+        public string simc;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string terc
-        {
-            get
-            {
-                return this.tercField;
-            }
-            set
-            {
-                this.tercField = value;
-            }
-        }
+        public string terc;
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1434,185 +1287,42 @@
     public partial class JednostkaPodzialuTerytorialnegoDoSortowania : object
     {
 
-        private string NazwaDodatkowaWyszukanaField;
-
-        private string NazwaGminyField;
-
-        private string NazwaPowiatField;
-
-        private string NazwaWojewodztwaField;
-
-        private string NazwaWyszukanaField;
-
-        private string RodzajGminyField;
-
-        private int SortGminyField;
-
-        private int SortPowiatField;
-
-        private string SymbolGminyField;
-
-        private string SymbolPowiatField;
-
-        private string SymbolWojewodztwaField;
-
-        private string SymbolWyszukanaField;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaDodatkowaWyszukana
-        {
-            get
-            {
-                return this.NazwaDodatkowaWyszukanaField;
-            }
-            set
-            {
-                this.NazwaDodatkowaWyszukanaField = value;
-            }
-        }
+        public string NazwaDodatkowaWyszukana;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaGminy
-        {
-            get
-            {
-                return this.NazwaGminyField;
-            }
-            set
-            {
-                this.NazwaGminyField = value;
-            }
-        }
+        public string NazwaGminy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaPowiat
-        {
-            get
-            {
-                return this.NazwaPowiatField;
-            }
-            set
-            {
-                this.NazwaPowiatField = value;
-            }
-        }
+        public string NazwaPowiat;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaWojewodztwa
-        {
-            get
-            {
-                return this.NazwaWojewodztwaField;
-            }
-            set
-            {
-                this.NazwaWojewodztwaField = value;
-            }
-        }
+        public string NazwaWojewodztwa;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaWyszukana
-        {
-            get
-            {
-                return this.NazwaWyszukanaField;
-            }
-            set
-            {
-                this.NazwaWyszukanaField = value;
-            }
-        }
+        public string NazwaWyszukana;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajGminy
-        {
-            get
-            {
-                return this.RodzajGminyField;
-            }
-            set
-            {
-                this.RodzajGminyField = value;
-            }
-        }
+        public string RodzajGminy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int SortGminy
-        {
-            get
-            {
-                return this.SortGminyField;
-            }
-            set
-            {
-                this.SortGminyField = value;
-            }
-        }
+        public int SortGminy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int SortPowiat
-        {
-            get
-            {
-                return this.SortPowiatField;
-            }
-            set
-            {
-                this.SortPowiatField = value;
-            }
-        }
+        public int SortPowiat;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string SymbolGminy
-        {
-            get
-            {
-                return this.SymbolGminyField;
-            }
-            set
-            {
-                this.SymbolGminyField = value;
-            }
-        }
+        public string SymbolGminy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string SymbolPowiat
-        {
-            get
-            {
-                return this.SymbolPowiatField;
-            }
-            set
-            {
-                this.SymbolPowiatField = value;
-            }
-        }
+        public string SymbolPowiat;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string SymbolWojewodztwa
-        {
-            get
-            {
-                return this.SymbolWojewodztwaField;
-            }
-            set
-            {
-                this.SymbolWojewodztwaField = value;
-            }
-        }
+        public string SymbolWojewodztwa;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string SymbolWyszukana
-        {
-            get
-            {
-                return this.SymbolWyszukanaField;
-            }
-            set
-            {
-                this.SymbolWyszukanaField = value;
-            }
-        }
+        public string SymbolWyszukana;
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1621,215 +1331,47 @@
     public partial class WyszukanaMiejscowosc : object
     {
 
-        private string DataStanuField;
-
-        private string GmiField;
-
-        private string GminaField;
-
-        private string MzField;
-
-        private string NazwaField;
-
-        private string PowField;
-
-        private string PowiatField;
-
-        private string RmField;
-
-        private string RodzajGminyField;
-
-        private string RodzajMiejscowosciField;
-
-        private string SymbolField;
-
-        private string SymbolPodstField;
-
-        private string WojField;
-
-        private string WojewodztwoField;
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string DataStanu;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string DataStanu
-        {
-            get
-            {
-                return this.DataStanuField;
-            }
-            set
-            {
-                this.DataStanuField = value;
-            }
-        }
+        public string Gmi;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Gmi
-        {
-            get
-            {
-                return this.GmiField;
-            }
-            set
-            {
-                this.GmiField = value;
-            }
-        }
+        public string Gmina;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Gmina
-        {
-            get
-            {
-                return this.GminaField;
-            }
-            set
-            {
-                this.GminaField = value;
-            }
-        }
+        public string Mz;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Mz
-        {
-            get
-            {
-                return this.MzField;
-            }
-            set
-            {
-                this.MzField = value;
-            }
-        }
+        public string Nazwa;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa
-        {
-            get
-            {
-                return this.NazwaField;
-            }
-            set
-            {
-                this.NazwaField = value;
-            }
-        }
+        public string Pow;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Pow
-        {
-            get
-            {
-                return this.PowField;
-            }
-            set
-            {
-                this.PowField = value;
-            }
-        }
+        public string Powiat;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Powiat
-        {
-            get
-            {
-                return this.PowiatField;
-            }
-            set
-            {
-                this.PowiatField = value;
-            }
-        }
+        public string Rm;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Rm
-        {
-            get
-            {
-                return this.RmField;
-            }
-            set
-            {
-                this.RmField = value;
-            }
-        }
+        public string RodzajGminy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajGminy
-        {
-            get
-            {
-                return this.RodzajGminyField;
-            }
-            set
-            {
-                this.RodzajGminyField = value;
-            }
-        }
+        public string RodzajMiejscowosci;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajMiejscowosci
-        {
-            get
-            {
-                return this.RodzajMiejscowosciField;
-            }
-            set
-            {
-                this.RodzajMiejscowosciField = value;
-            }
-        }
+        public string Symbol;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Symbol
-        {
-            get
-            {
-                return this.SymbolField;
-            }
-            set
-            {
-                this.SymbolField = value;
-            }
-        }
+        public string SymbolPodst;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string SymbolPodst
-        {
-            get
-            {
-                return this.SymbolPodstField;
-            }
-            set
-            {
-                this.SymbolPodstField = value;
-            }
-        }
+        public string Woj;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Woj
-        {
-            get
-            {
-                return this.WojField;
-            }
-            set
-            {
-                this.WojField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Wojewodztwo
-        {
-            get
-            {
-                return this.WojewodztwoField;
-            }
-            set
-            {
-                this.WojewodztwoField = value;
-            }
-        }
+        public string Wojewodztwo;
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1838,230 +1380,50 @@
     public partial class WyszukanaUlica : object
     {
 
-        private string CechaField;
-
-        private string DataStanuField;
-
-        private string GmiField;
-
-        private string GminaField;
-
-        private string MiejscowoscField;
-
-        private string NazwaField;
-
-        private string Nazwa1Field;
-
-        private string Nazwa2Field;
-
-        private string PowField;
-
-        private string PowiatField;
-
-        private string RodzajGminyField;
-
-        private string SymbolField;
-
-        private string SymbolSimcField;
-
-        private string WojField;
-
-        private string WojewodztwoField;
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Cecha;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Cecha
-        {
-            get
-            {
-                return this.CechaField;
-            }
-            set
-            {
-                this.CechaField = value;
-            }
-        }
+        public string DataStanu;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string DataStanu
-        {
-            get
-            {
-                return this.DataStanuField;
-            }
-            set
-            {
-                this.DataStanuField = value;
-            }
-        }
+        public string Gmi;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Gmi
-        {
-            get
-            {
-                return this.GmiField;
-            }
-            set
-            {
-                this.GmiField = value;
-            }
-        }
+        public string Gmina;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Gmina
-        {
-            get
-            {
-                return this.GminaField;
-            }
-            set
-            {
-                this.GminaField = value;
-            }
-        }
+        public string Miejscowosc;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Miejscowosc
-        {
-            get
-            {
-                return this.MiejscowoscField;
-            }
-            set
-            {
-                this.MiejscowoscField = value;
-            }
-        }
+        public string Nazwa;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa
-        {
-            get
-            {
-                return this.NazwaField;
-            }
-            set
-            {
-                this.NazwaField = value;
-            }
-        }
+        public string Nazwa1;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa1
-        {
-            get
-            {
-                return this.Nazwa1Field;
-            }
-            set
-            {
-                this.Nazwa1Field = value;
-            }
-        }
+        public string Nazwa2;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa2
-        {
-            get
-            {
-                return this.Nazwa2Field;
-            }
-            set
-            {
-                this.Nazwa2Field = value;
-            }
-        }
+        public string Pow;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Pow
-        {
-            get
-            {
-                return this.PowField;
-            }
-            set
-            {
-                this.PowField = value;
-            }
-        }
+        public string Powiat;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Powiat
-        {
-            get
-            {
-                return this.PowiatField;
-            }
-            set
-            {
-                this.PowiatField = value;
-            }
-        }
+        public string RodzajGminy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajGminy
-        {
-            get
-            {
-                return this.RodzajGminyField;
-            }
-            set
-            {
-                this.RodzajGminyField = value;
-            }
-        }
+        public string Symbol;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Symbol
-        {
-            get
-            {
-                return this.SymbolField;
-            }
-            set
-            {
-                this.SymbolField = value;
-            }
-        }
+        public string SymbolSimc;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string SymbolSimc
-        {
-            get
-            {
-                return this.SymbolSimcField;
-            }
-            set
-            {
-                this.SymbolSimcField = value;
-            }
-        }
+        public string Woj;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Woj
-        {
-            get
-            {
-                return this.WojField;
-            }
-            set
-            {
-                this.WojField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Wojewodztwo
-        {
-            get
-            {
-                return this.WojewodztwoField;
-            }
-            set
-            {
-                this.WojewodztwoField = value;
-            }
-        }
+        public string Wojewodztwo;
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2070,260 +1432,56 @@
     public partial class WyszukanaMiejscowoscZPodstawowa : object
     {
 
-        private string DataStanuField;
-
-        private string GmiField;
-
-        private string GminaField;
-
-        private string MzField;
-
-        private string NazwaField;
-
-        private string NazwaPodstField;
-
-        private string NazwaRodzajuGminyField;
-
-        private string PowField;
-
-        private string PowiatField;
-
-        private string RmField;
-
-        private string RodzajGminyField;
-
-        private string RodzajMiejscowosciField;
-
-        private string RodzajMiejscowosciPodstField;
-
-        private string SymbolField;
-
-        private string SymbolPodstField;
-
-        private string WojField;
-
-        private string WojewodztwoField;
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string DataStanu;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string DataStanu
-        {
-            get
-            {
-                return this.DataStanuField;
-            }
-            set
-            {
-                this.DataStanuField = value;
-            }
-        }
+        public string Gmi;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Gmi
-        {
-            get
-            {
-                return this.GmiField;
-            }
-            set
-            {
-                this.GmiField = value;
-            }
-        }
+        public string Gmina;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Gmina
-        {
-            get
-            {
-                return this.GminaField;
-            }
-            set
-            {
-                this.GminaField = value;
-            }
-        }
+        public string Mz;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Mz
-        {
-            get
-            {
-                return this.MzField;
-            }
-            set
-            {
-                this.MzField = value;
-            }
-        }
+        public string Nazwa;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa
-        {
-            get
-            {
-                return this.NazwaField;
-            }
-            set
-            {
-                this.NazwaField = value;
-            }
-        }
+        public string NazwaPodst;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaPodst
-        {
-            get
-            {
-                return this.NazwaPodstField;
-            }
-            set
-            {
-                this.NazwaPodstField = value;
-            }
-        }
+        public string NazwaRodzajuGminy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaRodzajuGminy
-        {
-            get
-            {
-                return this.NazwaRodzajuGminyField;
-            }
-            set
-            {
-                this.NazwaRodzajuGminyField = value;
-            }
-        }
+        public string Pow;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Pow
-        {
-            get
-            {
-                return this.PowField;
-            }
-            set
-            {
-                this.PowField = value;
-            }
-        }
+        public string Powiat;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Powiat
-        {
-            get
-            {
-                return this.PowiatField;
-            }
-            set
-            {
-                this.PowiatField = value;
-            }
-        }
+        public string Rm;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Rm
-        {
-            get
-            {
-                return this.RmField;
-            }
-            set
-            {
-                this.RmField = value;
-            }
-        }
+        public string RodzajGminy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajGminy
-        {
-            get
-            {
-                return this.RodzajGminyField;
-            }
-            set
-            {
-                this.RodzajGminyField = value;
-            }
-        }
+        public string RodzajMiejscowosci;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajMiejscowosci
-        {
-            get
-            {
-                return this.RodzajMiejscowosciField;
-            }
-            set
-            {
-                this.RodzajMiejscowosciField = value;
-            }
-        }
+        public string RodzajMiejscowosciPodst;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajMiejscowosciPodst
-        {
-            get
-            {
-                return this.RodzajMiejscowosciPodstField;
-            }
-            set
-            {
-                this.RodzajMiejscowosciPodstField = value;
-            }
-        }
+        public string Symbol;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Symbol
-        {
-            get
-            {
-                return this.SymbolField;
-            }
-            set
-            {
-                this.SymbolField = value;
-            }
-        }
+        public string SymbolPodst;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string SymbolPodst
-        {
-            get
-            {
-                return this.SymbolPodstField;
-            }
-            set
-            {
-                this.SymbolPodstField = value;
-            }
-        }
+        public string Woj;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Woj
-        {
-            get
-            {
-                return this.WojField;
-            }
-            set
-            {
-                this.WojField = value;
-            }
-        }
-
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Wojewodztwo
-        {
-            get
-            {
-                return this.WojewodztwoField;
-            }
-            set
-            {
-                this.WojewodztwoField = value;
-            }
-        }
+        public string Wojewodztwo;
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2332,305 +1490,66 @@
     public partial class WyszukanaUlicaZPodstawowa : object
     {
 
-        private string CechaField;
-
-        private string DataStanuField;
-
-        private string GmiField;
-
-        private string GminaField;
-
-        private string MiejscowoscField;
-
-        private string MiejscowoscPodstField;
-
-        private string NazwaField;
-
-        private string Nazwa1Field;
-
-        private string Nazwa2Field;
-
-        private string NazwaRodzajuGminyField;
-
-        private string PowField;
-
-        private string PowiatField;
-
-        private string RodzajGminyField;
-
-        private string RodzajMiejscowosciField;
-
-        private string RodzajMiejscowosciPodstField;
-
-        private string SymbolField;
-
-        private string SymbolSimcField;
-
-        private string SymbolSimcPodstField;
-
-        private string WojField;
-
-        private string WojewodztwoField;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Cecha
-        {
-            get
-            {
-                return this.CechaField;
-            }
-            set
-            {
-                this.CechaField = value;
-            }
-        }
+        public string Cecha;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string DataStanu
-        {
-            get
-            {
-                return this.DataStanuField;
-            }
-            set
-            {
-                this.DataStanuField = value;
-            }
-        }
+        public string DataStanu;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Gmi
-        {
-            get
-            {
-                return this.GmiField;
-            }
-            set
-            {
-                this.GmiField = value;
-            }
-        }
+        public string Gmi;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Gmina
-        {
-            get
-            {
-                return this.GminaField;
-            }
-            set
-            {
-                this.GminaField = value;
-            }
-        }
+        public string Gmina;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Miejscowosc
-        {
-            get
-            {
-                return this.MiejscowoscField;
-            }
-            set
-            {
-                this.MiejscowoscField = value;
-            }
-        }
+        public string Miejscowosc;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string MiejscowoscPodst
-        {
-            get
-            {
-                return this.MiejscowoscPodstField;
-            }
-            set
-            {
-                this.MiejscowoscPodstField = value;
-            }
-        }
+        public string MiejscowoscPodst;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa
-        {
-            get
-            {
-                return this.NazwaField;
-            }
-            set
-            {
-                this.NazwaField = value;
-            }
-        }
+        public string Nazwa;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa1
-        {
-            get
-            {
-                return this.Nazwa1Field;
-            }
-            set
-            {
-                this.Nazwa1Field = value;
-            }
-        }
+        public string Nazwa1;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa2
-        {
-            get
-            {
-                return this.Nazwa2Field;
-            }
-            set
-            {
-                this.Nazwa2Field = value;
-            }
-        }
+        public string Nazwa2;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaRodzajuGminy
-        {
-            get
-            {
-                return this.NazwaRodzajuGminyField;
-            }
-            set
-            {
-                this.NazwaRodzajuGminyField = value;
-            }
-        }
+        public string NazwaRodzajuGminy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Pow
-        {
-            get
-            {
-                return this.PowField;
-            }
-            set
-            {
-                this.PowField = value;
-            }
-        }
+        public string Pow;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Powiat
-        {
-            get
-            {
-                return this.PowiatField;
-            }
-            set
-            {
-                this.PowiatField = value;
-            }
-        }
+        public string Powiat;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajGminy
-        {
-            get
-            {
-                return this.RodzajGminyField;
-            }
-            set
-            {
-                this.RodzajGminyField = value;
-            }
-        }
+        public string RodzajGminy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajMiejscowosci
-        {
-            get
-            {
-                return this.RodzajMiejscowosciField;
-            }
-            set
-            {
-                this.RodzajMiejscowosciField = value;
-            }
-        }
+        public string RodzajMiejscowosci;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajMiejscowosciPodst
-        {
-            get
-            {
-                return this.RodzajMiejscowosciPodstField;
-            }
-            set
-            {
-                this.RodzajMiejscowosciPodstField = value;
-            }
-        }
+        public string RodzajMiejscowosciPodst;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Symbol
-        {
-            get
-            {
-                return this.SymbolField;
-            }
-            set
-            {
-                this.SymbolField = value;
-            }
-        }
+        public string Symbol;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string SymbolSimc
-        {
-            get
-            {
-                return this.SymbolSimcField;
-            }
-            set
-            {
-                this.SymbolSimcField = value;
-            }
-        }
+        public string SymbolSimc;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string SymbolSimcPodst
-        {
-            get
-            {
-                return this.SymbolSimcPodstField;
-            }
-            set
-            {
-                this.SymbolSimcPodstField = value;
-            }
-        }
+        public string SymbolSimcPodst;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Woj
-        {
-            get
-            {
-                return this.WojField;
-            }
-            set
-            {
-                this.WojField = value;
-            }
-        }
+        public string Woj;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Wojewodztwo
-        {
-            get
-            {
-                return this.WojewodztwoField;
-            }
-            set
-            {
-                this.WojewodztwoField = value;
-            }
-        }
+        public string Wojewodztwo;
     }
 
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -2689,320 +1608,69 @@
     public partial class ObiektyZZ : object
     {
 
-        private string CechaField;
-
-        private string GminaField;
-
-        private string LiczbaMiejscField;
-
-        private string MiejscowoscField;
-
-        private string NazwaOzzField;
-
-        private string NazwaUlicyField;
-
-        private string Nazwa_1Field;
-
-        private string Nazwa_2Field;
-
-        private string NrBudWaField;
-
-        private string NrDomuField;
-
-        private string NrOzzField;
-
-        private string NrbNierField;
-
-        private string ObrebGeodezyjnyField;
-
-        private string ObwodsSpisowyField;
-
-        private string OpisSymboluOzzField;
-
-        private string PowiatField;
-
-        private string RejonStatystycznyField;
-
-        private string RodzajField;
-
-        private string RodzajBudynkuField;
-
-        private string SymbolOzzField;
-
-        private string WojewodztwoField;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Cecha
-        {
-            get
-            {
-                return this.CechaField;
-            }
-            set
-            {
-                this.CechaField = value;
-            }
-        }
+        public string Cecha;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Gmina
-        {
-            get
-            {
-                return this.GminaField;
-            }
-            set
-            {
-                this.GminaField = value;
-            }
-        }
+        public string Gmina;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string LiczbaMiejsc
-        {
-            get
-            {
-                return this.LiczbaMiejscField;
-            }
-            set
-            {
-                this.LiczbaMiejscField = value;
-            }
-        }
+        public string LiczbaMiejsc;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Miejscowosc
-        {
-            get
-            {
-                return this.MiejscowoscField;
-            }
-            set
-            {
-                this.MiejscowoscField = value;
-            }
-        }
+        public string Miejscowosc;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaOzz
-        {
-            get
-            {
-                return this.NazwaOzzField;
-            }
-            set
-            {
-                this.NazwaOzzField = value;
-            }
-        }
+        public string NazwaOzz;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaUlicy
-        {
-            get
-            {
-                return this.NazwaUlicyField;
-            }
-            set
-            {
-                this.NazwaUlicyField = value;
-            }
-        }
+        public string NazwaUlicy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa_1
-        {
-            get
-            {
-                return this.Nazwa_1Field;
-            }
-            set
-            {
-                this.Nazwa_1Field = value;
-            }
-        }
+        public string Nazwa_1;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa_2
-        {
-            get
-            {
-                return this.Nazwa_2Field;
-            }
-            set
-            {
-                this.Nazwa_2Field = value;
-            }
-        }
+        public string Nazwa_2;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NrBudWa
-        {
-            get
-            {
-                return this.NrBudWaField;
-            }
-            set
-            {
-                this.NrBudWaField = value;
-            }
-        }
+        public string NrBudWa;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NrDomu
-        {
-            get
-            {
-                return this.NrDomuField;
-            }
-            set
-            {
-                this.NrDomuField = value;
-            }
-        }
+        public string NrDomu;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NrOzz
-        {
-            get
-            {
-                return this.NrOzzField;
-            }
-            set
-            {
-                this.NrOzzField = value;
-            }
-        }
+        public string NrOzz;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NrbNier
-        {
-            get
-            {
-                return this.NrbNierField;
-            }
-            set
-            {
-                this.NrbNierField = value;
-            }
-        }
+        public string NrbNier;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string ObrebGeodezyjny
-        {
-            get
-            {
-                return this.ObrebGeodezyjnyField;
-            }
-            set
-            {
-                this.ObrebGeodezyjnyField = value;
-            }
-        }
+        public string ObrebGeodezyjny;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string ObwodsSpisowy
-        {
-            get
-            {
-                return this.ObwodsSpisowyField;
-            }
-            set
-            {
-                this.ObwodsSpisowyField = value;
-            }
-        }
+        public string ObwodsSpisowy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string OpisSymboluOzz
-        {
-            get
-            {
-                return this.OpisSymboluOzzField;
-            }
-            set
-            {
-                this.OpisSymboluOzzField = value;
-            }
-        }
+        public string OpisSymboluOzz;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Powiat
-        {
-            get
-            {
-                return this.PowiatField;
-            }
-            set
-            {
-                this.PowiatField = value;
-            }
-        }
+        public string Powiat;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RejonStatystyczny
-        {
-            get
-            {
-                return this.RejonStatystycznyField;
-            }
-            set
-            {
-                this.RejonStatystycznyField = value;
-            }
-        }
+        public string RejonStatystyczny;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Rodzaj
-        {
-            get
-            {
-                return this.RodzajField;
-            }
-            set
-            {
-                this.RodzajField = value;
-            }
-        }
+        public string Rodzaj;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajBudynku
-        {
-            get
-            {
-                return this.RodzajBudynkuField;
-            }
-            set
-            {
-                this.RodzajBudynkuField = value;
-            }
-        }
+        public string RodzajBudynku;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string SymbolOzz
-        {
-            get
-            {
-                return this.SymbolOzzField;
-            }
-            set
-            {
-                this.SymbolOzzField = value;
-            }
-        }
+        public string SymbolOzz;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Wojewodztwo
-        {
-            get
-            {
-                return this.WojewodztwoField;
-            }
-            set
-            {
-                this.WojewodztwoField = value;
-            }
-        }
+        public string Wojewodztwo;
     }
 
 [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3258,275 +1926,60 @@ public partial class AdresoBudynki : object
     public partial class AdresoBudynkiMieszkania : object
     {
 
-        private string CechaField;
-
-        private string GminaField;
-
-        private string KodNiezamieszkaniaField;
-
-        private string MiejscowoscField;
-
-        private string NazwaUlicyField;
-
-        private string Nazwa_1Field;
-
-        private string Nazwa_2Field;
-
-        private string NrBudWaField;
-
-        private string NrDomuField;
-
-        private string NrMieszkaniaField;
-
-        private string NrbNierField;
-
-        private string ObwodsSpisowyField;
-
-        private string PowiatField;
-
-        private string RejonStatystycznyField;
-
-        private string RodzajField;
-
-        private string RodzajBudynkuField;
-
-        private string RodzajMieszkaniaField;
-
-        private string WojewodztwoField;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Cecha
-        {
-            get
-            {
-                return this.CechaField;
-            }
-            set
-            {
-                this.CechaField = value;
-            }
-        }
+        public string Cecha;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Gmina
-        {
-            get
-            {
-                return this.GminaField;
-            }
-            set
-            {
-                this.GminaField = value;
-            }
-        }
+        public string Gmina;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string KodNiezamieszkania
-        {
-            get
-            {
-                return this.KodNiezamieszkaniaField;
-            }
-            set
-            {
-                this.KodNiezamieszkaniaField = value;
-            }
-        }
+        public string KodNiezamieszkania;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Miejscowosc
-        {
-            get
-            {
-                return this.MiejscowoscField;
-            }
-            set
-            {
-                this.MiejscowoscField = value;
-            }
-        }
+        public string Miejscowosc;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NazwaUlicy
-        {
-            get
-            {
-                return this.NazwaUlicyField;
-            }
-            set
-            {
-                this.NazwaUlicyField = value;
-            }
-        }
+        public string NazwaUlicy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa_1
-        {
-            get
-            {
-                return this.Nazwa_1Field;
-            }
-            set
-            {
-                this.Nazwa_1Field = value;
-            }
-        }
+        public string Nazwa_1;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Nazwa_2
-        {
-            get
-            {
-                return this.Nazwa_2Field;
-            }
-            set
-            {
-                this.Nazwa_2Field = value;
-            }
-        }
+        public string Nazwa_2;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NrBudWa
-        {
-            get
-            {
-                return this.NrBudWaField;
-            }
-            set
-            {
-                this.NrBudWaField = value;
-            }
-        }
+        public string NrBudWa;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NrDomu
-        {
-            get
-            {
-                return this.NrDomuField;
-            }
-            set
-            {
-                this.NrDomuField = value;
-            }
-        }
+        public string NrDomu;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NrMieszkania
-        {
-            get
-            {
-                return this.NrMieszkaniaField;
-            }
-            set
-            {
-                this.NrMieszkaniaField = value;
-            }
-        }
+        public string NrMieszkania;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string NrbNier
-        {
-            get
-            {
-                return this.NrbNierField;
-            }
-            set
-            {
-                this.NrbNierField = value;
-            }
-        }
+        public string NrbNier;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string ObwodsSpisowy
-        {
-            get
-            {
-                return this.ObwodsSpisowyField;
-            }
-            set
-            {
-                this.ObwodsSpisowyField = value;
-            }
-        }
+        public string ObwodsSpisowy;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Powiat
-        {
-            get
-            {
-                return this.PowiatField;
-            }
-            set
-            {
-                this.PowiatField = value;
-            }
-        }
+        public string Powiat;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RejonStatystyczny
-        {
-            get
-            {
-                return this.RejonStatystycznyField;
-            }
-            set
-            {
-                this.RejonStatystycznyField = value;
-            }
-        }
+        public string RejonStatystyczny;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Rodzaj
-        {
-            get
-            {
-                return this.RodzajField;
-            }
-            set
-            {
-                this.RodzajField = value;
-            }
-        }
+        public string Rodzaj;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajBudynku
-        {
-            get
-            {
-                return this.RodzajBudynkuField;
-            }
-            set
-            {
-                this.RodzajBudynkuField = value;
-            }
-        }
+        public string RodzajBudynku;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string RodzajMieszkania
-        {
-            get
-            {
-                return this.RodzajMieszkaniaField;
-            }
-            set
-            {
-                this.RodzajMieszkaniaField = value;
-            }
-        }
+        public string RodzajMieszkania;
 
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Wojewodztwo
-        {
-            get
-            {
-                return this.WojewodztwoField;
-            }
-            set
-            {
-                this.WojewodztwoField = value;
-            }
-        }
+        public string Wojewodztwo;
     }
 
 [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -3535,50 +1988,14 @@ public partial class AdresoBudynki : object
 public partial class PlikZbioryNOBC : object
 {
 
-    private string nazwa_plikuField;
-
-    private string opisField;
-
-    private string plik_zawartoscField;
+    [System.Runtime.Serialization.DataMemberAttribute()]
+    public string nazwa_pliku;
 
     [System.Runtime.Serialization.DataMemberAttribute()]
-    public string nazwa_pliku
-    {
-        get
-        {
-            return this.nazwa_plikuField;
-        }
-        set
-        {
-            this.nazwa_plikuField = value;
-        }
-    }
+    public string opis;
 
     [System.Runtime.Serialization.DataMemberAttribute()]
-    public string opis
-    {
-        get
-        {
-            return this.opisField;
-        }
-        set
-        {
-            this.opisField = value;
-        }
-    }
-
-    [System.Runtime.Serialization.DataMemberAttribute()]
-    public string plik_zawartosc
-    {
-        get
-        {
-            return this.plik_zawartoscField;
-        }
-        set
-        {
-            this.plik_zawartoscField = value;
-        }
-    }
+    public string plik_zawartosc;
 }
 
 public enum RodzajJednostki
