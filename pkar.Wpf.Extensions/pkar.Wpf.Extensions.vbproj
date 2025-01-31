@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>pkar.UI.Extensions</RootNamespace>
     <UseWPF>true</UseWPF>
-    <Version>2.0.11</Version>
+    <Version>2.0.14</Version>
     <Title>Several extensions of WPF UI classes</Title>
     <Authors>pkar</Authors>
     <Company>none</Company>
@@ -13,7 +13,7 @@
     <PackageProjectUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.WPF.Extensions</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/pkar70/MyLibs/tree/master/pkar.WPF.Extensions</RepositoryUrl>
-    <PackageReleaseNotes>Now all texts in Dialogs can be Localized (see pkar.Localize nuget)</PackageReleaseNotes>
+    <PackageReleaseNotes>Tooltip for ProgressBar</PackageReleaseNotes>
     <Description>This Nuget adds UI extensions for WPF, similar to my other Nuget: pkar.Uwp.Extensions</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
