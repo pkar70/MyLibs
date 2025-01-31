@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>pkar.Wpf.obiekty</RootNamespace>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>pkar.Wpf.obiekty</RootNamespace>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+</Project>

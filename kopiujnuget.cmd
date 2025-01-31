@@ -15,11 +15,17 @@ GOTO :EOF
 
 :lNoUWP
 CD bin
+IF %1. == deb. GOTO lUseDebug
+IF NOT %1. == /d. GOTO lUseRelease
 
+:lUseDebug
+CD Debug 
+GOTO lUseThisDir
+
+:lUseRelease
 CD Release
-IF %1.==deb. CD ..\Debug 
-IF %1.==/d. CD ..\Debug 
 
+:lUseThisDir
 FOR %%f in (*.nupkg) DO SET newestNuget=%%f
 
 SET newestNuget=%newestNuget:.symbols.nupkg=.nupkg%

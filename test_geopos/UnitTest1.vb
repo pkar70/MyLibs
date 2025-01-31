@@ -45,6 +45,30 @@ Namespace test_geopos
 
         End Sub
 
+
+        <Test>
+        Public Sub GeoKrakowWiki()
+            Dim oKrak As pkar.BasicGeopos = pkar.BasicGeopos.GetKrakowCenter
+            Dim link As Uri = oKrak.GeoWikiGetQueryUri("pl")
+
+            Assert.AreEqual(link.ToString, "https://pl.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord=50.06138|19.93833&gsradius=500&gslimit=10&format=json")
+        End Sub
+
+        <Test>
+        Public Async Sub TestLinkiNesebyr()
+
+            Dim oPos As New pkar.BasicGeopos(50.061648, 19.938005)
+
+            Dim listaPL = Await oPos.GeoWikiGetItemsAsync("pl")
+            Dim listaEn = Await oPos.GeoWikiGetItemsAsync("en")
+            Dim listaGb = Await oPos.GeoWikiGetItemsAsync("gb")
+            Dim listaBg = Await oPos.GeoWikiGetItemsAsync("bg")
+            Dim listaUa = Await oPos.GeoWikiGetItemsAsync("ua")
+
+
+
+        End Sub
+
     End Class
 
 End Namespace

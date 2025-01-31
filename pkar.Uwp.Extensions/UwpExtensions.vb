@@ -1,5 +1,7 @@
 ﻿
 Imports pkar.Localize
+Imports System.Windows.Markup
+
 'Imports System.Runtime.InteropServices.WindowsRuntime
 'Imports System.Net.Mime.MediaTypeNames
 
@@ -539,7 +541,7 @@ Partial Public Module extensions
     End Sub
 
     ''' <summary>
-    ''' Initialization of ProgressRing (center of Page) and ProgressBar (top of last Page.Grid.Row)
+    ''' Initialization of ProgressRing (center of Page) and ProgressBar (top of last Page.Grid.Row); uses existing uiPkAutoProgRing and uiPkAutoProgBar or creates own
     ''' </summary>
     ''' <param name="bRing">True if ProgressRing should be created</param>
     ''' <param name="bBar">True if ProgressBar should be created</param>
@@ -839,6 +841,7 @@ Partial Public Module extensions
         End If
 
         _mProgBar.Value = dValue
+        _mProgBar.ToolTip = _mProgBar.Value & "/" & _mProgBar.Maximum
 
     End Sub
 
@@ -878,6 +881,8 @@ Partial Public Module extensions
         Else
             _mProgBar.Value = dVal
         End If
+
+        _mProgBar.ToolTip = _mProgBar.Value & "/" & _mProgBar.Maximum
     End Sub
 
 
@@ -1255,6 +1260,38 @@ Partial Public Module extensions
     End Sub
 #End Region
 
+
+#Region "fonts"
+
+#If PK_WPF Then
+    <Extension>
+    Public Function SupportsUnicodeChar(ByVal czcionka As GlyphTypeface, codepoint As Integer) As Boolean
+        Dim dummy As UShort
+        Return czcionka.CharacterToGlyphMap.TryGetValue(codepoint, dummy)
+    End Function
+
+    <Extension>
+    Public Function SupportsUnicodeChar(ByVal czcionka As Typeface, codepoint As Integer) As Boolean
+        ' typeface: TImes New Roman Bold ...
+        Dim dummy As GlyphTypeface = Nothing
+        If Not czcionka.TryGetGlyphTypeface(dummy) Then Return False
+        Return dummy.SupportsUnicodeChar(codepoint)
+    End Function
+
+    <Extension>
+    Public Function SupportsUnicodeChar(ByVal rodzina As FontFamily, codepoint As Integer) As Boolean
+        ' family: Times New Roman
+        For Each czcionka As Typeface In rodzina.GetTypefaces
+            If czcionka.SupportsUnicodeChar(codepoint) Then Return True
+        Next
+        Return False
+
+    End Function
+
+
+#End If
+
+#End Region
 
 
 #End Region

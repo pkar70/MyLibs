@@ -296,6 +296,8 @@ namespace p
 
             vb14.LibInitClip(FromLibClipPut, FromLibClipPutHtml);
 
+            vb14.LangEnsureInit();
+
 #if PKAR_USEDATALOG
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             InitDatalogFolder(bUseOwnFolderIfNotSD);
@@ -1709,12 +1711,12 @@ return "";
 
         public static void SetLangText(this Windows.UI.Xaml.Controls.TextBlock uiElement, string stringId)
         {
-            uiElement.Text = vb14.GetLangString(stringId);
+            uiElement.Text = pkar.Localize.GetResManString(stringId);
         }
 
         public static void SetLangText(this Windows.UI.Xaml.Controls.Button uiElement, string stringId)
         {
-            uiElement.Content= vb14.GetLangString(stringId);
+            uiElement.Content= pkar.Localize.GetResManString(stringId);
         }
 
 
@@ -1769,7 +1771,7 @@ return "";
         }
 #endif
 
-#if PK_USE_GEO
+#if PK_USE_GEO || true
         public static Windows.Devices.Geolocation.BasicGeoposition ToWinGeopos(this pkar.BasicGeopos oPos)
         {
             var oPoint = new Windows.Devices.Geolocation.BasicGeoposition()

@@ -8,7 +8,6 @@ Imports Microsoft.Extensions.Configuration
 Imports pkar.DotNetExtensions
 Imports pkar
 
-
 'Imports Newtonsoft.Json
 'Imports Newtonsoft.Json.Linq
 ' Imports pkar.NetConfigs.Extensions
@@ -536,21 +535,23 @@ Partial Public Module pkarlibmodule14
         If sResID = "" Then Return ""
         LangEnsureInit()
 
-        Dim sRet As String
-#Disable Warning CA1304 ' Specify CultureInfo
-        Try
-            sRet = moResMan.GetString(sResID)
-        Catch ex As Exception
-            ' jakby co
-            ' bez dodania dla VBLib defLang - zdarza się zawsze w RELEASE (i dla PL i dla EN)
-            sRet = Nothing
-        End Try
+        Return pkar.Localize.GetResManString(sResID, sDefault)
 
-#Enable Warning CA1304 ' Specify CultureInfo
-        If Not String.IsNullOrEmpty(sRet) Then Return sRet
-        If sDefault Is Nothing Then Return Nothing
-        If sDefault <> "" Then Return sDefault
-        Return sResID
+        '        Dim sRet As String
+        '#Disable Warning CA1304 ' Specify CultureInfo
+        '        Try
+        '            sRet = moResMan.GetString(sResID)
+        '        Catch ex As Exception
+        '            ' jakby co
+        '            ' bez dodania dla VBLib defLang - zdarza się zawsze w RELEASE (i dla PL i dla EN)
+        '            sRet = Nothing
+        '        End Try
+
+        '#Enable Warning CA1304 ' Specify CultureInfo
+        '        If Not String.IsNullOrEmpty(sRet) Then Return sRet
+        '        If sDefault Is Nothing Then Return Nothing
+        '        If sDefault <> "" Then Return sDefault
+        '        Return sResID
     End Function
 
 

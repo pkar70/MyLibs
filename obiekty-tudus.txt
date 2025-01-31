@@ -1,0 +1,89 @@
+
+* zestaw obiektów .Net (np. ean inherits string)
+* zestaw kontrolek UI
+
+
+
+EAN:
+Verify
+GetCountry - tylko jak zwracaæ?
+GetLink
+GetProducerName
+
+
+https://www.gs1.org/services/verified-by-gs1/results?gtin=3574661286167
+https://www.gs1.org/services/verified-by-gs1/results?gtin=3574661286167#companyInformation
+https://www.gs1.org/services/verified-by-gs1/results?gtin=5901044003611#productInformation
+
+https://www.ean-search.org/?q=5901044003611 - z linkami do sklepu, ale dziwne, bo 
+Roleski Polnischer Senf Sarepska 175g 
+
+
+https://www.szukaj-ean.pl/EAN-5901044003611
+https://pl.product-search.net/?q=5901044003611
+https://www.eprodukty.gs1.pl/catalog/05901044003611
+https://www.barcodelookup.com/5901044003611 podaje sk³ad
+
+https://geolocation.onetrust.com/cookieconsentpub/v1/geo/location
+
+princepolo: 7622210309792   https://www.gs1.org/services/verified-by-gs1/results?gtin=7622210309792
+firma: Mondelez Schweiz GmbH
+GS1prefix: 7622210
+tylko tu jest prefix?
+wedle https://gs1.fi/en/services/gs1-company-prefix, GS1 prefix jest od 7 do 11 cyfr
+
+https://www.eprodukty.gs1.pl/catalog/07622210309792
+
+https://kodpocztowy.intami.pl/
+
+RegionInfo(String) - ISO 3166 two-letter code
+
+
+https://www.eprodukty.gs1.pl/catalog/05902795001352 podaje NIP, 6182045200
+
+https://wyszukiwarka-krs.ms.gov.pl/ -> NIP dane o firmie
+https://wyszukiwarkaregon.stat.gov.pl/appBIR/index.aspx -> NIP informacja o firmie
+https://api.stat.gov.pl/Home/RegonApi - publiczne, ale jako firma trzeba, z REGON/NIP/KRS
+nip.Verify
+nip....
+
+https://wyszukiwarka-krs.ms.gov.pl/dane-szczegolowe-podmiotu;numerKRS=3AdaJuW3%2BiHya0WyKREqCg%3D%3D;typ=P
+nie ma czyje to finansowo (jaki kapita³)
+
+.Net ze string (pesel inherits string), oraz editbox na to (maska, czerwony gdy sie nie zgadza na lostfocus), context menu rozszerzony o ró¿ne (np. uri), np. SetDymek(format)
+
+textbox.Wikilink (dla jedno wyrazowych), dla imion, nazwisk, miejscowoœci, i tak dalej
+
+https://romek.info/ut/modulo.html
+    Numer xPESEL
+    Numery xNIP i REGON
+    Numery ISBN, ISMN, ISSN, xEAN13, EAN8
+    Numery kolczyków IACS
+    Numery banków, kont i kart kredytowych
+
+
+
+Nugety-wrappery do:
+TERYT
+REGON
+
+
+3574661286167 AVEENO DLY MOIST HND CR 75 (JOHNSON&JOHNSON SANTE BEAUTE FRANCE)
+4056489717331 parobulki lidl
+5201301120847 ser feta biedronka
+5298004331069 ser wielomleczny
+7622210309792 princepolo
+9019100538536 kefir natural gobio 500g
+
+5900242000156 majonez kielecki spolem Majonez Kielecki 170 ml  (Wytwórcza Spó³dzielnia Pracy Spo³em), NIP 6570387884
+5900512500348 ser zolty swiatowid gouda Spó³dzielnia Mleczarska MLEKOVITA NIP 7220002329
+5900567012339 parowki krakus z szynki Animex Foods NIP 5272698951
+5900643050217 danone activia jogurt probiotyki DANONE Sp. z o.o. NIP 5270204471
+5900352015798 helena oranzada czerwona
+5900746002168 ser tylzycki topiony sertop SERTOP SP. Z O.O. NIP 6460323825
+5901005000512 ser zolty wloszczowa typu szwajcarskiego OSM W³oszczowa NIP 6560000033
+5901044003611 Roleski Polnischer Senf Sarepska 175g Roleski Spó³ka Jawna, NIP 8732595273
+5901696011903 profi rosol  z ryzem i kurczakiem PROFI SPÓ£KA AKCYJNA NIP 5252658055
+5902599000247 serek homo OSM Miechów
+5902795001352 ORAN¯ADA CZERWONA W PROSZ.(35X18G)0,63KG (firma Colian, NIP 6182045200)
+5907809285957 delikate twarog klinek POLMLEK RACI¥¯ Sp. z o.o. NIP 7821014202
