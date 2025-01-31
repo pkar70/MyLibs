@@ -1,0 +1,124 @@
+﻿<UserControl x:Class="AdresUI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:testyUIobiekty"
+             mc:Ignorable="d" 
+             d:DesignHeight="220" d:DesignWidth="310" Loaded="UserControl_Loaded">
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Top">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBox Name="uiShortAdres" HorizontalAlignment="Stretch" IsReadOnly="True"/>
+        <Button Content=" 🖉 " Grid.Column="1" ToolTip="Edit" Click="uiAdresEdit_Click" Margin="5,0,0,0" />
+
+        <Popup IsOpen="False" Name="uiAdresEditorFlyout" PlacementTarget="{Binding ElementName=uiShortAdres}" Height="240" Width="300" AllowsTransparency="True">
+
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <RadioButton Content="akt" IsChecked="True" GroupName="uiRadioAktualnosc" ToolTip="Adres jest wg stanu na dziś" Checked="uiRadioAktualnosc_Checked"/>
+                <RadioButton Content="hist" Name="uiRadioAktHist" GroupName="uiRadioAktualnosc" Margin="20,0,20,0" ToolTip="Adres jest dla podanej daty" Checked="uiRadioAktualnosc_Checked"/>
+                <DatePicker Name="uiAdresDated" Visibility="Collapsed" ToolTip="Wybierz datę adresu"/>
+            </StackPanel>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+
+                <TextBlock Text="Kod" />
+                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                    <TextBox Name="uiAdresZIP" Width="50" GotFocus="uiAdresZIP_GotFocus" LostFocus="uiAdresZIP_LostFocus" TextChanged="uiAdresZIP_TextChanged"/>
+                    <Button Content="🔎" ToolTip="Wyszukaj" Click="uiAdresZipResolve_Click" Name="uiAdresZipResolve" IsEnabled="False"/>
+                </StackPanel>
+
+                <TextBlock Text="Wojew" Grid.Row="1" Grid.Column="0" />
+                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
+                    <ComboBox Name="uiWojewCBox" Width="100"/>
+                    <Button Content="⚙" Click="uiAdresWojMenuOpen_Click" Name="uiAdresWojMenuOpen" IsEnabled="False" ToolTip="Statystyki z TERYT"/>
+                    <Popup IsOpen="False" Name="uiAdresWojMenuFlyout" PlacementTarget="{Binding ElementName=uiAdresWojMenuOpen}">
+                        <Menu Name="uiAdresWojMenu" >
+                            <Menu.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </Menu.ItemsPanel>
+                            <MenuItem Header="Stat jednostek" Click="uiAdresWojStatJedn_Click" />
+                            <MenuItem Header="Stat wsi" Click="uiAdresWojStatWsi_Click" />
+                        </Menu>
+                    </Popup>
+
+                </StackPanel>
+
+                <TextBlock Text="Powiat " Grid.Row="2" Grid.Column="0" />
+                <ComboBox Name="uiPowiatCBox" Width="100" Grid.Row="2" Grid.Column="1" IsEnabled="False" HorizontalAlignment="Left"/>
+
+                <TextBlock Text="Gmina" Grid.Row="3" Grid.Column="0" />
+                <ComboBox Name="uiGminaCBox" Width="100" Grid.Row="3" Grid.Column="1" IsEnabled="False" HorizontalAlignment="Left"/>
+
+                <TextBlock Text="Miejscowość " Grid.Row="4" Grid.Column="0" />
+                <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="1">
+                    <ComboBox Name="uiMiejscCBox" Width="100" HorizontalAlignment="Left" IsEditable="True"/>
+                    <Button Content="🔎" ToolTip="Spróbuj wyszukać miejscowość po nazwie" IsEnabled="True" Click="uiAdresMscSrch_Click" Name="uiAdresMscSrch"/>
+                    <Popup IsOpen="False" Name="uiAdresMscSrchFlyout" PlacementTarget="{Binding ElementName=uiAdresMscSrch}">
+                        <Menu Name="uiMscSrchMenu" >
+                            <Menu.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </Menu.ItemsPanel>
+                        </Menu>
+                    </Popup>
+                </StackPanel>
+
+                <TextBlock Text="Ulica" Grid.Row="5" Grid.Column="0" />
+                <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1">
+                    <ComboBox Name="uiUlicCBox" Width="100" HorizontalAlignment="Left" IsEditable="True"/>
+                    <Button Content="🔎" ToolTip="Spróbuj wyszukać miejscowość po nazwie (woj, pow, gmina, msc jako prefix)" IsEnabled="True" Click="uiAdresUlicSrch_Click" Name="uiAdresUlicSrch"/>
+                    <Popup IsOpen="False" Name="uiUlicSrchFlyout" PlacementTarget="{Binding ElementName=uiAdresUlicSrch}">
+                        <Menu Name="uiUlicSrchMenu" >
+                            <Menu.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </Menu.ItemsPanel>
+                        </Menu>
+                    </Popup>
+                </StackPanel>
+                <TextBlock Text="Numer/lokal " Grid.Row="6" Grid.Column="0" />
+
+                    <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal">
+                        <TextBox Name="uiAdresDom" Width="50" HorizontalAlignment="Left"/>
+                        <TextBlock Text=" / "/>
+                        <TextBox Name="uiAdresLokal" Width="50" HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                    <TextBlock Text="Info dod " Grid.Row="7" />
+                    <TextBox Name="uiAdresInfoDod" Width="100" HorizontalAlignment="Left" Grid.Row="7" Grid.Column="1"/>
+                </Grid>
+
+            <Button Margin="10,20,10,10" Content=" OK " HorizontalAlignment="Center" Click="uiAdresEditOk_Click"/>
+
+        </StackPanel>
+    </Popup>
+    </Grid>
+</UserControl>

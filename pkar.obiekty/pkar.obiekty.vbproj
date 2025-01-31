@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>pkar.obiekty</RootNamespace>
+    <TargetFramework>netstandard1.4</TargetFramework>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>Piotr Karocki</Authors>
+    <Version>1.0.2</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="pkar.DotNetExts" Version="1.2.7" />
+    <PackageReference Include="pkar.StructList" Version="1.8.2" />
+  </ItemGroup>
+
+</Project>

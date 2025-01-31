@@ -1,0 +1,172 @@
+﻿<Window x:Class="MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:testyUIobiekty"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
+    <Grid Margin="5,5,5,5">
+        <Grid.RowDefinitions>
+            <RowDefinition  Height="Auto" />
+            <RowDefinition  />
+        </Grid.RowDefinitions>
+        <TextBlock Text="testowanie obiektów" HorizontalAlignment="Center" FontSize="18" />
+        <TabControl Grid.Row="1" VerticalAlignment="Stretch"  >
+
+            <TabItem Header="PESEL" VerticalAlignment="Stretch" >
+
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="numer" HorizontalAlignment="Center" Grid.Column="1" />
+                    <TextBox Name="uiPesel1" Width="80" HorizontalAlignment="Center" TextChanged="uiPesel1_TextChanged"/>
+                    <TextBox Name="uiPesel2" Width="80" HorizontalAlignment="Center" Grid.Column="2" TextChanged="uiPesel1_TextChanged"/>
+
+                    <TextBlock Text="valid" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="1"/>
+                    <CheckBox Name="uiPesel1valid" HorizontalAlignment="Center" Grid.Row="1"/>
+                    <CheckBox Name="uiPesel2valid" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="2" />
+
+                    <TextBlock Text="data" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="2" />
+                    <TextBlock Name="uiPesel1data" Width="80" HorizontalAlignment="Center" Grid.Row="2" />
+                    <TextBlock Name="uiPesel2data" Width="80" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="2" />
+
+                    <TextBlock Text="ismale" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="3"/>
+                    <CheckBox Name="uiPesel1male" HorizontalAlignment="Center" Grid.Row="3"/>
+                    <CheckBox Name="uiPesel2male" HorizontalAlignment="Center" Grid.Row="3" Grid.Column="2" />
+
+                    <TextBlock Text="sexicon" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="4" />
+                    <TextBlock Name="uiPesel1sex" Width="80" HorizontalAlignment="Center" Grid.Row="4" />
+                    <TextBlock Name="uiPesel2sex" Width="80" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="4" />
+
+                    <TextBlock Text="age" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="5" />
+                    <TextBlock Name="uiPesel1age" Width="80" HorizontalAlignment="Center" Grid.Row="5" />
+                    <TextBlock Name="uiPesel2age" Width="80" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="5" />
+
+                    <TextBlock Text="isadult" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="6"/>
+                    <CheckBox Name="uiPesel1adult" HorizontalAlignment="Center" Grid.Row="6"/>
+                    <CheckBox Name="uiPesel2adult" HorizontalAlignment="Center" Grid.Row="6" Grid.Column="2" />
+
+                    <TextBlock Text="samesex" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="7"/>
+                    <CheckBox Name="uiPesel1samesex" HorizontalAlignment="Center" Grid.Row="7"/>
+                    <CheckBox Name="uiPesel2samesex" HorizontalAlignment="Center" Grid.Row="7" Grid.Column="2" />
+
+                    <TextBlock Text="sameday" HorizontalAlignment="Center" Grid.Column="1" Grid.Row="8"/>
+                    <CheckBox Name="uiPesel1sameday" HorizontalAlignment="Center" Grid.Row="8"/>
+                    <CheckBox Name="uiPesel2sameday" HorizontalAlignment="Center" Grid.Row="8" Grid.Column="2" />
+
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Zip">
+                <StackPanel>
+                    <TextBlock Text="Wpisz kod pocztowy (38-223 ma kilka msc)" />
+                    <TextBox Width="150" HorizontalAlignment="Left" Name="uiZipCode" />
+                    <Button Content="try resolve!" HorizontalAlignment="Left" Click="uiZip_Click"/>
+                    <TextBlock Name="uiZipCodeResolved" />
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="EAN">
+                <StackPanel>
+                    <TextBlock Text="Wpisz EAN" />
+                    <TextBox Width="100" Name="uiEAN" TextChanged="uiEAN_TextChanged" HorizontalAlignment="Left"/>
+                    <CheckBox Content="IsValid" Name="uiEANvalid" />
+                    <StackPanel Orientation="Horizontal" >
+                        <TextBlock Text="Kraj: " />
+                        <TextBox Name="uiEANkraj" />
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="NIP">
+                <StackPanel>
+                    <TextBlock Text="Wpisz NIP" />
+                    <TextBox Width="100" Name="uiNIP" HorizontalAlignment="Left"/>
+                    <CheckBox Content="IsValid" Name="uiNIPvalid" />
+                    <StackPanel Orientation="Horizontal" >
+                        <TextBlock Text="UrzSkarb: " />
+                        <TextBox Name="uiNIPkraj" />
+                    </StackPanel>
+                    <StackPanel Name="uiLinkList" >
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="Teryt" >
+                <StackPanel>
+                    <Button Content="Try" Click="uiTerytTry_Click" HorizontalAlignment="Left"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="TERC" Grid.Row="0" />
+                        <TextBlock Text="NTS" Grid.Row="1" />
+                        <TextBlock Text="SIMC" Grid.Row="2" />
+                        <TextBlock Text="ULIC" Grid.Row="3" />
+
+                        <TextBox Name="uiTerytTERC" Grid.Row="0" Grid.Column="1" Width="100" HorizontalAlignment="Left"/>
+                        <TextBox Name="uiTerytNTS" Grid.Row="1"  Grid.Column="1" Width="100" HorizontalAlignment="Left"/>
+                        <TextBox Name="uiTerytSIMC" Grid.Row="2"  Grid.Column="1" Width="100" HorizontalAlignment="Left"/>
+                        <TextBox Name="uiTerytULIC" Grid.Row="3"  Grid.Column="1" Width="100" HorizontalAlignment="Left"/>
+                    </Grid>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="AdresPL">
+                <StackPanel>
+                <local:AdresUI HorizontalAlignment="Left"/>
+                </StackPanel>
+            </TabItem>
+
+            <TabItem Header="KRS">
+                <StackPanel>
+                    <TextBlock Text="Podaj jedno z:" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="KRS " />
+                        <TextBox Name="uiKrsKrs" Width="100" InputScope="Digits" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="NIP " />
+                        <TextBox Name="uiKrsNip" Width="100" InputScope="Digits" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="REGON " />
+                        <TextBox Name="uiKrsRegon" Width="100" InputScope="Digits" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <Button Content="Resolve" HorizontalAlignment="Left" Click="uiKrsResolve_Click" />
+
+                    <TextBlock Name="uiKrsFirmaName" FontWeight="Bold" />
+                    <TextBlock Name="uiKrsFirmaAdres" />
+                    <TextBlock Name="uiKrsFirmaForma" />
+                    <TextBlock Name="uiKrsFirmaPKDmain" />
+                    <TextBlock Name="uiKrsFirmaPKDsecond" />
+                    <Button Content="JSONclip" HorizontalAlignment="Left" Click="uiKrsSendToClip_Click" />
+
+                </StackPanel>
+            </TabItem>
+        
+        </TabControl>
+    </Grid>
+</Window>
