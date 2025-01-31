@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>pkar.UWP.OneDriveSync</id>
+    <version>1.1.0</version>
+    <authors>pkar</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">GPL-3.0-or-later</license>
+    <projectUrl>https://github.com/pkar70/MyLibs/pkar.UWP.OneDriveSync/</projectUrl>
+    <description>OneDrive macros for UWP</description>
+    <releaseNotes>Changed namespace from pkar.Uwp to pkar.UI</releaseNotes>
+    <copyright>Piotr Karocki</copyright>
+    <tags>Extension Configuration ApplicationData</tags>
+	<readme>docs\README.md</readme>
+
+    <dependencies>
+      <group targetFramework="UAP10.0">
+<dependency id="Microsoft.OneDriveSDK" version="2.0.7"/>
+<dependency id="Microsoft.OneDriveSDK.Authentication" version="1.0.10"/>
+<dependency id="pkar.NetConfigs" version="1.0.3"/>
+      </group>
+    </dependencies>
+
+
+  </metadata>
+
+    <files>
+        <!-- WinMd and IntelliSense files -->
+      <file src="bin\Release\pkar.UWP.winmd" target="lib\uap10.0"/>
+      <file src="bin\Release\pkar.UWP.xml" target="lib\uap10.0"/>
+
+ <file src="README.md" target="docs\" />
+
+ <!-- WINMDs and resources -->
+      <file src="bin\ARM\Release\pkar.UWP.winmd" target="runtimes\win10-arm"/>
+      <file src="bin\ARM\Release\pkar.UWP.pri" target="runtimes\win10-arm"/>
+
+      <file src="bin\x64\Release\pkar.UWP.winmd" target="runtimes\win10-x64"/>
+      <file src="bin\x64\Release\pkar.UWP.pri" target="runtimes\win10-x64"/>
+
+      <file src="bin\x86\Release\pkar.UWP.winmd" target="runtimes\win10-x86"/>
+      <file src="bin\x86\Release\pkar.UWP.pri" target="runtimes\win10-x86"/>
+
+    </files>
+
+
+
+</package>
